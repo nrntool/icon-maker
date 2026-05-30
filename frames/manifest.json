@@ -1,0 +1,12 @@
+[
+  {
+    "name": "green_blue_circle",
+    "path": "frames/green_blue_circle.png",
+    "label": "Green Blue Circle"
+  },
+  {
+    "name": "pink_purple_circle",
+    "path": "frames/pink_purple_circle.png",
+    "label": "Pink Purple Circle"
+  }
+]
