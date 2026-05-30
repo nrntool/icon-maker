@@ -1,0 +1,34 @@
+name: Generate manifest.json
+
+on:
+  push:
+    paths:
+      - "frames/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate manifest.json
+        run: |
+          echo "[" > frames/manifest.json
+          for file in frames/*; do
+            if [[ -f "$file" ]]; then
+              name=$(basename "$file")
+              echo "  \"$name\"," >> frames/manifest.json
+            fi
+          done
+          sed -i '$ s/,$//' frames/manifest.json
+          echo "]" >> frames/manifest.json
+
+      - name: Commit manifest.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add frames/manifest.json
+          git commit -m "Auto-update manifest.json" || echo "No changes to commit"
+          git push
