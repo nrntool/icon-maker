@@ -6,6 +6,12 @@ const ctx = canvas.getContext("2d");
 let baseImage = null;
 let frameImage = null;
 
+// ★ 表示サイズ（CSSで縮小された後のサイズ）を取得
+function getCanvasDisplaySize() {
+  const rect = canvas.getBoundingClientRect();
+  return { w: rect.width, h: rect.width }; // 正方形に固定
+}
+
 // フレーム一覧を読み込む
 fetch("frames/manifest.json")
   .then(res => res.json())
@@ -39,40 +45,35 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = frameSelect.value;
 });
 
-// 描画（順番自由・フレーム先でも崩れない）
+// ★ スマホ最適化：内部描画サイズを表示サイズに合わせる
 function draw() {
-  // 写真あり → 写真サイズに合わせる
+  const { w, h } = getCanvasDisplaySize();
+
+  // 内部サイズを表示サイズに合わせる
+  canvas.width = w;
+  canvas.height = h;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // 写真がある場合 → フィット
   if (baseImage) {
-    canvas.width = baseImage.width;
-    canvas.height = baseImage.height;
-    ctx.drawImage(baseImage, 0, 0);
-  }
-  // 写真なし → フレームだけ表示（固定サイズ）
-  else if (frameImage && frameImage.complete) {
-    canvas.width = 600;   // ★ 固定サイズ
-    canvas.height = 600;  // ★ 固定サイズ
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  } else {
-    return;
+    const scale = Math.min(w / baseImage.width, h / baseImage.height);
+    const bw = baseImage.width * scale;
+    const bh = baseImage.height * scale;
+    const bx = (w - bw) / 2;
+    const by = (h - bh) / 2;
+    ctx.drawImage(baseImage, bx, by, bw, bh);
   }
 
-  // フレームが読み込まれていない場合は終了
-  if (!frameImage || !frameImage.complete) return;
-
-  const fw = frameImage.naturalWidth;
-  const fh = frameImage.naturalHeight;
-
-  // 写真あり → 写真にフィット  
-  // 写真なし → 600×600 にフィット
-  let scale = Math.min(canvas.width / fw, canvas.height / fh);
-
-  const drawW = fw * scale;
-  const drawH = fh * scale;
-
-  const dx = (canvas.width - drawW) / 2;
-  const dy = (canvas.height - drawH) / 2;
-
-  ctx.drawImage(frameImage, dx, dy, drawW, drawH);
+  // フレームがある場合 → フィット
+  if (frameImage && frameImage.complete) {
+    const scale = Math.min(w / frameImage.naturalWidth, h / frameImage.naturalHeight);
+    const fw = frameImage.naturalWidth * scale;
+    const fh = frameImage.naturalHeight * scale;
+    const fx = (w - fw) / 2;
+    const fy = (h - fh) / 2;
+    ctx.drawImage(frameImage, fx, fy, fw, fh);
+  }
 }
 
 // 保存
@@ -91,7 +92,8 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   imageInput.value = "";
   frameSelect.value = "";
 
-  canvas.width = 600;
-  canvas.height = 600;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const { w, h } = getCanvasDisplaySize();
+  canvas.width = w;
+  canvas.height = h;
+  ctx.clearRect(0, 0, w, h);
 });
