@@ -8,7 +8,6 @@ let frameImage = null;
 
 /* -----------------------------------------
    ★ フレーム一覧（ここに PNG を追加するだけ）
-   Actions も manifest.json も不要
 ----------------------------------------- */
 const frameFiles = [
   "01_yoyaku_battle.png",
@@ -20,9 +19,9 @@ const frameFiles = [
 ----------------------------------------- */
 function makeLabelFromFilename(filename) {
   return filename
-    .replace(/^\d+_?/, "")     // 先頭の数字やアンダーバーを削除
-    .replace(/\.[^/.]+$/, "")  // 拡張子削除
-    .replace(/_/g, " ");       // アンダーバーをスペースに
+    .replace(/^\d+_?/, "")
+    .replace(/\.[^/.]+$/, "")
+    .replace(/_/g, " ");
 }
 
 /* -----------------------------------------
