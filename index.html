@@ -8,14 +8,19 @@
 </head>
 <body>
 
-  <h1>Frame Maker</h1>
+  <h2>Frame Maker</h2>
 
+  <!-- 画像選択 -->
   <input type="file" id="imageInput" accept="image/*">
+
+  <!-- フレーム選択（※ここが重要：中身は空） -->
   <select id="frameSelect"></select>
 
+  <!-- キャンバス -->
   <canvas id="canvas"></canvas>
 
-  <button id="saveBtn">画像を保存</button>
+  <!-- 保存ボタン -->
+  <button id="saveBtn">保存</button>
 
   <script src="script.js"></script>
 </body>
