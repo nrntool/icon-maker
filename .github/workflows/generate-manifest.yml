@@ -26,7 +26,7 @@ jobs:
           sed -i '$ s/,$//' frames/manifest.json
           echo "]" >> frames/manifest.json
 
-      - name: Upload manifest.json as artifact
+      - name: Upload manifest.json
         uses: actions/upload-artifact@v4
         with:
           name: manifest
