@@ -5,23 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FrameLab</title>
   <link rel="stylesheet" href="style.css">
-</head>
-<body>
 
-  <h1>FrameLab</h1>
+  <style>
+    body {
+      font-family: "Helvetica Neue", "Segoe UI", sans-serif;
+      background: #f5f5f7;
+      margin: 0;
+      padding: 0;
+    }
 
-  <div class="menu">
-    <a href="index.html" class="btn">フレーム作成へ</a>
-  </div>
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
 
-  <div class="notes">
-    <h2>注意事項</h2>
-    <div class="card">
-      <p>・画像はサーバーに保存されません</p>
-      <p>・ブラウザ内だけで処理されます</p>
-      <p>・URLを知っている人だけが利用できます</p>
-    </div>
-  </div>
+    /* ロゴタイトル */
+    .logo-title {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      margin-bottom: 22px;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 6px;
+      color: #111;
+    }
 
-</body>
-</html>
+    .logo-title::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 60%;
+      height
