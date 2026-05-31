@@ -39,16 +39,13 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = frameSelect.value;
 });
 
-// 描画（写真なしでもフレームだけ表示）
+// 描画
 function draw() {
-  // 写真あり → 写真サイズに合わせる
   if (baseImage) {
     canvas.width = baseImage.width;
     canvas.height = baseImage.height;
     ctx.drawImage(baseImage, 0, 0);
-  }
-  // 写真なし → フレームだけ表示
-  else if (frameImage && frameImage.complete) {
+  } else if (frameImage && frameImage.complete) {
     canvas.width = frameImage.naturalWidth;
     canvas.height = frameImage.naturalHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -56,7 +53,6 @@ function draw() {
     return;
   }
 
-  // フレームが読み込まれていない場合は終了
   if (!frameImage || !frameImage.complete) return;
 
   const fw = frameImage.naturalWidth;
@@ -84,7 +80,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   link.click();
 });
 
-// ★ リセット機能
+// ★ リセット
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
