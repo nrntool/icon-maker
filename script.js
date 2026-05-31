@@ -18,13 +18,22 @@ fetch("frames/manifest.json")
     });
   });
 
-// 画像読み込み
+// 写真読み込み
 imageInput.addEventListener("change", e => {
   const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = () => {
     baseImage = new Image();
-    baseImage.onload = () => draw();
+    baseImage.onload = () => {
+      draw();
+
+      // すでにフレームが選ばれていたら再読み込み
+      if (frameSelect.value) {
+        frameImage = new Image();
+        frameImage.onload = () => draw();
+        frameImage.src = frameSelect.value;
+      }
+    };
     baseImage.src = reader.result;
   };
   reader.readAsDataURL(file);
@@ -43,27 +52,21 @@ frameSelect.addEventListener("change", () => {
 function draw() {
   if (!baseImage) return;
 
-  // キャンバスを写真サイズに合わせる
   canvas.width = baseImage.width;
   canvas.height = baseImage.height;
 
-  // 写真を描画
   ctx.drawImage(baseImage, 0, 0);
 
-  // フレームが読み込まれていない場合は終了
-  if (!frameImage || !frameImage.complete) return;
+  if (!frameImage || !frameImage.complete || frameImage.naturalWidth === 0) return;
 
-  // フレームの元サイズ
-  const fw = frameImage.width;
-  const fh = frameImage.height;
+  const fw = frameImage.naturalWidth;
+  const fh = frameImage.naturalHeight;
 
-  // 写真の短辺に合わせてスケール
   const scale = Math.min(canvas.width / fw, canvas.height / fh);
 
   const drawW = fw * scale;
   const drawH = fh * scale;
 
-  // 中央に配置
   const dx = (canvas.width - drawW) / 2;
   const dy = (canvas.height - drawH) / 2;
 
