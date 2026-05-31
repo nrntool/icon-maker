@@ -85,3 +85,51 @@ button {
 button:hover {
   background-color: #e0e0e0;
 }
+
+/* ===========================
+   スマホ最適化
+=========================== */
+@media (max-width: 600px) {
+  body {
+    padding: 1.2em;
+  }
+
+  h1 {
+    font-size: 1.6em;
+  }
+
+  .note {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1em;
+    margin: 1em 0;
+  }
+
+  .control {
+    margin: 1em 0;
+  }
+
+  input[type="file"],
+  select {
+    width: 100%;
+    font-size: 0.95em;
+  }
+
+  canvas {
+    width: 100%;
+    height: auto;
+    margin: 1em 0;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  button {
+    width: 90%;
+    margin: 0.4em 0;
+    font-size: 1em;
+  }
+}
