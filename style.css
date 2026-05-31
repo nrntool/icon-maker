@@ -1,47 +1,79 @@
-/* -----------------------------------------
-   ページ全体（キャンバス外）
-   → スクロールOK
-   → ピンチズーム禁止
-   → ダブルタップズーム禁止
------------------------------------------ */
-html, body {
-  touch-action: pan-y;   /* 上下スクロールのみ許可 */
-  overflow: auto;        /* ページスクロールOK */
+/* 全体レイアウト */
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  -webkit-user-select: none;
-  user-select: none;
+  background: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* -----------------------------------------
-   キャンバス
-   → ブラウザ標準操作をすべて無効化
-   → JS のピンチズーム・ドラッグ・慣性だけ動く
------------------------------------------ */
-canvas {
-  touch-action: none;    /* ピンチ・ダブルタップズーム・スクロールすべて無効 */
-  display: block;
-  width: 100%;
-  max-width: 500px;      /* 必要に応じて調整 */
-  margin: 0 auto;
-}
-
-/* -----------------------------------------
-   UI（ボタンなど）
------------------------------------------ */
-button, select, input {
-  font-size: 16px;
-  padding: 8px 12px;
-  margin: 8px 0;
-}
-
-/* -----------------------------------------
-   レイアウト調整（任意）
------------------------------------------ */
 .container {
-  width: 100%;
-  max-width: 600px;
+  max-width: 480px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px;
+}
+
+/* 見出し */
+h1 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+/* セクション */
+.section {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+/* 入力系 */
+input[type="file"],
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+/* キャンバス */
+.canvas-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ボタン */
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 12px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #007aff;
+  color: white;
+  font-weight: bold;
+}
+
+button#resetBtn {
+  background: #888;
 }
