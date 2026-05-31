@@ -60,16 +60,23 @@ imageInput.addEventListener("change", e => {
     baseImage.onload = () => {
       const { w, h } = getCanvasDisplaySize();
 
-      // 初期位置
-      imgX = 0;
-      imgY = 0;
-
-      // 初期スケール（フレーム内側にフィット）
+      // フレーム内側のサイズ
       const innerScale = 0.80;
       const innerW = w * innerScale;
       const innerH = h * innerScale;
+      const innerX = (w - innerW) / 2;
+      const innerY = (h - innerH) / 2;
+
+      // 初期スケール（フレーム内側にフィット）
       const scaleFit = Math.min(innerW / baseImage.width, innerH / baseImage.height);
       imgScale = scaleFit;
+
+      // ★ 初期位置をフレーム内側中心に合わせる
+      const centerX = innerX + innerW / 2;
+      const centerY = innerY + innerH / 2;
+
+      imgX = centerX - (baseImage.width * imgScale) / 2;
+      imgY = centerY - (baseImage.height * imgScale) / 2;
 
       draw();
     };
