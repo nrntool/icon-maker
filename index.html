@@ -1,49 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>Frame Maker</title>
-<style>
-  body {
-    text-align: center;
-    font-family: sans-serif;
-  }
-  #canvas {
-    border: 1px solid #ccc;
-    display: block;
-    margin: 20px auto;
-
-    /* ★ スマホ最適化 */
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-  }
-  .controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アイコンメーカー</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <div class="container">
 
-<h1>Frame Maker</h1>
+    <h1>アイコンメーカー</h1>
 
-<canvas id="canvas" width="600" height="600"></canvas>
+    <!-- 画像アップロード -->
+    <div class="section">
+      <label for="imageInput">画像を選択</label>
+      <input type="file" id="imageInput" accept="image/*" />
+    </div>
 
-<div class="controls">
-  <input type="file" id="imageInput" accept="image/*">
+    <!-- フレーム選択 -->
+    <div class="section">
+      <label for="frameSelect">フレームを選択</label>
+      <select id="frameSelect">
+        <option value="">選択してください</option>
+      </select>
+    </div>
 
-  <select id="frameSelect">
-    <option value="">フレームを選択</option>
-  </select>
+    <!-- キャンバス -->
+    <div class="canvas-wrapper">
+      <canvas id="canvas"></canvas>
+    </div>
 
-  <button id="saveBtn">保存</button>
-  <button id="resetBtn">リセット</button>
-</div>
+    <!-- ボタン -->
+    <div class="buttons">
+      <button id="saveBtn">保存</button>
+      <button id="resetBtn">リセット</button>
+    </div>
 
-<script src="script.js"></script>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
