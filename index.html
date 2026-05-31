@@ -21,6 +21,7 @@
       text-align: center;
     }
 
+    /* ロゴタイトル */
     .logo-title {
       font-size: 32px;
       font-weight: 700;
@@ -44,6 +45,7 @@
       border-radius: 2px;
     }
 
+    /* 注意事項カード（アプリ風・行間詰め） */
     .notes {
       margin-top: 30px;
       text-align: center;
@@ -66,11 +68,12 @@
         0 4px 12px rgba(0,0,0,0.08),
         0 1px 3px rgba(0,0,0,0.04);
       font-size: 15px;
-      line-height: 1.7;
+      line-height: 1.45;   /* ← ★ 行間を詰めた最適値 */
       color: #444;
       text-align: left;
     }
 
+    /* 入力系 */
     .section {
       margin-top: 28px;
       text-align: left;
@@ -90,6 +93,7 @@
       background: white;
     }
 
+    /* キャンバス */
     .canvas-wrapper {
       margin-top: 20px;
       background: white;
@@ -98,6 +102,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
+    /* ボタン */
     .buttons button {
       width: 100%;
       padding: 14px;
@@ -126,7 +131,6 @@
 
     <h1 class="logo-title">FrameLab</h1>
 
-    <!-- ★ ここを変更済み ★ -->
     <p>画像にフレームを合成して、アイコンを作成できます。</p>
 
     <div class="notes">
