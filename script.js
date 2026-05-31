@@ -14,8 +14,8 @@ let frameImage = null;
 // ===============================
 const frames = [
   { label: "予約フレーム", file: "01_yoyaku.png" }
-  // 将来追加するならここに書くだけ
-  // { label: "新フレーム", file: "02_new.png" }
+  // 例：将来追加する場合
+  // { label: "桜フレーム", file: "02_sakura.png" }
 ];
 
 function initFrameList() {
