@@ -24,16 +24,7 @@ imageInput.addEventListener("change", e => {
   const reader = new FileReader();
   reader.onload = () => {
     baseImage = new Image();
-    baseImage.onload = () => {
-      draw();
-
-      // すでにフレームが選ばれていたら再読み込み
-      if (frameSelect.value) {
-        frameImage = new Image();
-        frameImage.onload = () => draw();
-        frameImage.src = frameSelect.value;
-      }
-    };
+    baseImage.onload = () => draw();
     baseImage.src = reader.result;
   };
   reader.readAsDataURL(file);
@@ -48,9 +39,9 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = frameSelect.value;
 });
 
-// 描画（写真なしでもフレームだけ表示できる）
+// 描画（写真なしでもフレームだけ表示）
 function draw() {
-  // 写真がある場合 → 写真サイズに合わせる
+  // 写真あり → 写真サイズに合わせる
   if (baseImage) {
     canvas.width = baseImage.width;
     canvas.height = baseImage.height;
@@ -66,12 +57,11 @@ function draw() {
   }
 
   // フレームが読み込まれていない場合は終了
-  if (!frameImage || !frameImage.complete || frameImage.naturalWidth === 0) return;
+  if (!frameImage || !frameImage.complete) return;
 
   const fw = frameImage.naturalWidth;
   const fh = frameImage.naturalHeight;
 
-  // 写真がある場合はフィット、ない場合は等倍
   let scale = 1;
   if (baseImage) {
     scale = Math.min(canvas.width / fw, canvas.height / fh);
