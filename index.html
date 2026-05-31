@@ -1,14 +1,33 @@
-<div style="text-align:center;">
-  <h1>Frame Maker</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Frame Maker</title>
+<style>
+  body {
+    text-align: center;
+    font-family: sans-serif;
+  }
+  #canvas {
+    border: 1px solid #ccc;
+    display: block;
+    margin: 20px auto;
+  }
+</style>
+</head>
+<body>
 
-  <!-- ★ canvas を常に表示し、初期サイズを持たせるのが超重要 -->
-  <canvas id="canvas" width="600" height="600" style="border:1px solid #ccc;"></canvas>
+<h1>Frame Maker</h1>
 
-  <div style="margin-top:20px;">
-    <input type="file" id="imageInput" accept="image/*">
-    <select id="frameSelect"></select>
-    <button id="saveBtn">保存</button>
-  </div>
+<!-- ★ 初期サイズを必ず持たせる（これがないと絶対に表示されない） -->
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<div>
+  <input type="file" id="imageInput" accept="image/*">
+  <select id="frameSelect"></select>
+  <button id="saveBtn">保存</button>
 </div>
 
 <script src="script.js"></script>
+</body>
+</html>
