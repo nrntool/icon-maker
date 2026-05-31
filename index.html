@@ -13,12 +13,12 @@
     display: block;
     margin: 20px auto;
   }
-  /* ★ ボタンが横並びで見えるように */
   .controls {
     display: flex;
     justify-content: center;
     gap: 10px;
     margin-top: 10px;
+    flex-wrap: wrap;
   }
 </style>
 </head>
@@ -36,8 +36,6 @@
   </select>
 
   <button id="saveBtn">保存</button>
-
-  <!-- ★ これがリセットボタン（確実に表示される） -->
   <button id="resetBtn">リセット</button>
 </div>
 
