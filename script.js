@@ -153,6 +153,11 @@ canvas.addEventListener("touchstart", e => {
   }
 });
 
+/* -----------------------------------------
+   ピンチズーム（スマホ）
+----------------------------------------- */
+let lastDist = null;
+
 canvas.addEventListener("touchmove", e => {
   if (e.touches.length === 1 && isDragging) {
     const t = e.touches[0];
@@ -160,41 +165,62 @@ canvas.addEventListener("touchmove", e => {
     imgY = t.clientY - startY;
     draw();
   }
-});
 
-canvas.addEventListener("touchend", () => isDragging = false);
+  if (e.touches.length === 2) {
+    e.preventDefault();
+
+    const [t1, t2] = e.touches;
+
+    // ピンチ距離
+    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+
+    // ピンチ中心（画面座標）
+    const cx = (t1.clientX + t2.clientX) / 2;
+    const cy = (t1.clientY + t2.clientY) / 2;
+
+    if (lastDist !== null) {
+      const delta = (dist - lastDist) * 0.005;
+
+      const oldScale = imgScale;
+      imgScale = Math.max(0.1, imgScale + delta);
+
+      // ★ ピンチ中心を基準にズーム補正
+      const scaleRatio = imgScale / oldScale;
+      imgX = cx - (cx - imgX) * scaleRatio;
+      imgY = cy - (cy - imgY) * scaleRatio;
+
+      draw();
+    }
+
+    lastDist = dist;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => {
+  isDragging = false;
+  lastDist = null;
+});
 
 /* -----------------------------------------
    拡大縮小（PCホイール）
 ----------------------------------------- */
 canvas.addEventListener("wheel", e => {
   e.preventDefault();
+
+  const rect = canvas.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+
+  const oldScale = imgScale;
   const delta = e.deltaY > 0 ? -0.05 : 0.05;
   imgScale = Math.max(0.1, imgScale + delta);
+
+  // ★ ホイールでも中心ズーム
+  const scaleRatio = imgScale / oldScale;
+  imgX = cx - (cx - imgX) * scaleRatio;
+  imgY = cy - (cy - imgY) * scaleRatio;
+
   draw();
-});
-
-/* -----------------------------------------
-   ピンチ拡大縮小（スマホ）
------------------------------------------ */
-let lastDist = null;
-
-canvas.addEventListener("touchmove", e => {
-  if (e.touches.length === 2) {
-    const [t1, t2] = e.touches;
-    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-
-    if (lastDist !== null) {
-      const delta = (dist - lastDist) * 0.005;
-      imgScale = Math.max(0.1, imgScale + delta);
-      draw();
-    }
-    lastDist = dist;
-  }
-});
-
-canvas.addEventListener("touchend", () => {
-  lastDist = null;
 });
 
 /* -----------------------------------------
