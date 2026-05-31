@@ -39,9 +39,9 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = frameSelect.value;
 });
 
-// 描画（写真なしでもフレームだけ表示）
+// ★ 写真なしでもフレームだけ描画できる draw()
 function draw() {
-  // 写真あり → 写真サイズに合わせる
+  // 写真がある場合 → 写真サイズに合わせる
   if (baseImage) {
     canvas.width = baseImage.width;
     canvas.height = baseImage.height;
