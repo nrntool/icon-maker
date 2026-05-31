@@ -1,177 +1,203 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FrameLab</title>
-  <link rel="stylesheet" href="style.css" />
+// ===============================
+// 画像・フレーム管理
+// ===============================
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-  <style>
-    body {
-      font-family: "Helvetica Neue", "Segoe UI", sans-serif;
-      background: #f5f5f7;
-      margin: 0;
-      padding: 0;
+// スマホ画面のピンチズームを無効化
+canvas.style.touchAction = "none";
+
+let baseImage = null;
+let frameImage = null;
+
+// キャンバス初期サイズ
+canvas.width = 600;
+canvas.height = 600;
+
+// ===============================
+// 画像の変形状態（移動・拡大縮小）
+// ===============================
+let imgScale = 1;
+let imgOffsetX = 0;
+let imgOffsetY = 0;
+
+let isDragging = false;
+let lastX = 0;
+let lastY = 0;
+
+let lastDist = 0; // ピンチ距離
+
+// ===============================
+// 画像読み込み（自動フィット付き）
+// ===============================
+document.getElementById("imageInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    baseImage = new Image();
+    baseImage.onload = () => {
+      autoFitImage();
+      draw();
+    };
+    baseImage.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// ===============================
+// 自動フィット処理
+// ===============================
+function autoFitImage() {
+  if (!baseImage) return;
+
+  const imgW = baseImage.width;
+  const imgH = baseImage.height;
+  const canvasW = canvas.width;
+  const canvasH = canvas.height;
+
+  const scaleW = canvasW / imgW;
+  const scaleH = canvasH / imgH;
+  imgScale = Math.min(scaleW, scaleH);
+
+  imgOffsetX = (canvasW - imgW * imgScale) / 2;
+  imgOffsetY = (canvasH - imgH * imgScale) / 2;
+}
+
+// ===============================
+// フレーム読み込み（絶対パス版）
+// ===============================
+const frameSelect = document.getElementById("frameSelect");
+
+// ★ GitHub Pages の絶対パスを使用（確実に表示される）
+const frameFiles = [
+  "https://framesynth.github.io/icon-maker/frames/01_yoyaku.png"
+];
+
+frameFiles.forEach((file) => {
+  const option = document.createElement("option");
+  option.value = file;
+  option.textContent = file.split("/").pop();
+  frameSelect.appendChild(option);
+});
+
+frameSelect.addEventListener("change", () => {
+  if (!frameSelect.value) {
+    frameImage = null;
+    draw();
+    return;
+  }
+
+  frameImage = new Image();
+  frameImage.onload = draw;
+  frameImage.src = frameSelect.value;
+});
+
+// ===============================
+// 描画処理
+// ===============================
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (baseImage) {
+    ctx.save();
+    ctx.translate(imgOffsetX, imgOffsetY);
+    ctx.scale(imgScale, imgScale);
+    ctx.drawImage(baseImage, 0, 0);
+    ctx.restore();
+  }
+
+  if (frameImage) {
+    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+  }
+}
+
+// ===============================
+// PC：ドラッグ移動
+// ===============================
+canvas.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+
+  imgOffsetX += e.clientX - lastX;
+  imgOffsetY += e.clientY - lastY;
+
+  lastX = e.clientX;
+  lastY = e.clientY;
+
+  draw();
+});
+
+canvas.addEventListener("mouseup", () => (isDragging = false));
+canvas.addEventListener("mouseleave", () => (isDragging = false));
+
+// ===============================
+// スマホ：ドラッグ移動
+// ===============================
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  }
+});
+
+// ===============================
+// スマホ：ドラッグ & ピンチズーム
+// ===============================
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+
+  // 1本指 → 移動
+  if (e.touches.length === 1) {
+    imgOffsetX += e.touches[0].clientX - lastX;
+    imgOffsetY += e.touches[0].clientY - lastY;
+
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+
+    draw();
+  }
+
+  // 2本指 → ピンチズーム
+  if (e.touches.length === 2) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (lastDist !== 0) {
+      imgScale *= dist / lastDist;
+      imgScale = Math.max(0.3, Math.min(imgScale, 5));
+      draw();
     }
 
-    .container {
-      max-width: 420px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      text-align: center;
-    }
+    lastDist = dist;
+  }
+});
 
-    /* ロゴタイトル */
-    .logo-title {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      margin-bottom: 22px;
-      position: relative;
-      display: inline-block;
-      padding-bottom: 6px;
-      color: #111;
-    }
+canvas.addEventListener("touchend", () => {
+  lastDist = 0;
+});
 
-    .logo-title::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: 60%;
-      height: 3px;
-      background: #007aff;
-      border-radius: 2px;
-    }
+// ===============================
+// 保存
+// ===============================
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.download = "framelab.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+});
 
-    /* 注意事項タイトル（アプリ風） */
-    .notes {
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    .notes h2 {
-      font-size: 17px;
-      font-weight: 600;
-      color: #222;
-      letter-spacing: 0.5px;          /* アプリ感の決め手 */
-      margin-bottom: 10px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #e5e5ea; /* iOS風の薄いライン */
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* 注意事項カード（行間詰め＋アプリ風） */
-    .card {
-      max-width: 300px;
-      margin: 0 auto;
-      padding: 20px 18px;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow:
-        0 4px 12px rgba(0,0,0,0.08),
-        0 1px 3px rgba(0,0,0,0.04);
-      font-size: 15px;
-      line-height: 1.45;   /* 行間を詰めた最適値 */
-      color: #444;
-      text-align: left;
-    }
-
-    /* 入力系 */
-    .section {
-      margin-top: 28px;
-      text-align: left;
-    }
-
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    select, input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: white;
-    }
-
-    /* キャンバス */
-    .canvas-wrapper {
-      margin-top: 20px;
-      background: white;
-      padding: 10px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-
-    /* ボタン */
-    .buttons button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    #saveBtn {
-      background: #007aff;
-      color: white;
-    }
-
-    #resetBtn {
-      background: #e5e5ea;
-      color: #333;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-
-    <h1 class="logo-title">FrameLab</h1>
-
-    <p>画像にフレームを合成して、アイコンを作成できます。</p>
-
-    <div class="notes">
-      <h2>注意事項</h2>
-      <div class="card">
-        <p>・画像はサーバーに保存されません</p>
-        <p>・ブラウザ内だけで処理されます</p>
-        <p>・URLを知っている人だけが利用できます</p>
-      </div>
-    </div>
-
-    <div class="section">
-      <label for="imageInput">画像を選択</label>
-      <input type="file" id="imageInput" accept="image/*" />
-    </div>
-
-    <div class="section">
-      <label for="frameSelect">フレームを選択</label>
-      <select id="frameSelect">
-        <option value="">選択してください</option>
-      </select>
-    </div>
-
-    <div class="canvas-wrapper">
-      <canvas id="canvas"></canvas>
-    </div>
-
-    <div class="buttons">
-      <button id="saveBtn">保存</button>
-      <button id="resetBtn">リセット</button>
-    </div>
-
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+// ===============================
+// リセット
+// ===============================
+document.getElementById("resetBtn").addEventListener("click", () => {
+  autoFitImage();
+  draw();
+});
