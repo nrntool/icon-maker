@@ -19,12 +19,16 @@
 
 <h1>Frame Maker</h1>
 
-<!-- ★ 初期サイズを必ず持たせる（これがないと絶対に表示されない） -->
 <canvas id="canvas" width="600" height="600"></canvas>
 
 <div>
   <input type="file" id="imageInput" accept="image/*">
-  <select id="frameSelect"></select>
+
+  <!-- ★ 初期状態は空にする（これが最重要） -->
+  <select id="frameSelect">
+    <option value="">フレームを選択</option>
+  </select>
+
   <button id="saveBtn">保存</button>
 </div>
 
