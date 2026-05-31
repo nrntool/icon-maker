@@ -66,13 +66,13 @@ function autoFitImage() {
 }
 
 // ===============================
-// フレーム読み込み（01_yoyaku.png のみ）
+// フレーム読み込み（絶対パス版）
 // ===============================
 const frameSelect = document.getElementById("frameSelect");
 
-// ★ ここが重要：1 枚だけを読み込む
+// ★ GitHub Pages の絶対パスを使用（確実に表示される）
 const frameFiles = [
-  "frames/01_yoyaku.png"
+  "https://framesynth.github.io/icon-maker/frames/01_yoyaku.png"
 ];
 
 frameFiles.forEach((file) => {
