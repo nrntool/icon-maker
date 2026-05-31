@@ -4,6 +4,9 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// スマホ画面のピンチズームを無効化（超重要）
+canvas.style.touchAction = "none";
+
 let baseImage = null;
 let frameImage = null;
 
