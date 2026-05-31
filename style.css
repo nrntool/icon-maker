@@ -1,120 +1,79 @@
-const imageInput = document.getElementById("imageInput");
-const frameSelect = document.getElementById("frameSelect");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-let baseImage = null;
-let frameImage = null;
-
-/* -----------------------------------------
-   ★ フレーム一覧（ここに PNG を追加するだけ）
------------------------------------------ */
-const frameFiles = [
-  "01_yoyaku.png"
-];
-
-/* -----------------------------------------
-   ★ ファイル名 → ラベル変換
------------------------------------------ */
-function makeLabelFromFilename(filename) {
-  return filename
-    .replace(/^\d+_?/, "")
-    .replace(/\.[^/.]+$/, "")
-    .replace(/_/g, " ");
+/* 全体レイアウト */
+body {
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* -----------------------------------------
-   ★ フレーム読み込み
------------------------------------------ */
-function loadFrames() {
-  frameFiles.forEach(filename => {
-    const path = `./frames/${filename}`;  // ← GitHub Pages で確実に動く
-    const option = document.createElement("option");
-    option.value = path;
-    option.textContent = makeLabelFromFilename(filename);
-    frameSelect.appendChild(option);
-  });
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-loadFrames();
-
-/* -----------------------------------------
-   ★ 写真読み込み
------------------------------------------ */
-imageInput.addEventListener("change", e => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = () => {
-    baseImage = new Image();
-    baseImage.onload = () => draw();
-    baseImage.src = reader.result;
-  };
-  reader.readAsDataURL(file);
-});
-
-/* -----------------------------------------
-   ★ フレーム変更
------------------------------------------ */
-frameSelect.addEventListener("change", () => {
-  if (!frameSelect.value) return;
-
-  frameImage = new Image();
-  frameImage.onload = () => draw();
-  frameImage.src = frameSelect.value;
-});
-
-/* -----------------------------------------
-   ★ 描画（スマホ最適化）
------------------------------------------ */
-function getCanvasDisplaySize() {
-  const rect = canvas.getBoundingClientRect();
-  return { w: rect.width, h: rect.width };
+/* 見出し */
+h1 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 20px;
 }
 
-function draw() {
-  const { w, h } = getCanvasDisplaySize();
-
-  canvas.width = w;
-  canvas.height = h;
-  ctx.clearRect(0, 0, w, h);
-
-  if (baseImage) {
-    const scale = Math.min(w / baseImage.width, h / baseImage.height);
-    const bw = baseImage.width * scale;
-    const bh = baseImage.height * scale;
-    ctx.drawImage(baseImage, (w - bw) / 2, (h - bh) / 2, bw, bh);
-  }
-
-  if (frameImage && frameImage.complete) {
-    const scale = Math.min(w / frameImage.naturalWidth, h / frameImage.naturalHeight);
-    const fw = frameImage.naturalWidth * scale;
-    const fh = frameImage.naturalHeight * scale;
-    ctx.drawImage(frameImage, (w - fw) / 2, (h - fh) / 2, fw, fh);
-  }
+/* セクション */
+.section {
+  margin-bottom: 20px;
 }
 
-/* -----------------------------------------
-   ★ 保存
------------------------------------------ */
-document.getElementById("saveBtn").addEventListener("click", () => {
-  const link = document.createElement("a");
-  link.download = "framed.png";
-  link.href = canvas.toDataURL();
-  link.click();
-});
+label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
 
-/* -----------------------------------------
-   ★ リセット
------------------------------------------ */
-document.getElementById("resetBtn").addEventListener("click", () => {
-  baseImage = null;
-  frameImage = null;
+/* 入力系 */
+input[type="file"],
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
 
-  imageInput.value = "";
-  frameSelect.value = "";
+/* キャンバス */
+.canvas-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
 
-  const { w, h } = getCanvasDisplaySize();
-  canvas.width = w;
-  canvas.height = h;
-  ctx.clearRect(0, 0, w, h);
-});
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ボタン */
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 12px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #007aff;
+  color: white;
+  font-weight: bold;
+}
+
+button#resetBtn {
+  background: #888;
+}
