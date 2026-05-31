@@ -5,40 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FrameLab</title>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ロゴ風タイトル */
+    .logo-title {
+      font-size: 30px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 22px;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 6px;
+      color: #111;
+      letter-spacing: 1px;
+    }
+
+    .logo-title::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background: #007aff;
+      border-radius: 2px;
+    }
+
+    /* タイトルを中央に配置するためのラッパー */
+    .logo-wrapper {
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container">
 
-    <h1>FrameLab</h1>
+    <!-- ロゴタイトル -->
+    <div class="logo-wrapper">
+      <h1 class="logo-title">FrameLab</h1>
+    </div>
 
     <!-- 画像アップロード -->
-    <div class="section">
-      <label for="imageInput">画像を選択</label>
-      <input type="file" id="imageInput" accept="image/*" />
-    </div>
-
-    <!-- フレーム選択 -->
-    <div class="section">
-      <label for="frameSelect">フレームを選択</label>
-      <select id="frameSelect">
-        <option value="">選択してください</option>
-      </select>
-    </div>
-
-    <!-- キャンバス -->
-    <div class="canvas-wrapper">
-      <canvas id="canvas"></canvas>
-    </div>
-
-    <!-- ボタン -->
-    <div class="buttons">
-      <button id="saveBtn">保存</button>
-      <button id="resetBtn">リセット</button>
-    </div>
-
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
