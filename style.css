@@ -1,17 +1,22 @@
 /* -----------------------------------------
-   ページ全体の基本スタイル
+   ページ全体（背景・フォント・レイアウト）
 ----------------------------------------- */
-body {
+html, body {
+  touch-action: pan-y; /* キャンバス外のピンチズーム禁止 */
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  height: 100%;
   background-color: #fafafa; /* 白に近いグレー */
   color: #222;
   font-family: "Noto Sans JP", sans-serif;
-  margin: 0;
-  padding: 0;
   text-align: center;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* -----------------------------------------
-   タイトル部分
+   タイトル（FrameLab 風）
 ----------------------------------------- */
 h1 {
   font-size: 2.2em;
@@ -32,12 +37,15 @@ h1::after {
 }
 
 /* -----------------------------------------
-   注意事項カード
+   注意事項カード（青みグレー影・柔らかい）
 ----------------------------------------- */
 .notice-box {
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 0 0 1px #ddd;
+
+  /* ★ 青みグレーの柔らかい影（完成版） */
+  box-shadow: 0 8px 28px rgba(0, 40, 80, 0.12);
+
   padding: 20px;
   margin: 20px auto;
   width: 90%;
@@ -47,7 +55,7 @@ h1::after {
 }
 
 /* -----------------------------------------
-   フォーム部分
+   入力フォーム（ファイル選択・セレクト）
 ----------------------------------------- */
 label {
   display: block;
@@ -64,8 +72,12 @@ select {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 15px;
+  background-color: #fff;
 }
 
+/* -----------------------------------------
+   ボタン（FrameLab 風）
+----------------------------------------- */
 button {
   margin-top: 20px;
   padding: 10px 20px;
@@ -82,7 +94,19 @@ button:hover {
 }
 
 /* -----------------------------------------
-   コンテナ全体
+   キャンバス（操作系）
+----------------------------------------- */
+canvas {
+  touch-action: none; /* ブラウザ標準のピンチズーム無効 */
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+  background-color: transparent;
+}
+
+/* -----------------------------------------
+   全体コンテナ
 ----------------------------------------- */
 .container {
   width: 100%;
