@@ -1,37 +1,45 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FrameLab</title>
-  <link rel="stylesheet" href="./style.css?v=10">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>フレーム合成ツール</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <div class="container">
 
-  <h1>FrameLab</h1>
+    <h1>フレーム合成ツール</h1>
 
-  <p>画像にフレームを合成してアイコンを作成できます。</p>
+    <!-- 画像アップロード -->
+    <div class="section">
+      <label for="imageInput">画像を選択</label>
+      <input type="file" id="imageInput" accept="image/*" />
+    </div>
 
-  <div class="control">
-    <label>画像を選択</label><br>
-    <input type="file" id="imageInput" accept="image/*">
+    <!-- フレーム選択 -->
+    <div class="section">
+      <label for="frameSelect">フレームを選択</label>
+      <select id="frameSelect">
+        <option value="">選択してください</option>
+      </select>
+    </div>
+
+    <!-- キャンバス -->
+    <div class="canvas-wrapper">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <!-- ボタン -->
+    <div class="buttons">
+      <button id="saveBtn">保存</button>
+      <button id="resetBtn">リセット</button>
+    </div>
+
   </div>
 
-  <div class="control">
-    <label>フレームを選択</label><br>
-    <select id="frameSelect">
-      <option value="">選択してください</option>
-    </select>
-  </div>
-
-  <canvas id="canvas"></canvas>
-
-  <div class="buttons">
-    <button id="saveBtn">保存</button>
-    <button id="resetBtn">リセット</button>
-  </div>
-
-  <script src="./script.js?v=10"></script>
+  <script src="script.js"></script>
 </body>
 </html>
