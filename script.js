@@ -9,7 +9,6 @@ let frameImage = null;
 /* -----------------------------
    ★ ファイル名 → ラベル変換
    01_yoyaku.png → yoyaku
-   03_sakura_frame.png → sakura frame
 ----------------------------- */
 function makeLabelFromFilename(filename) {
   return filename
@@ -20,14 +19,14 @@ function makeLabelFromFilename(filename) {
 
 /* -----------------------------
    ★ frames フォルダの PNG を自動検出
-   → どんな名前でも OK
+   → 000〜9999 まで番号付きファイルを全部チェック
 ----------------------------- */
 function loadFrames() {
-  // 1〜200 まで存在チェック（存在するものだけ追加）
-  for (let i = 1; i <= 200; i++) {
-    const path = `frames/${i}.png`;
-    const img = new Image();
+  for (let i = 0; i <= 9999; i++) {
+    const num = String(i).padStart(2, "0"); // 01, 02, 03...
+    const path = `frames/${num}_frame.png`; // 例: 01_frame.png
 
+    const img = new Image();
     img.onload = () => {
       const filename = path.split("/").pop();
       const label = makeLabelFromFilename(filename);
@@ -50,7 +49,7 @@ loadFrames();
 ----------------------------- */
 function getCanvasDisplaySize() {
   const rect = canvas.getBoundingClientRect();
-  return { w: rect.width, h: rect.width }; // 正方形
+  return { w: rect.width, h: rect.width };
 }
 
 /* -----------------------------
@@ -88,7 +87,6 @@ function draw() {
   canvas.height = h;
   ctx.clearRect(0, 0, w, h);
 
-  // 写真
   if (baseImage) {
     const scale = Math.min(w / baseImage.width, h / baseImage.height);
     const bw = baseImage.width * scale;
@@ -96,7 +94,6 @@ function draw() {
     ctx.drawImage(baseImage, (w - bw) / 2, (h - bh) / 2, bw, bh);
   }
 
-  // フレーム
   if (frameImage && frameImage.complete) {
     const scale = Math.min(w / frameImage.naturalWidth, h / frameImage.naturalHeight);
     const fw = frameImage.naturalWidth * scale;
