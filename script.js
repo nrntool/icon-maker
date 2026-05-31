@@ -12,7 +12,7 @@ let baseImage = null;
 let frameImage = null;
 
 // ===============================
-// フレームリスト初期化
+// フレームリスト
 // ===============================
 const frames = [
   "01_yoyaku.png",
@@ -84,7 +84,7 @@ function drawCanvas() {
 }
 
 // ===============================
-// 保存ボタン
+// 保存
 // ===============================
 saveBtn.addEventListener('click', () => {
   if (!baseImage) return;
@@ -95,7 +95,7 @@ saveBtn.addEventListener('click', () => {
 });
 
 // ===============================
-// リセットボタン
+// リセット
 // ===============================
 resetBtn.addEventListener('click', () => {
   baseImage = null;
