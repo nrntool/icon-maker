@@ -49,7 +49,7 @@ frameSelect.addEventListener("change", () => {
 function draw() {
   const { w, h } = getCanvasDisplaySize();
 
-  // 内部サイズを表示サイズに合わせる
+  // 内部サイズを表示サイズに合わせる（ここが最重要）
   canvas.width = w;
   canvas.height = h;
 
