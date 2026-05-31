@@ -1,6 +1,4 @@
-// ===============================
 // 要素取得
-// ===============================
 const imageInput = document.getElementById('imageInput');
 const frameSelect = document.getElementById('frameSelect');
 const canvas = document.getElementById('canvas');
@@ -12,21 +10,20 @@ let baseImage = null;
 let frameImage = null;
 
 // ===============================
-// フレームリスト
+// フレームリスト（今は1種類、将来増やせる）
 // ===============================
 const frames = [
-  "01_yoyaku.png",
-  "02_sakura.png",
-  "03_gold.png",
-  "04_black.png"
+  { label: "予約フレーム", file: "01_yoyaku.png" }
+  // 将来追加するならここに書くだけ
+  // { label: "新フレーム", file: "02_new.png" }
 ];
 
 function initFrameList() {
   frameSelect.innerHTML = '<option value="">選択してください</option>';
-  frames.forEach(name => {
+  frames.forEach(frame => {
     const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = name.replace('.png', '');
+    opt.value = frame.file;
+    opt.textContent = frame.label;
     frameSelect.appendChild(opt);
   });
 }
@@ -52,8 +49,8 @@ imageInput.addEventListener('change', e => {
 // フレーム選択
 // ===============================
 frameSelect.addEventListener('change', e => {
-  const frameName = e.target.value;
-  if (!frameName) {
+  const fileName = e.target.value;
+  if (!fileName) {
     frameImage = null;
     drawCanvas();
     return;
@@ -61,7 +58,7 @@ frameSelect.addEventListener('change', e => {
 
   frameImage = new Image();
   frameImage.onload = drawCanvas;
-  frameImage.src = `frames/${frameName}`;
+  frameImage.src = `frames/${fileName}`;
 });
 
 // ===============================
