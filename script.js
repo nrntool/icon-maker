@@ -48,21 +48,34 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = frameSelect.value;
 });
 
-// 描画（どんな画像サイズでも中央フィット）
+// 描画（写真なしでもフレームだけ表示できる）
 function draw() {
-  if (!baseImage) return;
+  // 写真がある場合 → 写真サイズに合わせる
+  if (baseImage) {
+    canvas.width = baseImage.width;
+    canvas.height = baseImage.height;
+    ctx.drawImage(baseImage, 0, 0);
+  }
+  // 写真なし → フレームだけ表示
+  else if (frameImage && frameImage.complete) {
+    canvas.width = frameImage.naturalWidth;
+    canvas.height = frameImage.naturalHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  } else {
+    return;
+  }
 
-  canvas.width = baseImage.width;
-  canvas.height = baseImage.height;
-
-  ctx.drawImage(baseImage, 0, 0);
-
+  // フレームが読み込まれていない場合は終了
   if (!frameImage || !frameImage.complete || frameImage.naturalWidth === 0) return;
 
   const fw = frameImage.naturalWidth;
   const fh = frameImage.naturalHeight;
 
-  const scale = Math.min(canvas.width / fw, canvas.height / fh);
+  // 写真がある場合はフィット、ない場合は等倍
+  let scale = 1;
+  if (baseImage) {
+    scale = Math.min(canvas.width / fw, canvas.height / fh);
+  }
 
   const drawW = fw * scale;
   const drawH = fh * scale;
