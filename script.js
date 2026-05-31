@@ -6,54 +6,43 @@ const ctx = canvas.getContext("2d");
 let baseImage = null;
 let frameImage = null;
 
-/* -----------------------------
-   ★ ここに frames フォルダの PNG を列挙するだけ
+/* -----------------------------------------
+   ★ フレーム一覧（ここに PNG を追加するだけ）
    Actions も manifest.json も不要
------------------------------ */
+----------------------------------------- */
 const frameFiles = [
   "01_yoyaku_battle.png",
   "02_yoyaku_battle.png"
 ];
 
-/* -----------------------------
+/* -----------------------------------------
    ★ ファイル名 → ラベル変換
------------------------------ */
+----------------------------------------- */
 function makeLabelFromFilename(filename) {
   return filename
-    .replace(/^\d+_?/, "")
-    .replace(/\.[^/.]+$/, "")
-    .replace(/_/g, " ");
+    .replace(/^\d+_?/, "")     // 先頭の数字やアンダーバーを削除
+    .replace(/\.[^/.]+$/, "")  // 拡張子削除
+    .replace(/_/g, " ");       // アンダーバーをスペースに
 }
 
-/* -----------------------------
+/* -----------------------------------------
    ★ フレーム読み込み
------------------------------ */
+----------------------------------------- */
 function loadFrames() {
   frameFiles.forEach(filename => {
     const path = `frames/${filename}`;
-    const img = new Image();
-
-    img.onload = () => {
-      const option = document.createElement("option");
-      option.value = path;
-      option.textContent = makeLabelFromFilename(filename);
-      frameSelect.appendChild(option);
-    };
-
-    img.onerror = () => {
-      console.log("読み込み失敗:", path);
-    };
-
-    img.src = path;
+    const option = document.createElement("option");
+    option.value = path;
+    option.textContent = makeLabelFromFilename(filename);
+    frameSelect.appendChild(option);
   });
 }
 
 loadFrames();
 
-/* -----------------------------
-   ★ 以下は今まで通り
------------------------------ */
-
+/* -----------------------------------------
+   ★ 写真読み込み
+----------------------------------------- */
 imageInput.addEventListener("change", e => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -65,6 +54,9 @@ imageInput.addEventListener("change", e => {
   reader.readAsDataURL(file);
 });
 
+/* -----------------------------------------
+   ★ フレーム変更
+----------------------------------------- */
 frameSelect.addEventListener("change", () => {
   if (!frameSelect.value) return;
 
@@ -73,6 +65,9 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = frameSelect.value;
 });
 
+/* -----------------------------------------
+   ★ 描画（スマホ最適化）
+----------------------------------------- */
 function getCanvasDisplaySize() {
   const rect = canvas.getBoundingClientRect();
   return { w: rect.width, h: rect.width };
@@ -100,6 +95,9 @@ function draw() {
   }
 }
 
+/* -----------------------------------------
+   ★ 保存
+----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   const link = document.createElement("a");
   link.download = "framed.png";
@@ -107,6 +105,9 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   link.click();
 });
 
+/* -----------------------------------------
+   ★ リセット
+----------------------------------------- */
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
