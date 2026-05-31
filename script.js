@@ -6,14 +6,8 @@ const ctx = canvas.getContext("2d");
 let baseImage = null;
 let frameImage = null;
 
-/* -----------------------------------------
-   フレーム一覧
------------------------------------------ */
 const frameFiles = ["01_yoyaku.png"];
 
-/* -----------------------------------------
-   ラベル生成
------------------------------------------ */
 function makeLabelFromFilename(filename) {
   return filename
     .replace(/^\d+_?/, "")
@@ -21,9 +15,6 @@ function makeLabelFromFilename(filename) {
     .replace(/_/g, " ");
 }
 
-/* -----------------------------------------
-   フレーム読み込み
------------------------------------------ */
 function loadFrames() {
   frameFiles.forEach(filename => {
     const path = `./frames/${filename}`;
@@ -35,23 +26,14 @@ function loadFrames() {
 }
 loadFrames();
 
-/* -----------------------------------------
-   画像の状態（位置・拡大率）
------------------------------------------ */
 let imgX = 0;
 let imgY = 0;
 let imgScale = 1;
 
-/* -----------------------------------------
-   慣性用の変数
------------------------------------------ */
 let vx = 0;
 let vy = 0;
 let lastMoveTime = 0;
 
-/* -----------------------------------------
-   写真読み込み
------------------------------------------ */
 imageInput.addEventListener("change", e => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -60,18 +42,15 @@ imageInput.addEventListener("change", e => {
     baseImage.onload = () => {
       const { w, h } = getCanvasDisplaySize();
 
-      // フレーム内側のサイズ
       const innerScale = 0.80;
       const innerW = w * innerScale;
       const innerH = h * innerScale;
       const innerX = (w - innerW) / 2;
       const innerY = (h - innerH) / 2;
 
-      // 初期スケール（フレーム内側にフィット）
       const scaleFit = Math.min(innerW / baseImage.width, innerH / baseImage.height);
       imgScale = scaleFit;
 
-      // ★ 初期位置をフレーム内側中心に合わせる
       const centerX = innerX + innerW / 2;
       const centerY = innerY + innerH / 2;
 
@@ -85,9 +64,6 @@ imageInput.addEventListener("change", e => {
   reader.readAsDataURL(file);
 });
 
-/* -----------------------------------------
-   フレーム変更
------------------------------------------ */
 frameSelect.addEventListener("change", () => {
   if (!frameSelect.value) return;
 
@@ -96,37 +72,28 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = frameSelect.value;
 });
 
-/* -----------------------------------------
-   キャンバスサイズ取得
------------------------------------------ */
 function getCanvasDisplaySize() {
   const rect = canvas.getBoundingClientRect();
   return { w: rect.width, h: rect.width };
 }
 
-/* -----------------------------------------
-   描画（マスク＋スムーズ操作対応）
------------------------------------------ */
 function draw() {
   const { w, h } = getCanvasDisplaySize();
   canvas.width = w;
   canvas.height = h;
   ctx.clearRect(0, 0, w, h);
 
-  // フレーム内側の描画領域（80%）
   const innerScale = 0.80;
   const innerW = w * innerScale;
   const innerH = h * innerScale;
   const innerX = (w - innerW) / 2;
   const innerY = (h - innerH) / 2;
 
-  // マスク開始
   ctx.save();
   ctx.beginPath();
   ctx.rect(innerX, innerY, innerW, innerH);
   ctx.clip();
 
-  // ユーザー画像
   if (baseImage) {
     ctx.save();
     ctx.translate(imgX, imgY);
@@ -135,17 +102,13 @@ function draw() {
     ctx.restore();
   }
 
-  ctx.restore(); // マスク解除
+  ctx.restore();
 
-  // フレームを最前面に描画
   if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, w, h);
   }
 }
 
-/* -----------------------------------------
-   ドラッグ移動（PC）
------------------------------------------ */
 let isDragging = false;
 let startX, startY;
 
@@ -165,7 +128,6 @@ canvas.addEventListener("mousemove", e => {
   const newX = e.clientX - startX;
   const newY = e.clientY - startY;
 
-  // 速度の平滑化
   const smoothing = 0.2;
   vx = vx * (1 - smoothing) + ((newX - imgX) / dt) * smoothing;
   vy = vy * (1 - smoothing) + ((newY - imgY) / dt) * smoothing;
@@ -186,9 +148,6 @@ canvas.addEventListener("mouseleave", () => {
   startInertia();
 });
 
-/* -----------------------------------------
-   ドラッグ移動（スマホ）
------------------------------------------ */
 canvas.addEventListener("touchstart", e => {
   if (e.touches.length === 1) {
     const t = e.touches[0];
@@ -199,9 +158,6 @@ canvas.addEventListener("touchstart", e => {
   }
 });
 
-/* -----------------------------------------
-   ピンチズーム（スマホ）
------------------------------------------ */
 let lastDist = null;
 
 canvas.addEventListener("touchmove", e => {
@@ -260,9 +216,6 @@ canvas.addEventListener("touchend", () => {
   startInertia();
 });
 
-/* -----------------------------------------
-   拡大縮小（PCホイール）
------------------------------------------ */
 canvas.addEventListener("wheel", e => {
   e.preventDefault();
 
@@ -281,9 +234,6 @@ canvas.addEventListener("wheel", e => {
   draw();
 });
 
-/* -----------------------------------------
-   慣性アニメーション（自然な減速）
------------------------------------------ */
 function startInertia() {
   let lastTime = performance.now();
 
@@ -292,12 +242,10 @@ function startInertia() {
     const dt = now - lastTime;
     lastTime = now;
 
-    // 減速（時間ベース）
     const friction = 0.002;
     vx *= (1 - friction * dt);
     vy *= (1 - friction * dt);
 
-    // 最大速度制限
     const maxSpeed = 2.0;
     vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
     vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
@@ -316,18 +264,49 @@ function startInertia() {
 }
 
 /* -----------------------------------------
-   保存
+   ★ 正方形・高解像度・フレーム込み・外側グレー保存
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
+  const { w } = getCanvasDisplaySize();
+
+  const baseSize = w;
+  const scaleFactor = 3;
+
+  const innerScale = 0.80;
+  const innerW = baseSize * innerScale;
+  const innerH = baseSize * innerScale;
+  const innerX = (baseSize - innerW) / 2;
+  const innerY = (baseSize - innerH) / 2;
+
+  const saveCanvas = document.createElement("canvas");
+  saveCanvas.width = baseSize * scaleFactor;
+  saveCanvas.height = baseSize * scaleFactor;
+  const sctx = saveCanvas.getContext("2d");
+
+  sctx.fillStyle = "#cccccc";
+  sctx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
+
+  sctx.save();
+  sctx.beginPath();
+  sctx.rect(innerX * scaleFactor, innerY * scaleFactor, innerW * scaleFactor, innerH * scaleFactor);
+  sctx.clip();
+
+  sctx.translate(imgX * scaleFactor, imgY * scaleFactor);
+  sctx.scale(imgScale * scaleFactor, imgScale * scaleFactor);
+  sctx.drawImage(baseImage, 0, 0);
+
+  sctx.restore();
+
+  if (frameImage && frameImage.complete) {
+    sctx.drawImage(frameImage, 0, 0, baseSize * scaleFactor, baseSize * scaleFactor);
+  }
+
   const link = document.createElement("a");
-  link.download = "framed.png";
-  link.href = canvas.toDataURL();
+  link.download = "framed_square.png";
+  link.href = saveCanvas.toDataURL("image/png");
   link.click();
 });
 
-/* -----------------------------------------
-   リセット
------------------------------------------ */
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
