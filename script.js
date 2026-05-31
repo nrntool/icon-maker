@@ -10,8 +10,7 @@ let frameImage = null;
    ★ フレーム一覧（ここに PNG を追加するだけ）
 ----------------------------------------- */
 const frameFiles = [
-  "03_yoyaku_battle.png",
-  "04_yoyaku_battle.png"
+  "01_yoyaku.png"
 ];
 
 /* -----------------------------------------
