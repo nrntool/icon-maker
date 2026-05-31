@@ -8,25 +8,26 @@ let frameImage = null;
 
 /* -----------------------------
    ★ ファイル名 → ラベル変換
-   01_yoyaku.png → yoyaku
+   01_yoyaku_battle.png → yoyaku battle
 ----------------------------- */
 function makeLabelFromFilename(filename) {
   return filename
-    .replace(/^\d+_?/, "")     // 先頭の数字＋_ を削除
+    .replace(/^\d+_?/, "")     // 先頭の数字＋_ を削除（01_ → ""）
     .replace(/\.[^/.]+$/, "")  // 拡張子削除
     .replace(/_/g, " ");       // _ → スペース
 }
 
 /* -----------------------------
    ★ frames フォルダの PNG を自動検出
-   → 000〜9999 まで番号付きファイルを全部チェック
+   → 01_〜99_ の形式に完全対応
 ----------------------------- */
 function loadFrames() {
-  for (let i = 0; i <= 9999; i++) {
+  for (let i = 1; i <= 99; i++) {
     const num = String(i).padStart(2, "0"); // 01, 02, 03...
-    const path = `frames/${num}_frame.png`; // 例: 01_frame.png
+    const path = `frames/${num}_yoyaku_battle.png`;
 
     const img = new Image();
+
     img.onload = () => {
       const filename = path.split("/").pop();
       const label = makeLabelFromFilename(filename);
