@@ -14,10 +14,9 @@ let frameImage = null;
 // ===============================
 const frames = [
   { label: "予約フレーム", file: "01_yoyaku.png" }
-  // 例：将来追加する場合
-  // { label: "桜フレーム", file: "02_sakura.png" }
 ];
 
+// セレクトに反映
 function initFrameList() {
   frameSelect.innerHTML = '<option value="">選択してください</option>';
   frames.forEach(frame => {
@@ -50,6 +49,7 @@ imageInput.addEventListener('change', e => {
 // ===============================
 frameSelect.addEventListener('change', e => {
   const fileName = e.target.value;
+
   if (!fileName) {
     frameImage = null;
     drawCanvas();
@@ -58,7 +58,9 @@ frameSelect.addEventListener('change', e => {
 
   frameImage = new Image();
   frameImage.onload = drawCanvas;
-  frameImage.src = `frames/${fileName}`;
+
+  // ★ GitHub Pages で確実に通る相対パス
+  frameImage.src = `./frames/${fileName}`;
 });
 
 // ===============================
@@ -72,6 +74,7 @@ function drawCanvas() {
 
   canvas.width = baseImage.width;
   canvas.height = baseImage.height;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(baseImage, 0, 0);
 
@@ -85,6 +88,7 @@ function drawCanvas() {
 // ===============================
 saveBtn.addEventListener('click', () => {
   if (!baseImage) return;
+
   const link = document.createElement('a');
   link.download = 'framelab.png';
   link.href = canvas.toDataURL('image/png');
