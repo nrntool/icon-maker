@@ -45,30 +45,37 @@
       border-radius: 2px;
     }
 
-    /* 注意事項カード */
+    /* 注意事項カード（アプリ風） */
     .notes {
       margin-top: 30px;
-      text-align: left;
+      text-align: center;
     }
 
     .notes h2 {
       font-size: 20px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       color: #333;
+      font-weight: 700;
     }
 
     .card {
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-width: 300px;              /* 行幅を詰める */
+      margin: 0 auto;                /* 中央寄せ */
+      padding: 20px 18px;            /* 内側余白 */
+      background: #ffffff;
+      border-radius: 16px;           /* 大きめ角丸でアプリ感 */
+      box-shadow:
+        0 4px 12px rgba(0,0,0,0.08),
+        0 1px 3px rgba(0,0,0,0.04);  /* iOS風の二重影 */
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.7;
+      color: #444;
+      text-align: left;
     }
 
     /* 入力系 */
     .section {
-      margin-top: 24px;
+      margin-top: 28px;
       text-align: left;
     }
 
