@@ -91,4 +91,80 @@
       margin-top: 20px;
       background: white;
       padding: 10px;
-      border
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* ボタン */
+    .buttons button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    #saveBtn {
+      background: #007aff;
+      color: white;
+    }
+
+    #resetBtn {
+      background: #e5e5ea;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- ロゴ -->
+    <h1 class="logo-title">FrameLab</h1>
+
+    <!-- 説明文 -->
+    <p>写真にフレームを合成して、SNSアイコンを作成できます。</p>
+
+    <!-- 注意事項 -->
+    <div class="notes">
+      <h2>注意事項</h2>
+      <div class="card">
+        <p>・画像はサーバーに保存されません</p>
+        <p>・ブラウザ内だけで処理されます</p>
+        <p>・URLを知っている人だけが利用できます</p>
+      </div>
+    </div>
+
+    <!-- 画像アップロード -->
+    <div class="section">
+      <label for="imageInput">画像を選択</label>
+      <input type="file" id="imageInput" accept="image/*" />
+    </div>
+
+    <!-- フレーム選択 -->
+    <div class="section">
+      <label for="frameSelect">フレームを選択</label>
+      <select id="frameSelect">
+        <option value="">選択してください</option>
+      </select>
+    </div>
+
+    <!-- キャンバス -->
+    <div class="canvas-wrapper">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <!-- ボタン -->
+    <div class="buttons">
+      <button id="saveBtn">保存</button>
+      <button id="resetBtn">リセット</button>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
