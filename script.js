@@ -12,8 +12,8 @@ fetch("frames/manifest.json")
   .then(list => {
     list.forEach(frame => {
       const option = document.createElement("option");
-      option.value = frame.path;        // ← 画像パス
-      option.textContent = frame.label; // ← 表示名
+      option.value = frame.path;        // 画像パス
+      option.textContent = frame.label; // 表示名
       frameSelect.appendChild(option);
     });
   });
@@ -24,7 +24,9 @@ imageInput.addEventListener("change", e => {
   const reader = new FileReader();
   reader.onload = () => {
     baseImage = new Image();
-    baseImage.onload = draw;
+    baseImage.onload = () => {
+      draw(); // 画像読み込み後に描画
+    };
     baseImage.src = reader.result;
   };
   reader.readAsDataURL(file);
@@ -33,8 +35,10 @@ imageInput.addEventListener("change", e => {
 // フレーム変更
 frameSelect.addEventListener("change", () => {
   frameImage = new Image();
-  frameImage.onload = draw;
-  frameImage.src = frameSelect.value; // ← そのまま使う
+  frameImage.onload = () => {
+    draw(); // フレーム読み込み後に描画
+  };
+  frameImage.src = frameSelect.value;
 });
 
 // 描画
@@ -46,7 +50,8 @@ function draw() {
 
   ctx.drawImage(baseImage, 0, 0);
 
-  if (frameImage) {
+  // フレームが読み込み済みなら描画
+  if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
   }
 }
