@@ -83,3 +83,16 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   link.href = canvas.toDataURL();
   link.click();
 });
+
+// ★ リセット機能
+document.getElementById("resetBtn").addEventListener("click", () => {
+  baseImage = null;
+  frameImage = null;
+
+  imageInput.value = "";
+  frameSelect.value = "";
+
+  canvas.width = 600;
+  canvas.height = 600;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
