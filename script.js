@@ -38,7 +38,7 @@ document.getElementById("imageInput").addEventListener("change", (e) => {
   reader.onload = () => {
     baseImage = new Image();
     baseImage.onload = () => {
-      autoFitImage(); // ← ★ 自動フィット
+      autoFitImage();
       draw();
     };
     baseImage.src = reader.result;
@@ -57,25 +57,22 @@ function autoFitImage() {
   const canvasW = canvas.width;
   const canvasH = canvas.height;
 
-  // キャンバスに収まるように scale を計算（contain）
   const scaleW = canvasW / imgW;
   const scaleH = canvasH / imgH;
   imgScale = Math.min(scaleW, scaleH);
 
-  // 中央に配置
   imgOffsetX = (canvasW - imgW * imgScale) / 2;
   imgOffsetY = (canvasH - imgH * imgScale) / 2;
 }
 
 // ===============================
-// フレーム読み込み
+// フレーム読み込み（01_yoyaku.png のみ）
 // ===============================
 const frameSelect = document.getElementById("frameSelect");
 
+// ★ ここが重要：1 枚だけを読み込む
 const frameFiles = [
-  "frames/frame1.png",
-  "frames/frame2.png",
-  "frames/frame3.png"
+  "frames/01_yoyaku.png"
 ];
 
 frameFiles.forEach((file) => {
@@ -175,7 +172,7 @@ canvas.addEventListener("touchmove", (e) => {
 
     if (lastDist !== 0) {
       imgScale *= dist / lastDist;
-      imgScale = Math.max(0.3, Math.min(imgScale, 5)); // ズーム制限
+      imgScale = Math.max(0.3, Math.min(imgScale, 5));
       draw();
     }
 
@@ -201,6 +198,6 @@ document.getElementById("saveBtn").addEventListener("click", () => {
 // リセット
 // ===============================
 document.getElementById("resetBtn").addEventListener("click", () => {
-  autoFitImage(); // ← ★ リセット時もフィット
+  autoFitImage();
   draw();
 });
