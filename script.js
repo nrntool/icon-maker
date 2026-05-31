@@ -6,17 +6,38 @@ const ctx = canvas.getContext("2d");
 let baseImage = null;
 let frameImage = null;
 
-// ★ frames フォルダの PNG を自動検出（1〜200 までチェック）
+/* -----------------------------
+   ★ ファイル名 → ラベル変換
+   01_yoyaku.png → yoyaku
+   03_sakura_frame.png → sakura frame
+----------------------------- */
+function makeLabelFromFilename(filename) {
+  return filename
+    .replace(/^\d+_?/, "")     // 先頭の数字＋_ を削除
+    .replace(/\.[^/.]+$/, "")  // 拡張子削除
+    .replace(/_/g, " ");       // _ → スペース
+}
+
+/* -----------------------------
+   ★ frames フォルダの PNG を自動検出
+   → どんな名前でも OK
+----------------------------- */
 function loadFrames() {
+  // 1〜200 まで存在チェック（存在するものだけ追加）
   for (let i = 1; i <= 200; i++) {
     const path = `frames/${i}.png`;
     const img = new Image();
+
     img.onload = () => {
+      const filename = path.split("/").pop();
+      const label = makeLabelFromFilename(filename);
+
       const option = document.createElement("option");
       option.value = path;
-      option.textContent = `Frame ${i}`;
+      option.textContent = label;
       frameSelect.appendChild(option);
     };
+
     img.onerror = () => {};
     img.src = path;
   }
@@ -24,13 +45,17 @@ function loadFrames() {
 
 loadFrames();
 
-// ★ 表示サイズ取得
+/* -----------------------------
+   ★ 表示サイズ（スマホ対応）
+----------------------------- */
 function getCanvasDisplaySize() {
   const rect = canvas.getBoundingClientRect();
-  return { w: rect.width, h: rect.width };
+  return { w: rect.width, h: rect.width }; // 正方形
 }
 
-// 写真読み込み
+/* -----------------------------
+   ★ 写真読み込み
+----------------------------- */
 imageInput.addEventListener("change", e => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -42,21 +67,28 @@ imageInput.addEventListener("change", e => {
   reader.readAsDataURL(file);
 });
 
-// フレーム変更
+/* -----------------------------
+   ★ フレーム変更
+----------------------------- */
 frameSelect.addEventListener("change", () => {
   if (!frameSelect.value) return;
+
   frameImage = new Image();
   frameImage.onload = () => draw();
   frameImage.src = frameSelect.value;
 });
 
-// 描画
+/* -----------------------------
+   ★ 描画（スマホ最適化）
+----------------------------- */
 function draw() {
   const { w, h } = getCanvasDisplaySize();
+
   canvas.width = w;
   canvas.height = h;
   ctx.clearRect(0, 0, w, h);
 
+  // 写真
   if (baseImage) {
     const scale = Math.min(w / baseImage.width, h / baseImage.height);
     const bw = baseImage.width * scale;
@@ -64,6 +96,7 @@ function draw() {
     ctx.drawImage(baseImage, (w - bw) / 2, (h - bh) / 2, bw, bh);
   }
 
+  // フレーム
   if (frameImage && frameImage.complete) {
     const scale = Math.min(w / frameImage.naturalWidth, h / frameImage.naturalHeight);
     const fw = frameImage.naturalWidth * scale;
@@ -72,7 +105,9 @@ function draw() {
   }
 }
 
-// 保存
+/* -----------------------------
+   ★ 保存
+----------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   const link = document.createElement("a");
   link.download = "framed.png";
@@ -80,12 +115,16 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   link.click();
 });
 
-// リセット
+/* -----------------------------
+   ★ リセット
+----------------------------- */
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
+
   imageInput.value = "";
   frameSelect.value = "";
+
   const { w, h } = getCanvasDisplaySize();
   canvas.width = w;
   canvas.height = h;
