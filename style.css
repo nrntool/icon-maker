@@ -44,7 +44,7 @@ select {
 /* キャンバス */
 .canvas-wrapper {
   width: 100%;
-  aspect-ratio: 1 / 1; /* 正方形にする */
+  aspect-ratio: 1 / 1;
   background: #ddd;
   border-radius: 10px;
   overflow: hidden;
