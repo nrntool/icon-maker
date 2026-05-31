@@ -12,6 +12,27 @@ let baseImage = null;
 let frameImage = null;
 
 // ===============================
+// フレームリスト初期化
+// ===============================
+const frames = [
+  "01_yoyaku.png",
+  "02_sakura.png",
+  "03_gold.png",
+  "04_black.png"
+];
+
+function initFrameList() {
+  frameSelect.innerHTML = '<option value="">選択してください</option>';
+  frames.forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name.replace('.png', '');
+    frameSelect.appendChild(opt);
+  });
+}
+initFrameList();
+
+// ===============================
 // 画像選択
 // ===============================
 imageInput.addEventListener('change', e => {
@@ -52,14 +73,11 @@ function drawCanvas() {
     return;
   }
 
-  // キャンバスを画像サイズに合わせる
   canvas.width = baseImage.width;
   canvas.height = baseImage.height;
-
-  // 元画像
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(baseImage, 0, 0);
 
-  // フレーム
   if (frameImage) {
     ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
   }
@@ -70,7 +88,6 @@ function drawCanvas() {
 // ===============================
 saveBtn.addEventListener('click', () => {
   if (!baseImage) return;
-
   const link = document.createElement('a');
   link.download = 'framelab.png';
   link.href = canvas.toDataURL('image/png');
@@ -85,6 +102,5 @@ resetBtn.addEventListener('click', () => {
   frameImage = null;
   imageInput.value = "";
   frameSelect.value = "";
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
