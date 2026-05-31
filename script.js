@@ -24,9 +24,7 @@ imageInput.addEventListener("change", e => {
   const reader = new FileReader();
   reader.onload = () => {
     baseImage = new Image();
-    baseImage.onload = () => {
-      draw();
-    };
+    baseImage.onload = () => draw();
     baseImage.src = reader.result;
   };
   reader.readAsDataURL(file);
@@ -37,27 +35,39 @@ frameSelect.addEventListener("change", () => {
   if (!frameSelect.value) return;
 
   frameImage = new Image();
-  frameImage.onload = () => {
-    draw();
-  };
-  frameImage.onerror = () => {
-    console.log("フレーム画像が読み込めません:", frameSelect.value);
-  };
+  frameImage.onload = () => draw();
   frameImage.src = frameSelect.value;
 });
 
-// 描画
+// 描画（どんな画像サイズでも中央フィット）
 function draw() {
   if (!baseImage) return;
 
+  // キャンバスを写真サイズに合わせる
   canvas.width = baseImage.width;
   canvas.height = baseImage.height;
 
+  // 写真を描画
   ctx.drawImage(baseImage, 0, 0);
 
-  if (frameImage && frameImage.complete) {
-    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
-  }
+  // フレームが読み込まれていない場合は終了
+  if (!frameImage || !frameImage.complete) return;
+
+  // フレームの元サイズ
+  const fw = frameImage.width;
+  const fh = frameImage.height;
+
+  // 写真の短辺に合わせてスケール
+  const scale = Math.min(canvas.width / fw, canvas.height / fh);
+
+  const drawW = fw * scale;
+  const drawH = fh * scale;
+
+  // 中央に配置
+  const dx = (canvas.width - drawW) / 2;
+  const dy = (canvas.height - drawH) / 2;
+
+  ctx.drawImage(frameImage, dx, dy, drawW, drawH);
 }
 
 // 保存
