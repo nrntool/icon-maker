@@ -1,120 +1,192 @@
-const imageInput = document.getElementById("imageInput");
-const frameSelect = document.getElementById("frameSelect");
+// ===============================
+// 画像・フレーム管理
+// ===============================
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 let baseImage = null;
 let frameImage = null;
 
-/* -----------------------------------------
-   ★ フレーム一覧（ここに PNG を追加するだけ）
------------------------------------------ */
-const frameFiles = [
-  "01_yoyaku_battle.png"
-];
+// キャンバス初期サイズ
+canvas.width = 600;
+canvas.height = 600;
 
-/* -----------------------------------------
-   ★ ファイル名 → ラベル変換
------------------------------------------ */
-function makeLabelFromFilename(filename) {
-  return filename
-    .replace(/^\d+_?/, "")
-    .replace(/\.[^/.]+$/, "")
-    .replace(/_/g, " ");
-}
+// ===============================
+// 画像の変形状態（移動・拡大縮小）
+// ===============================
+let imgScale = 1;
+let imgOffsetX = 0;
+let imgOffsetY = 0;
 
-/* -----------------------------------------
-   ★ フレーム読み込み
------------------------------------------ */
-function loadFrames() {
-  frameFiles.forEach(filename => {
-    const path = `frames/${filename}`;
-    const option = document.createElement("option");
-    option.value = path;
-    option.textContent = makeLabelFromFilename(filename);
-    frameSelect.appendChild(option);
-  });
-}
+let isDragging = false;
+let lastX = 0;
+let lastY = 0;
 
-loadFrames();
+let lastDist = 0; // ピンチ距離
 
-/* -----------------------------------------
-   ★ 写真読み込み
------------------------------------------ */
-imageInput.addEventListener("change", e => {
+// ===============================
+// 画像読み込み
+// ===============================
+document.getElementById("imageInput").addEventListener("change", (e) => {
   const file = e.target.files[0];
+  if (!file) return;
+
   const reader = new FileReader();
   reader.onload = () => {
     baseImage = new Image();
-    baseImage.onload = () => draw();
+    baseImage.onload = () => {
+      resetTransform();
+      draw();
+    };
     baseImage.src = reader.result;
   };
   reader.readAsDataURL(file);
 });
 
-/* -----------------------------------------
-   ★ フレーム変更
------------------------------------------ */
+// ===============================
+// フレーム読み込み
+// ===============================
+const frameSelect = document.getElementById("frameSelect");
+
+// フレーム一覧（必要に応じて追加）
+const frameFiles = [
+  "frames/frame1.png",
+  "frames/frame2.png",
+  "frames/frame3.png"
+];
+
+frameFiles.forEach((file) => {
+  const option = document.createElement("option");
+  option.value = file;
+  option.textContent = file.split("/").pop();
+  frameSelect.appendChild(option);
+});
+
 frameSelect.addEventListener("change", () => {
-  if (!frameSelect.value) return;
+  if (!frameSelect.value) {
+    frameImage = null;
+    draw();
+    return;
+  }
 
   frameImage = new Image();
-  frameImage.onload = () => draw();
+  frameImage.onload = draw;
   frameImage.src = frameSelect.value;
 });
 
-/* -----------------------------------------
-   ★ 描画（スマホ最適化）
------------------------------------------ */
-function getCanvasDisplaySize() {
-  const rect = canvas.getBoundingClientRect();
-  return { w: rect.width, h: rect.width };
-}
-
+// ===============================
+// 描画処理
+// ===============================
 function draw() {
-  const { w, h } = getCanvasDisplaySize();
-
-  canvas.width = w;
-  canvas.height = h;
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (baseImage) {
-    const scale = Math.min(w / baseImage.width, h / baseImage.height);
-    const bw = baseImage.width * scale;
-    const bh = baseImage.height * scale;
-    ctx.drawImage(baseImage, (w - bw) / 2, (h - bh) / 2, bw, bh);
+    ctx.save();
+    ctx.translate(imgOffsetX, imgOffsetY);
+    ctx.scale(imgScale, imgScale);
+    ctx.drawImage(baseImage, 0, 0);
+    ctx.restore();
   }
 
-  if (frameImage && frameImage.complete) {
-    const scale = Math.min(w / frameImage.naturalWidth, h / frameImage.naturalHeight);
-    const fw = frameImage.naturalWidth * scale;
-    const fh = frameImage.naturalHeight * scale;
-    ctx.drawImage(frameImage, (w - fw) / 2, (h - fh) / 2, fw, fh);
+  if (frameImage) {
+    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
   }
 }
 
-/* -----------------------------------------
-   ★ 保存
------------------------------------------ */
+// ===============================
+// 変形リセット
+// ===============================
+function resetTransform() {
+  imgScale = 1;
+  imgOffsetX = 0;
+  imgOffsetY = 0;
+}
+
+// ===============================
+// PC：ドラッグ移動
+// ===============================
+canvas.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+
+  imgOffsetX += e.clientX - lastX;
+  imgOffsetY += e.clientY - lastY;
+
+  lastX = e.clientX;
+  lastY = e.clientY;
+
+  draw();
+});
+
+canvas.addEventListener("mouseup", () => (isDragging = false));
+canvas.addEventListener("mouseleave", () => (isDragging = false));
+
+// ===============================
+// スマホ：ドラッグ移動
+// ===============================
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  }
+});
+
+// ===============================
+// スマホ：ドラッグ & ピンチズーム
+// ===============================
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+
+  // 1本指 → 移動
+  if (e.touches.length === 1) {
+    imgOffsetX += e.touches[0].clientX - lastX;
+    imgOffsetY += e.touches[0].clientY - lastY;
+
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+
+    draw();
+  }
+
+  // 2本指 → ピンチズーム
+  if (e.touches.length === 2) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (lastDist !== 0) {
+      imgScale *= dist / lastDist;
+      imgScale = Math.max(0.3, Math.min(imgScale, 5)); // ズーム制限
+      draw();
+    }
+
+    lastDist = dist;
+  }
+});
+
+canvas.addEventListener("touchend", () => {
+  lastDist = 0;
+});
+
+// ===============================
+// 保存
+// ===============================
 document.getElementById("saveBtn").addEventListener("click", () => {
   const link = document.createElement("a");
-  link.download = "framed.png";
-  link.href = canvas.toDataURL();
+  link.download = "framelab.png";
+  link.href = canvas.toDataURL("image/png");
   link.click();
 });
 
-/* -----------------------------------------
-   ★ リセット
------------------------------------------ */
+// ===============================
+// リセット
+// ===============================
 document.getElementById("resetBtn").addEventListener("click", () => {
-  baseImage = null;
-  frameImage = null;
-
-  imageInput.value = "";
-  frameSelect.value = "";
-
-  const { w, h } = getCanvasDisplaySize();
-  canvas.width = w;
-  canvas.height = h;
-  ctx.clearRect(0, 0, w, h);
+  resetTransform();
+  draw();
 });
