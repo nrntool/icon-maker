@@ -7,56 +7,23 @@ let baseImage = null;
 let frameImage = null;
 
 /* -----------------------------
-   ★ ファイル名 → ラベル変換
-   01_yoyaku_battle.png → yoyaku battle
------------------------------ */
-function makeLabelFromFilename(filename) {
-  return filename
-    .replace(/^\d+_?/, "")     // 先頭の数字＋_ を削除
-    .replace(/\.[^/.]+$/, "")  // 拡張子削除
-    .replace(/_/g, " ");       // _ → スペース
-}
-
-/* -----------------------------
-   ★ frames フォルダの画像を確実に読み込む
-   → フォルダにあるファイル名をそのまま指定
+   ★ manifest.json を読み込む
 ----------------------------- */
 function loadFrames() {
-  const files = [
-    "01_yoyaku_battle.png",
-    "02_yoyaku_battle.png"
-  ];
-
-  files.forEach(filename => {
-    const path = `frames/${filename}`;
-    const img = new Image();
-
-    img.onload = () => {
-      const label = makeLabelFromFilename(filename);
-
-      const option = document.createElement("option");
-      option.value = path;
-      option.textContent = label;
-      frameSelect.appendChild(option);
-    };
-
-    img.onerror = () => {
-      console.log("読み込み失敗:", path);
-    };
-
-    img.src = path;
-  });
+  fetch("frames/manifest.json")
+    .then(res => res.json())
+    .then(list => {
+      list.forEach(frame => {
+        const option = document.createElement("option");
+        option.value = frame.path;
+        option.textContent = frame.label;
+        frameSelect.appendChild(option);
+      });
+    })
+    .catch(err => console.error("manifest 読み込み失敗:", err));
 }
 
 loadFrames();
-
-/* -----------------------------
-   ★ 表示サイズ（スマホ対応）
------------------------------ */
-function getCanvasDisplaySize() {
-  const rect = canvas.getBoundingClientRect();
-  return { w: rect.width, h: rect.width };
-}
 
 /* -----------------------------
    ★ 写真読み込み
@@ -86,6 +53,11 @@ frameSelect.addEventListener("change", () => {
 /* -----------------------------
    ★ 描画（スマホ最適化）
 ----------------------------- */
+function getCanvasDisplaySize() {
+  const rect = canvas.getBoundingClientRect();
+  return { w: rect.width, h: rect.width };
+}
+
 function draw() {
   const { w, h } = getCanvasDisplaySize();
 
