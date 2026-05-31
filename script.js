@@ -4,7 +4,7 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// スマホ画面のピンチズームを無効化（超重要）
+// スマホ画面のピンチズームを無効化
 canvas.style.touchAction = "none";
 
 let baseImage = null;
@@ -28,7 +28,7 @@ let lastY = 0;
 let lastDist = 0; // ピンチ距離
 
 // ===============================
-// 画像読み込み
+// 画像読み込み（自動フィット付き）
 // ===============================
 document.getElementById("imageInput").addEventListener("change", (e) => {
   const file = e.target.files[0];
@@ -38,7 +38,7 @@ document.getElementById("imageInput").addEventListener("change", (e) => {
   reader.onload = () => {
     baseImage = new Image();
     baseImage.onload = () => {
-      resetTransform();
+      autoFitImage(); // ← ★ 自動フィット
       draw();
     };
     baseImage.src = reader.result;
@@ -47,11 +47,31 @@ document.getElementById("imageInput").addEventListener("change", (e) => {
 });
 
 // ===============================
+// 自動フィット処理
+// ===============================
+function autoFitImage() {
+  if (!baseImage) return;
+
+  const imgW = baseImage.width;
+  const imgH = baseImage.height;
+  const canvasW = canvas.width;
+  const canvasH = canvas.height;
+
+  // キャンバスに収まるように scale を計算（contain）
+  const scaleW = canvasW / imgW;
+  const scaleH = canvasH / imgH;
+  imgScale = Math.min(scaleW, scaleH);
+
+  // 中央に配置
+  imgOffsetX = (canvasW - imgW * imgScale) / 2;
+  imgOffsetY = (canvasH - imgH * imgScale) / 2;
+}
+
+// ===============================
 // フレーム読み込み
 // ===============================
 const frameSelect = document.getElementById("frameSelect");
 
-// フレーム一覧（必要に応じて追加）
 const frameFiles = [
   "frames/frame1.png",
   "frames/frame2.png",
@@ -94,15 +114,6 @@ function draw() {
   if (frameImage) {
     ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
   }
-}
-
-// ===============================
-// 変形リセット
-// ===============================
-function resetTransform() {
-  imgScale = 1;
-  imgOffsetX = 0;
-  imgOffsetY = 0;
 }
 
 // ===============================
@@ -190,6 +201,6 @@ document.getElementById("saveBtn").addEventListener("click", () => {
 // リセット
 // ===============================
 document.getElementById("resetBtn").addEventListener("click", () => {
-  resetTransform();
+  autoFitImage(); // ← ★ リセット時もフィット
   draw();
 });
