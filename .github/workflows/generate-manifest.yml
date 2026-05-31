@@ -3,32 +3,31 @@ name: Generate manifest.json
 on:
   push:
     paths:
-      - "frames/**"
+      - 'frames/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Generate manifest.json
         run: |
+          mkdir -p frames
           echo "[" > frames/manifest.json
-          for file in frames/*; do
-            if [[ -f "$file" ]]; then
-              name=$(basename "$file")
-              echo "  \"$name\"," >> frames/manifest.json
-            fi
+          for f in frames/*.png; do
+            name=$(basename "$f")
+            label=$(echo "$name" | sed -E 's/^[0-9]+_?//' | sed -E 's/.png$//' | sed 's/_/ /g')
+            echo "  {\"path\": \"frames/$name\", \"label\": \"$label\"}," >> frames/manifest.json
           done
           sed -i '$ s/,$//' frames/manifest.json
           echo "]" >> frames/manifest.json
 
-      - name: Commit manifest.json
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add frames/manifest.json
-          git commit -m "Auto-update manifest.json" || echo "No changes to commit"
-          git push
+      - name: Upload manifest.json as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifest
+          path: frames/manifest.json
