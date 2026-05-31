@@ -45,19 +45,26 @@
       border-radius: 2px;
     }
 
-    /* 注意事項カード（アプリ風・行間詰め） */
+    /* 注意事項タイトル（アプリ風） */
     .notes {
       margin-top: 30px;
       text-align: center;
     }
 
     .notes h2 {
-      font-size: 20px;
-      margin-bottom: 12px;
-      color: #333;
-      font-weight: 700;
+      font-size: 17px;
+      font-weight: 600;
+      color: #222;
+      letter-spacing: 0.5px;          /* アプリ感の決め手 */
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e5e5ea; /* iOS風の薄いライン */
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
     }
 
+    /* 注意事項カード（行間詰め＋アプリ風） */
     .card {
       max-width: 300px;
       margin: 0 auto;
@@ -68,7 +75,7 @@
         0 4px 12px rgba(0,0,0,0.08),
         0 1px 3px rgba(0,0,0,0.04);
       font-size: 15px;
-      line-height: 1.45;   /* ← ★ 行間を詰めた最適値 */
+      line-height: 1.45;   /* 行間を詰めた最適値 */
       color: #444;
       text-align: left;
     }
