@@ -10,10 +10,10 @@ let frameImage = null;
 fetch("frames/manifest.json")
   .then(res => res.json())
   .then(list => {
-    list.forEach(name => {
+    list.forEach(frame => {
       const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
+      option.value = frame.path;        // ← 画像パス
+      option.textContent = frame.label; // ← 表示名
       frameSelect.appendChild(option);
     });
   });
@@ -34,7 +34,7 @@ imageInput.addEventListener("change", e => {
 frameSelect.addEventListener("change", () => {
   frameImage = new Image();
   frameImage.onload = draw;
-  frameImage.src = "frames/" + frameSelect.value;
+  frameImage.src = frameSelect.value; // ← そのまま使う
 });
 
 // 描画
