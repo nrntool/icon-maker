@@ -12,24 +12,26 @@ let frameImage = null;
 ----------------------------- */
 function makeLabelFromFilename(filename) {
   return filename
-    .replace(/^\d+_?/, "")     // 先頭の数字＋_ を削除（01_ → ""）
+    .replace(/^\d+_?/, "")     // 先頭の数字＋_ を削除
     .replace(/\.[^/.]+$/, "")  // 拡張子削除
     .replace(/_/g, " ");       // _ → スペース
 }
 
 /* -----------------------------
-   ★ frames フォルダの PNG を自動検出
-   → 01_〜99_ の形式に完全対応
+   ★ frames フォルダの画像を確実に読み込む
+   → フォルダにあるファイル名をそのまま指定
 ----------------------------- */
 function loadFrames() {
-  for (let i = 1; i <= 99; i++) {
-    const num = String(i).padStart(2, "0"); // 01, 02, 03...
-    const path = `frames/${num}_yoyaku_battle.png`;
+  const files = [
+    "01_yoyaku_battle.png",
+    "02_yoyaku_battle.png"
+  ];
 
+  files.forEach(filename => {
+    const path = `frames/${filename}`;
     const img = new Image();
 
     img.onload = () => {
-      const filename = path.split("/").pop();
       const label = makeLabelFromFilename(filename);
 
       const option = document.createElement("option");
@@ -38,9 +40,12 @@ function loadFrames() {
       frameSelect.appendChild(option);
     };
 
-    img.onerror = () => {};
+    img.onerror = () => {
+      console.log("読み込み失敗:", path);
+    };
+
     img.src = path;
-  }
+  });
 }
 
 loadFrames();
