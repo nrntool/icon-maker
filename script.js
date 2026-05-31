@@ -24,6 +24,7 @@ let imgOffsetY = 0;
 let isDragging = false;
 let lastX = 0;
 let lastY = 0;
+
 let lastDist = 0; // ピンチ距離
 
 // ===============================
@@ -123,10 +124,13 @@ canvas.addEventListener("mousedown", (e) => {
 
 canvas.addEventListener("mousemove", (e) => {
   if (!isDragging) return;
+
   imgOffsetX += e.clientX - lastX;
   imgOffsetY += e.clientY - lastY;
+
   lastX = e.clientX;
   lastY = e.clientY;
+
   draw();
 });
 
@@ -134,7 +138,7 @@ canvas.addEventListener("mouseup", () => (isDragging = false));
 canvas.addEventListener("mouseleave", () => (isDragging = false));
 
 // ===============================
-// スマホ：ドラッグ & ピンチズーム
+// スマホ：ドラッグ移動
 // ===============================
 canvas.addEventListener("touchstart", (e) => {
   if (e.touches.length === 1) {
@@ -143,26 +147,35 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
+// ===============================
+// スマホ：ドラッグ & ピンチズーム
+// ===============================
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
+  // 1本指 → 移動
   if (e.touches.length === 1) {
     imgOffsetX += e.touches[0].clientX - lastX;
     imgOffsetY += e.touches[0].clientY - lastY;
+
     lastX = e.touches[0].clientX;
     lastY = e.touches[0].clientY;
+
     draw();
   }
 
+  // 2本指 → ピンチズーム
   if (e.touches.length === 2) {
     const dx = e.touches[0].clientX - e.touches[1].clientX;
     const dy = e.touches[0].clientY - e.touches[1].clientY;
     const dist = Math.sqrt(dx * dx + dy * dy);
+
     if (lastDist !== 0) {
       imgScale *= dist / lastDist;
       imgScale = Math.max(0.3, Math.min(imgScale, 5));
       draw();
     }
+
     lastDist = dist;
   }
 });
