@@ -7,11 +7,10 @@ let baseImage = null;
 let frameImage = null;
 
 /* -----------------------------------------
-   フレーム一覧（frames フォルダ内）
+   フレーム一覧
 ----------------------------------------- */
 const frameFiles = ["01_yoyaku.png"];
 
-/* ファイル名 → 表示名 */
 function makeLabelFromFilename(filename) {
   return filename
     .replace(/^\d+_?/, "")
@@ -19,7 +18,6 @@ function makeLabelFromFilename(filename) {
     .replace(/_/g, " ");
 }
 
-/* セレクトにフレームを追加 */
 function loadFrames() {
   frameFiles.forEach(filename => {
     const path = `./frames/${filename}`;
@@ -34,16 +32,13 @@ loadFrames();
 /* -----------------------------------------
    ibisPaint風：現在値と目標値を分離
 ----------------------------------------- */
-let imgX = 0, imgY = 0;          // 現在位置
-let targetX = 0, targetY = 0;    // 目標位置
+let imgX = 0, imgY = 0;
+let targetX = 0, targetY = 0;
 
-let imgScale = 1;                // 現在スケール
-let targetScale = 1;             // 目標スケール
+let imgScale = 1;
+let targetScale = 1;
 
-let vx = 0, vy = 0;              // 慣性
-let lastMoveTime = 0;
-
-const smooth = 0.15;             // 補間の強さ（0.1〜0.2が自然）
+const smooth = 0.15;
 
 /* -----------------------------------------
    キャンバスサイズ（正方形）
@@ -138,7 +133,7 @@ frameSelect.addEventListener("change", () => {
 });
 
 /* -----------------------------------------
-   ドラッグ（目標値だけ動かす）
+   ドラッグ
 ----------------------------------------- */
 let isDragging = false;
 let startX = 0, startY = 0;
@@ -163,17 +158,14 @@ canvas.addEventListener("mousemove", e => {
   targetY = e.clientY - startY;
 });
 
-canvas.addEventListener("mouseup", () => {
-  isDragging = false;
-});
-
-canvas.addEventListener("mouseleave", () => {
-  isDragging = false;
-});
+canvas.addEventListener("mouseup", () => isDragging = false);
+canvas.addEventListener("mouseleave", () => isDragging = false);
 
 /* -----------------------------------------
-   タッチドラッグ
+   タッチ操作（ピンチ中心ズーム対応）
 ----------------------------------------- */
+let lastDist = null;
+
 canvas.addEventListener("touchstart", e => {
   if (e.touches.length === 1) {
     const pos = getTouchPos(e.touches[0]);
@@ -182,8 +174,6 @@ canvas.addEventListener("touchstart", e => {
     startY = pos.y - targetY;
   }
 });
-
-let lastDist = null;
 
 canvas.addEventListener("touchmove", e => {
   if (e.touches.length === 1 && isDragging) {
@@ -204,6 +194,7 @@ canvas.addEventListener("touchmove", e => {
 
     if (lastDist !== null) {
       const scaleRatio = dist / lastDist;
+
       targetScale *= scaleRatio;
 
       targetX = cx - (cx - targetX) * scaleRatio;
@@ -240,11 +231,10 @@ canvas.addEventListener("wheel", e => {
 });
 
 /* -----------------------------------------
-   ibisPaint風：毎フレーム補間
+   毎フレーム補間（ibisPaint風）
 ----------------------------------------- */
 function animate() {
   imgScale += (targetScale - imgScale) * smooth;
-
   imgX += (targetX - imgX) * smooth;
   imgY += (targetY - imgY) * smooth;
 
@@ -254,7 +244,7 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（正方形・高解像度・フレーム込み）
+   保存（正方形・高解像度）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   const { w } = getCanvasDisplaySize();
