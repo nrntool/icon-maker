@@ -46,21 +46,26 @@ h1::after {
 }
 
 /* -----------------------------------------
-   注意事項カード（青みグレー影・柔らかい）
+   注意事項カード（FrameLab風）
 ----------------------------------------- */
 .notice-box {
   background-color: #fff;
   border-radius: 12px;
-
-  /* ★ 青みグレーの柔らかい影（完成版） */
-  box-shadow: 0 8px 28px rgba(0, 40, 80, 0.12);
-
+  box-shadow: 0 8px 28px rgba(0, 40, 80, 0.12); /* 青みグレーの柔らかい影 */
   padding: 20px;
   margin: 20px auto;
   width: 90%;
   max-width: 500px;
   text-align: left;
   line-height: 1.6;
+  font-size: 15px;
+}
+
+.notice-box strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
 /* -----------------------------------------
