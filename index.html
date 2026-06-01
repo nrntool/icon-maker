@@ -8,33 +8,41 @@
 </head>
 <body>
 
+  <!-- タイトル -->
   <h1>FrameLab</h1>
-  <p class="description">画像をフレームに合わせて調整し、保存できます。</p>
+  <p class="description">画像をフレームに合わせて調整し、正方形で保存できます。</p>
 
+  <!-- 注意事項カード（FrameLab風） -->
   <div class="notice-box">
     <strong>注意事項</strong><br>
-    ・フレーム外の画像は保存時にグレーで塗りつぶされます。<br>
-    ・保存画像は高解像度（3倍）で出力されます。<br>
-    ・ピンチ操作で拡大縮小、ドラッグで移動できます。
+    ・画像はサーバーに保存されません<br>
+    ・ブラウザ内だけで処理されます<br>
+    ・URLを知っている人だけが利用できます
   </div>
 
+  <!-- メインコンテナ -->
   <div class="container">
 
+    <!-- 画像選択 -->
     <label>画像を選択</label>
     <input type="file" id="imageInput" accept="image/*">
 
+    <!-- フレーム選択 -->
     <label>フレームを選択</label>
     <select id="frameSelect">
       <option value="">選択してください</option>
     </select>
 
+    <!-- キャンバス -->
     <canvas id="canvas"></canvas>
 
+    <!-- ボタン -->
     <button class="btn-save" id="saveBtn">保存</button>
     <button class="btn-reset" id="resetBtn">リセット</button>
 
   </div>
 
+  <!-- JS -->
   <script src="script.js"></script>
 </body>
 </html>
