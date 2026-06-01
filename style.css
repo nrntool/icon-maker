@@ -7,7 +7,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #fafafa; /* 白に近いグレー */
+  background-color: #f5f5f5; /* 明るいグレー背景 */
   color: #222;
   font-family: "Noto Sans JP", sans-serif;
   text-align: center;
@@ -16,7 +16,7 @@ html, body {
 }
 
 /* -----------------------------------------
-   タイトル（FrameLab 風）
+   タイトル（FrameLab風）
 ----------------------------------------- */
 h1 {
   font-size: 2.2em;
@@ -34,6 +34,15 @@ h1::after {
   background-color: #0078d4; /* 青い下線 */
   margin: 8px auto 0;
   border-radius: 2px;
+}
+
+/* -----------------------------------------
+   説明文
+----------------------------------------- */
+.description {
+  font-size: 1em;
+  color: #333;
+  margin-bottom: 20px;
 }
 
 /* -----------------------------------------
@@ -76,25 +85,7 @@ select {
 }
 
 /* -----------------------------------------
-   ボタン（FrameLab 風）
------------------------------------------ */
-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 15px;
-  border: none;
-  border-radius: 6px;
-  background-color: #0078d4;
-  color: #fff;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #005fa3;
-}
-
-/* -----------------------------------------
-   キャンバス（操作系）
+   キャンバス（画像表示領域）
 ----------------------------------------- */
 canvas {
   touch-action: none; /* ブラウザ標準のピンチズーム無効 */
@@ -102,11 +93,65 @@ canvas {
   width: 100%;
   max-width: 500px;
   margin: 20px auto;
-  background-color: transparent;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 40, 80, 0.08);
 }
 
 /* -----------------------------------------
-   全体コンテナ
+   保存ボタン（青）
+----------------------------------------- */
+.btn-save {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0078d4; /* メインの青 */
+  color: #fff;
+  cursor: pointer;
+  width: 90%;
+  max-width: 400px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #005fa3;
+  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
+}
+
+.btn-save:active {
+  background-color: #004f8a;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
+}
+
+/* -----------------------------------------
+   リセットボタン（グレー）
+----------------------------------------- */
+.btn-reset {
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #e5e5e5;
+  color: #333;
+  cursor: pointer;
+  width: 90%;
+  max-width: 400px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-reset:hover {
+  background-color: #d5d5d5;
+}
+
+.btn-reset:active {
+  background-color: #c8c8c8;
+}
+
+/* -----------------------------------------
+   コンテナ全体
 ----------------------------------------- */
 .container {
   width: 100%;
