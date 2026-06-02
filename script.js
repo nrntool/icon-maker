@@ -40,6 +40,10 @@ let targetScale = 1;
 
 const smooth = 0.15;
 
+/* ★ ズーム制限（自然） */
+const MIN_SCALE = 0.2;
+const MAX_SCALE = 6.0;
+
 /* -----------------------------------------
    キャンバスサイズ（正方形）
 ----------------------------------------- */
@@ -162,7 +166,7 @@ canvas.addEventListener("mouseup", () => isDragging = false);
 canvas.addEventListener("mouseleave", () => isDragging = false);
 
 /* -----------------------------------------
-   タッチ操作（ピンチ中心ズーム対応）
+   タッチ操作（ピンチ中心ズーム＋制限）
 ----------------------------------------- */
 let lastDist = null;
 
@@ -197,6 +201,9 @@ canvas.addEventListener("touchmove", e => {
 
       targetScale *= scaleRatio;
 
+      /* ★ ズーム制限（自然） */
+      targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
+
       targetX = cx - (cx - targetX) * scaleRatio;
       targetY = cy - (cy - targetY) * scaleRatio;
     }
@@ -211,7 +218,7 @@ canvas.addEventListener("touchend", () => {
 });
 
 /* -----------------------------------------
-   ホイールズーム（PC）
+   ホイールズーム（PC）＋制限
 ----------------------------------------- */
 canvas.addEventListener("wheel", e => {
   e.preventDefault();
@@ -226,6 +233,10 @@ canvas.addEventListener("wheel", e => {
   const scaleRatio = newScale / targetScale;
 
   targetScale = newScale;
+
+  /* ★ ズーム制限（自然） */
+  targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
+
   targetX = cx - (cx - targetX) * scaleRatio;
   targetY = cy - (cy - targetY) * scaleRatio;
 });
