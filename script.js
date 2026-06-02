@@ -126,88 +126,6 @@ function draw() {
 }
 
 /* -----------------------------------------
-   画像読み込み
------------------------------------------ */
-imageInput.addEventListener("change", e => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    baseImage = new Image();
-    baseImage.onload = () => {
-      const { w, h } = getCanvasDisplaySize();
-
-      const innerScale = 0.80;
-      const innerW = w * innerScale;
-      const innerH = h * innerScale;
-      const innerX = (w - innerW) / 2;
-      const innerY = (h - innerH) / 2;
-
-      const scaleFit = Math.min(innerW / baseImage.width, innerH / baseImage.height);
-
-      imgScale = targetScale = scaleFit;
-
-      const centerX = innerX + innerW / 2;
-      const centerY = innerY + innerH / 2;
-
-      imgX = targetX = centerX - (baseImage.width * imgScale) / 2;
-      imgY = targetY = centerY - (baseImage.height * imgScale) / 2;
-
-      rotation = targetRotation = 0;
-
-      draw();
-    };
-    baseImage.src = reader.result;
-  };
-
-  reader.readAsDataURL(file);
-});
-
-/* -----------------------------------------
-   フレーム読み込み
------------------------------------------ */
-frameSelect.addEventListener("change", () => {
-  if (!frameSelect.value) return;
-
-  frameImage = new Image();
-  frameImage.onload = () => draw();
-  frameImage.src = frameSelect.value;
-});
-
-/* -----------------------------------------
-   ドラッグ（移動）
------------------------------------------ */
-let startX = 0, startY = 0;
-
-canvas.addEventListener("mousedown", e => {
-  isDragging = true;
-  startX = e.clientX - targetX;
-  startY = e.clientY - targetY;
-  lastMoveTime = performance.now();
-});
-
-canvas.addEventListener("mousemove", e => {
-  if (!isDragging) return;
-
-  const now = performance.now();
-  const dt = now - lastMoveTime || 16;
-
-  const newX = e.clientX - startX;
-  const newY = e.clientY - startY;
-
-  moveVX = (newX - targetX) / dt;
-  moveVY = (newY - targetY) / dt;
-
-  targetX = newX;
-  targetY = newY;
-
-  lastMoveTime = now;
-});
-
-canvas.addEventListener("mouseup", () => isDragging = false);
-canvas.addEventListener("mouseleave", () => isDragging = false);
-
-/* -----------------------------------------
    タッチ操作（移動＋ズーム＋回転）
 ----------------------------------------- */
 function getTouchPos(touch) {
@@ -523,4 +441,17 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   imgX = targetX = 0;
   imgY = targetY = 0;
   imgScale = targetScale = 1;
-  rotation =
+  rotation = targetRotation = 0;
+
+  moveVX = moveVY = 0;
+  pinchVelocity = 0;
+  rotationVelocity = 0;
+
+  imageInput.value = "";
+  frameSelect.value = "";
+
+  const { w, h } = getCanvasDisplaySize();
+  canvas.width = w;
+  canvas.height = h;
+  ctx.clearRect(0, 0, w, h);
+});
