@@ -1,5 +1,5 @@
 /* ============================================================
-   FrameLab – 安定版（スナップなし・バウンスなし）
+   FrameLab – フレーム外カット対応・軽量安定版
 ============================================================ */
 
 const imageInput = document.getElementById("imageInput");
@@ -54,7 +54,7 @@ function getCanvasDisplaySize() {
 }
 
 /* -----------------------------------------
-   描画
+   描画（フレームは常に表示）
 ----------------------------------------- */
 function draw() {
   const { w, h } = getCanvasDisplaySize();
@@ -69,6 +69,7 @@ function draw() {
   const innerX = (w - innerW) / 2;
   const innerY = (h - innerH) / 2;
 
+  // 背景画像はフレーム内側だけ描画
   ctx.save();
   ctx.beginPath();
   ctx.rect(innerX, innerY, innerW, innerH);
@@ -84,6 +85,7 @@ function draw() {
 
   ctx.restore();
 
+  // ★ フレームはキャンバス全体に描画（clip外）
   if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, w, h);
   }
@@ -248,45 +250,40 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（正方形・高解像度）
+   保存（フレーム内側だけカット）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   const { w } = getCanvasDisplaySize();
 
-  const baseSize = w;
-  const scaleFactor = 3;
-
   const innerScale = 0.80;
-  const innerW = baseSize * innerScale;
-  const innerH = baseSize * innerScale;
-  const innerX = (baseSize - innerW) / 2;
-  const innerY = (baseSize - innerH) / 2;
+  const innerW = w * innerScale;
+  const innerH = w * innerScale;
+  const innerX = (w - innerW) / 2;
+  const innerY = (w - innerH) / 2;
 
   const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = baseSize * scaleFactor;
-  saveCanvas.height = baseSize * scaleFactor;
+  saveCanvas.width = innerW;
+  saveCanvas.height = innerH;
   const sctx = saveCanvas.getContext("2d");
 
-  sctx.fillStyle = "#cccccc";
-  sctx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
-
+  // フレーム内側だけ描画
   sctx.save();
   sctx.beginPath();
-  sctx.rect(innerX * scaleFactor, innerY * scaleFactor, innerW * scaleFactor, innerH * scaleFactor);
+  sctx.rect(0, 0, innerW, innerH);
   sctx.clip();
 
-  sctx.translate(imgX * scaleFactor, imgY * scaleFactor);
-  sctx.scale(imgScale * scaleFactor, imgScale * scaleFactor);
+  sctx.translate(imgX - innerX, imgY - innerY);
+  sctx.scale(imgScale, imgScale);
   sctx.drawImage(baseImage, 0, 0);
-
   sctx.restore();
 
+  // フレームも内側に合わせて描画
   if (frameImage && frameImage.complete) {
-    sctx.drawImage(frameImage, 0, 0, baseSize * scaleFactor, baseSize * scaleFactor);
+    sctx.drawImage(frameImage, -innerX, -innerY, w, w);
   }
 
   const link = document.createElement("a");
-  link.download = "framed_square.png";
+  link.download = "framed_inner.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 });
