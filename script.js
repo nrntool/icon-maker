@@ -1,3 +1,7 @@
+/* ============================================================
+   FrameLab – 安定版（スナップなし・バウンスなし）
+============================================================ */
+
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
@@ -288,7 +292,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
 });
 
 /* -----------------------------------------
-   リセット
+   リセット（全部消える）
 ----------------------------------------- */
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
