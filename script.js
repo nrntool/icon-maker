@@ -1,3 +1,8 @@
+/* ============================================================
+   FrameLab – ibisPaint式 3軸統合慣性エンジン 完全版
+   （移動・ズーム・回転・補正・スナップ・減速 全部入り）
+============================================================ */
+
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
@@ -30,7 +35,7 @@ function loadFrames() {
 loadFrames();
 
 /* -----------------------------------------
-   変換パラメータ（位置・拡大・回転）
+   変換パラメータ
 ----------------------------------------- */
 let imgX = 0, imgY = 0;
 let targetX = 0, targetY = 0;
@@ -79,7 +84,7 @@ function getCanvasDisplaySize() {
 }
 
 /* -----------------------------------------
-   描画
+   描画（回転は画像中心固定）
 ----------------------------------------- */
 function draw() {
   const { w, h } = getCanvasDisplaySize();
@@ -101,10 +106,17 @@ function draw() {
 
   if (baseImage) {
     ctx.save();
-    ctx.translate(imgX, imgY);
-    ctx.scale(imgScale, imgScale);
+
+    // ★ 画像中心（回転軸）
+    const imgCenterX = imgX + (baseImage.width * imgScale) / 2;
+    const imgCenterY = imgY + (baseImage.height * imgScale) / 2;
+
+    ctx.translate(imgCenterX, imgCenterY);
     ctx.rotate(rotation);
-    ctx.drawImage(baseImage, 0, 0);
+    ctx.scale(imgScale, imgScale);
+
+    ctx.drawImage(baseImage, -baseImage.width / 2, -baseImage.height / 2);
+
     ctx.restore();
   }
 
@@ -259,11 +271,15 @@ canvas.addEventListener("touchmove", e => {
       pinchVelocity = targetScale - lastScale;
       lastScale = targetScale;
 
-      /* --- 回転 --- */
+      /* --- 回転（ズーム中は弱体化） --- */
+      const zoomSpeedForRot = Math.abs(pinchVelocity);
+      const rotWeak = 1 - Math.min(zoomSpeedForRot * 1.4, 0.65);
+
       const angleDiff = angle - lastAngle;
       const normalized = ((angleDiff + Math.PI) % (2 * Math.PI)) - Math.PI;
-      targetRotation += normalized;
-      rotationVelocity = normalized;
+
+      targetRotation += normalized * rotWeak;
+      rotationVelocity = normalized * rotWeak;
 
       /* --- 移動（ピンチ中心移動） --- */
       const moveX = cx - lastCx;
@@ -271,15 +287,29 @@ canvas.addEventListener("touchmove", e => {
       targetX += moveX;
       targetY += moveY;
 
-      /* --- ピンチ中心ズーム補正（ibisPaintベース） --- */
+      /* --- ピンチ中心ズーム補正（ibisPaint式） --- */
       targetX = cx - (cx - targetX) * scaleRatio;
       targetY = cy - (cy - targetY) * scaleRatio;
 
-      /* --- 画像中心への弱い吸着補正（ibisPaintっぽさ） --- */
+      /* --- 中心吸着補正（距離依存＋速度依存＋回転依存） --- */
       if (baseImage) {
         const centerX = imgX + (baseImage.width * imgScale) / 2;
         const centerY = imgY + (baseImage.height * imgScale) / 2;
-        const attract = 0.08; // 0.05〜0.12で調整
+
+        const dx = cx - centerX;
+        const dy = cy - centerY;
+        const distToCenter = Math.hypot(dx, dy);
+
+        const { w, h } = getCanvasDisplaySize();
+        const diag = Math.hypot(w, h);
+
+        let attract = 0.06 * (distToCenter / diag);
+
+        const zoomSpeed = Math.abs(pinchVelocity);
+        attract += Math.min(zoomSpeed * 1.2, 0.12);
+
+        const rotSpeed = Math.abs(rotationVelocity);
+        attract *= 1 - Math.min(rotSpeed * 1.8, 0.75);
 
         targetX += (centerX - targetX) * attract;
         targetY += (centerY - targetY) * attract;
@@ -323,15 +353,6 @@ canvas.addEventListener("wheel", e => {
 
   targetX = cx - (cx - targetX) * scaleRatio;
   targetY = cy - (cy - targetY) * scaleRatio;
-
-  if (baseImage) {
-    const centerX = imgX + (baseImage.width * imgScale) / 2;
-    const centerY = imgY + (baseImage.height * imgScale) / 2;
-    const attract = 0.08;
-
-    targetX += (centerX - targetX) * attract;
-    targetY += (centerY - targetY) * attract;
-  }
 });
 
 /* -----------------------------------------
@@ -339,25 +360,65 @@ canvas.addEventListener("wheel", e => {
 ----------------------------------------- */
 function animate() {
 
+  /* --- 慣性（指を離した後） --- */
   if (!isDragging && !isPinching) {
 
-    /* --- 移動慣性 --- */
     moveVX *= 0.92;
     moveVY *= 0.92;
     targetX += moveVX * 16;
     targetY += moveVY * 16;
 
-    /* --- ズーム慣性 --- */
     pinchVelocity *= 0.90;
     targetScale += pinchVelocity;
     targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
 
-    /* --- 回転慣性 --- */
     rotationVelocity *= 0.90;
     targetRotation += rotationVelocity;
   }
 
-  /* --- 補間（自然な追従） --- */
+  /* --- 回転スナップ（45°対応＋減速） --- */
+  {
+    const snapAngles = [
+      0,
+      Math.PI / 4,
+      Math.PI / 2,
+      Math.PI * 3 / 4,
+      Math.PI,
+      Math.PI * 5 / 4,
+      Math.PI * 3 / 2,
+      Math.PI * 7 / 4
+    ];
+
+    const rotSpeed = Math.abs(rotationVelocity);
+
+    if (rotSpeed < 0.02) {
+
+      let norm = targetRotation % (Math.PI * 2);
+      if (norm < 0) norm += Math.PI * 2;
+
+      let nearest = null;
+      let minDiff = Infinity;
+
+      for (const a of snapAngles) {
+        const diff = Math.abs(norm - a);
+        if (diff < minDiff) {
+          minDiff = diff;
+          nearest = a;
+        }
+      }
+
+      if (minDiff < 0.17) {
+
+        const snapStrength = 0.25;
+        targetRotation += (nearest - norm) * snapStrength;
+
+        const slowDown = 1 - (minDiff / 0.17);
+        rotationVelocity *= (0.35 + 0.65 * (1 - slowDown));
+      }
+    }
+  }
+
+  /* --- 補間 --- */
   imgScale += (targetScale - imgScale) * smooth;
   imgX += (targetX - imgX) * smooth;
   imgY += (targetY - imgY) * smooth;
