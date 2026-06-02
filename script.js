@@ -44,6 +44,16 @@ const smooth = 0.15;
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 6.0;
 
+/* ★ ピンチ慣性 */
+let pinchVelocity = 0;
+let lastScale = 1;
+let isPinching = false;
+
+/* ピンチ中心記録 */
+let lastCx = null;
+let lastCy = null;
+let lastDist = null;
+
 /* -----------------------------------------
    キャンバスサイズ（正方形）
 ----------------------------------------- */
@@ -166,10 +176,8 @@ canvas.addEventListener("mouseup", () => isDragging = false);
 canvas.addEventListener("mouseleave", () => isDragging = false);
 
 /* -----------------------------------------
-   タッチ操作（ピンチ中心ズーム＋制限）
+   タッチ操作（ピンチ中心ズーム＋自然移動＋慣性）
 ----------------------------------------- */
-let lastDist = null;
-
 canvas.addEventListener("touchstart", e => {
   if (e.touches.length === 1) {
     const pos = getTouchPos(e.touches[0]);
@@ -191,34 +199,50 @@ canvas.addEventListener("touchmove", e => {
     e.preventDefault();
 
     const [t1, t2] = e.touches;
-    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
 
     const cx = (t1.clientX + t2.clientX) / 2;
     const cy = (t1.clientY + t2.clientY) / 2;
+
+    const dist = Math.hypot(
+      t2.clientX - t1.clientX,
+      t2.clientY - t1.clientY
+    );
 
     if (lastDist !== null) {
       const scaleRatio = dist / lastDist;
 
       targetScale *= scaleRatio;
 
-      /* ★ ズーム制限（自然） */
       targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
 
       targetX = cx - (cx - targetX) * scaleRatio;
       targetY = cy - (cy - targetY) * scaleRatio;
+
+      const moveX = cx - lastCx;
+      const moveY = cy - lastCy;
+      targetX += moveX;
+      targetY += moveY;
+
+      pinchVelocity = targetScale - lastScale;
+      isPinching = true;
+      lastScale = targetScale;
     }
 
     lastDist = dist;
+    lastCx = cx;
+    lastCy = cy;
   }
 }, { passive: false });
 
 canvas.addEventListener("touchend", () => {
   isDragging = false;
   lastDist = null;
+
+  isPinching = false;
 });
 
 /* -----------------------------------------
-   ホイールズーム（PC）＋制限
+   ホイールズーム（PC）
 ----------------------------------------- */
 canvas.addEventListener("wheel", e => {
   e.preventDefault();
@@ -234,7 +258,6 @@ canvas.addEventListener("wheel", e => {
 
   targetScale = newScale;
 
-  /* ★ ズーム制限（自然） */
   targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
 
   targetX = cx - (cx - targetX) * scaleRatio;
@@ -242,9 +265,16 @@ canvas.addEventListener("wheel", e => {
 });
 
 /* -----------------------------------------
-   毎フレーム補間（ibisPaint風）
+   毎フレーム補間（ibisPaint風＋慣性ズーム）
 ----------------------------------------- */
 function animate() {
+  if (!isPinching) {
+    pinchVelocity *= 0.90;
+    targetScale += pinchVelocity;
+
+    targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
+  }
+
   imgScale += (targetScale - imgScale) * smooth;
   imgX += (targetX - imgX) * smooth;
   imgY += (targetY - imgY) * smooth;
