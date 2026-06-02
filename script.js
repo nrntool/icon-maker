@@ -1,5 +1,5 @@
 /* ============================================================
-   FrameLab – フレーム外カット対応・安定版
+   FrameLab – フレーム外カット対応・軽量安定版
 ============================================================ */
 
 const imageInput = document.getElementById("imageInput");
@@ -54,7 +54,7 @@ function getCanvasDisplaySize() {
 }
 
 /* -----------------------------------------
-   描画
+   描画（フレームは常に表示）
 ----------------------------------------- */
 function draw() {
   const { w, h } = getCanvasDisplaySize();
@@ -69,6 +69,7 @@ function draw() {
   const innerX = (w - innerW) / 2;
   const innerY = (h - innerH) / 2;
 
+  // 背景画像はフレーム内側だけ描画
   ctx.save();
   ctx.beginPath();
   ctx.rect(innerX, innerY, innerW, innerH);
@@ -84,6 +85,7 @@ function draw() {
 
   ctx.restore();
 
+  // ★ フレームはキャンバス全体に描画（clip外）
   if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, w, h);
   }
@@ -251,13 +253,13 @@ animate();
    保存（フレーム内側だけカット）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
-  const { w, h } = getCanvasDisplaySize();
+  const { w } = getCanvasDisplaySize();
 
   const innerScale = 0.80;
   const innerW = w * innerScale;
-  const innerH = h * innerScale;
+  const innerH = w * innerScale;
   const innerX = (w - innerW) / 2;
-  const innerY = (h - innerH) / 2;
+  const innerY = (w - innerH) / 2;
 
   const saveCanvas = document.createElement("canvas");
   saveCanvas.width = innerW;
@@ -273,4 +275,35 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.translate(imgX - innerX, imgY - innerY);
   sctx.scale(imgScale, imgScale);
   sctx.drawImage(baseImage, 0, 0);
-  s
+  sctx.restore();
+
+  // フレームも内側に合わせて描画
+  if (frameImage && frameImage.complete) {
+    sctx.drawImage(frameImage, -innerX, -innerY, w, w);
+  }
+
+  const link = document.createElement("a");
+  link.download = "framed_inner.png";
+  link.href = saveCanvas.toDataURL("image/png");
+  link.click();
+});
+
+/* -----------------------------------------
+   リセット（全部消える）
+----------------------------------------- */
+document.getElementById("resetBtn").addEventListener("click", () => {
+  baseImage = null;
+  frameImage = null;
+
+  imgX = targetX = 0;
+  imgY = targetY = 0;
+  imgScale = targetScale = 1;
+
+  imageInput.value = "";
+  frameSelect.value = "";
+
+  const { w, h } = getCanvasDisplaySize();
+  canvas.width = w;
+  canvas.height = h;
+  ctx.clearRect(0, 0, w, h);
+});
