@@ -1,6 +1,5 @@
 /* ============================================================
-   FrameLab – ibisPaint風 3軸統合慣性エンジン（軽量・最終版）
-   移動 / ズーム / 回転 / 中心補正 / 45°スナップ / 減速付き
+   FrameLab – ibisPaint風 3軸統合慣性エンジン（柔らかいバウンス入り）
 ============================================================ */
 
 const imageInput = document.getElementById("imageInput");
@@ -415,6 +414,43 @@ function animate() {
     }
   }
 
+  /* --- 柔らかいバウンス（ibisPaint式） --- */
+  {
+    const { w, h } = getCanvasDisplaySize();
+
+    const innerScale = 0.80;
+    const innerW = w * innerScale;
+    const innerH = h * innerScale;
+    const innerX = (w - innerW) / 2;
+    const innerY = (h - innerH) / 2;
+
+    const imgW = baseImage.width * imgScale;
+    const imgH = baseImage.height * imgScale;
+
+    const bounce = 0.12;
+
+    if (imgX > innerX) {
+      const over = imgX - innerX;
+      targetX -= over * bounce;
+    }
+
+    if (imgX + imgW < innerX + innerW) {
+      const over = (innerX + innerW) - (imgX + imgW);
+      targetX += over * bounce;
+    }
+
+    if (imgY > innerY) {
+      const over = imgY - innerY;
+      targetY -= over * bounce;
+    }
+
+    if (imgY + imgH < innerY + innerH) {
+      const over = (innerY + innerH) - (imgY + imgH);
+      targetY += over * bounce;
+    }
+  }
+
+  /* --- 補間 --- */
   imgScale += (targetScale - imgScale) * smooth;
   imgX += (targetX - imgX) * smooth;
   imgY += (targetY - imgY) * smooth;
@@ -487,17 +523,4 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   imgX = targetX = 0;
   imgY = targetY = 0;
   imgScale = targetScale = 1;
-  rotation = targetRotation = 0;
-
-  moveVX = moveVY = 0;
-  pinchVelocity = 0;
-  rotationVelocity = 0;
-
-  imageInput.value = "";
-  frameSelect.value = "";
-
-  const { w, h } = getCanvasDisplaySize();
-  canvas.width = w;
-  canvas.height = h;
-  ctx.clearRect(0, 0, w, h);
-});
+  rotation =
