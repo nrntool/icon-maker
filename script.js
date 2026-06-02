@@ -32,42 +32,20 @@ loadFrames();
 /* -----------------------------------------
    変換パラメータ（位置・拡大・回転）
 ----------------------------------------- */
-let imgX = 0, imgY = 0;
-let targetX = 0, targetY = 0;
+let posX = 0;
+let posY = 0;
+let scale = 1;
+let angle = 0;
 
-let imgScale = 1;
+let targetPosX = 0;
+let targetPosY = 0;
 let targetScale = 1;
-
-let rotation = 0;
-let targetRotation = 0;
+let targetAngle = 0;
 
 const smooth = 0.15;
 
-/* -----------------------------------------
-   制限値
------------------------------------------ */
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 6.0;
-
-/* -----------------------------------------
-   統合慣性エンジン
------------------------------------------ */
-let moveVX = 0;
-let moveVY = 0;
-
-let pinchVelocity = 0;
-let rotationVelocity = 0;
-
-let lastMoveTime = 0;
-let lastScale = 1;
-let lastAngle = null;
-
-let lastCx = null;
-let lastCy = null;
-let lastDist = null;
-
-let isDragging = false;
-let isPinching = false;
 
 /* -----------------------------------------
    キャンバスサイズ（正方形）
@@ -94,6 +72,7 @@ function draw() {
   const innerX = (w - innerW) / 2;
   const innerY = (h - innerH) / 2;
 
+  // 画像は内側だけに描画
   ctx.save();
   ctx.beginPath();
   ctx.rect(innerX, innerY, innerW, innerH);
@@ -101,15 +80,16 @@ function draw() {
 
   if (baseImage) {
     ctx.save();
-    ctx.translate(imgX, imgY);
-    ctx.scale(imgScale, imgScale);
-    ctx.rotate(rotation);
+    ctx.translate(posX, posY);
+    ctx.scale(scale, scale);
+    ctx.rotate(angle);
     ctx.drawImage(baseImage, 0, 0);
     ctx.restore();
   }
 
   ctx.restore();
 
+  // フレームはキャンバス全体に描画
   if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, w, h);
   }
@@ -120,6 +100,8 @@ function draw() {
 ----------------------------------------- */
 imageInput.addEventListener("change", e => {
   const file = e.target.files[0];
+  if (!file) return;
+
   const reader = new FileReader();
 
   reader.onload = () => {
@@ -135,15 +117,15 @@ imageInput.addEventListener("change", e => {
 
       const scaleFit = Math.min(innerW / baseImage.width, innerH / baseImage.height);
 
-      imgScale = targetScale = scaleFit;
+      scale = targetScale = scaleFit;
 
       const centerX = innerX + innerW / 2;
       const centerY = innerY + innerH / 2;
 
-      imgX = targetX = centerX - (baseImage.width * imgScale) / 2;
-      imgY = targetY = centerY - (baseImage.height * imgScale) / 2;
+      posX = targetPosX = centerX - (baseImage.width * scale) / 2;
+      posY = targetPosY = centerY - (baseImage.height * scale) / 2;
 
-      rotation = targetRotation = 0;
+      angle = targetAngle = 0;
 
       draw();
     };
@@ -165,41 +147,44 @@ frameSelect.addEventListener("change", () => {
 });
 
 /* -----------------------------------------
-   ドラッグ（移動）
+   マウス操作（PC）
 ----------------------------------------- */
-let startX = 0, startY = 0;
+let isDraggingMouse = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
 canvas.addEventListener("mousedown", e => {
-  isDragging = true;
-  startX = e.clientX - targetX;
-  startY = e.clientY - targetY;
-  lastMoveTime = performance.now();
+  isDraggingMouse = true;
+  dragOffsetX = e.clientX - targetPosX;
+  dragOffsetY = e.clientY - targetPosY;
 });
 
 canvas.addEventListener("mousemove", e => {
-  if (!isDragging) return;
-
-  const now = performance.now();
-  const dt = now - lastMoveTime || 16;
-
-  const newX = e.clientX - startX;
-  const newY = e.clientY - startY;
-
-  moveVX = (newX - targetX) / dt;
-  moveVY = (newY - targetY) / dt;
-
-  targetX = newX;
-  targetY = newY;
-
-  lastMoveTime = now;
+  if (!isDraggingMouse) return;
+  targetPosX = e.clientX - dragOffsetX;
+  targetPosY = e.clientY - dragOffsetY;
 });
 
-canvas.addEventListener("mouseup", () => isDragging = false);
-canvas.addEventListener("mouseleave", () => isDragging = false);
+canvas.addEventListener("mouseup", () => {
+  isDraggingMouse = false;
+});
+
+canvas.addEventListener("mouseleave", () => {
+  isDraggingMouse = false;
+});
 
 /* -----------------------------------------
    タッチ操作（移動＋ズーム＋回転）
 ----------------------------------------- */
+let lastDist = null;
+let lastAngle = null;
+let lastCx = null;
+let lastCy = null;
+
+let isDraggingTouch = false;
+let touchDragOffsetX = 0;
+let touchDragOffsetY = 0;
+
 function getTouchPos(touch) {
   const rect = canvas.getBoundingClientRect();
   return {
@@ -210,98 +195,84 @@ function getTouchPos(touch) {
 
 canvas.addEventListener("touchstart", e => {
   if (e.touches.length === 1) {
-    const pos = getTouchPos(e.touches[0]);
-    isDragging = true;
-    startX = pos.x - targetX;
-    startY = pos.y - targetY;
-    lastMoveTime = performance.now();
-  }
-});
-
-canvas.addEventListener("touchmove", e => {
-  if (e.touches.length === 1 && isDragging) {
-    e.preventDefault();
-
-    const pos = getTouchPos(e.touches[0]);
-    const now = performance.now();
-    const dt = now - lastMoveTime || 16;
-
-    const newX = pos.x - startX;
-    const newY = pos.y - startY;
-
-    moveVX = (newX - targetX) / dt;
-    moveVY = (newY - targetY) / dt;
-
-    targetX = newX;
-    targetY = newY;
-
-    lastMoveTime = now;
+    const t = e.touches[0];
+    isDraggingTouch = true;
+    touchDragOffsetX = t.clientX - targetPosX;
+    touchDragOffsetY = t.clientY - targetPosY;
   }
 
   if (e.touches.length === 2) {
-    e.preventDefault();
+    const [t1, t2] = e.touches;
+    const cx = (t1.clientX + t2.clientX) / 2;
+    const cy = (t1.clientY + t2.clientY) / 2;
+    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    const ang = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
 
+    lastCx = cx;
+    lastCy = cy;
+    lastDist = dist;
+    lastAngle = ang;
+    isDraggingTouch = false;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchmove", e => {
+  e.preventDefault();
+
+  if (e.touches.length === 1 && isDraggingTouch) {
+    const t = e.touches[0];
+    targetPosX = t.clientX - touchDragOffsetX;
+    targetPosY = t.clientY - touchDragOffsetY;
+  }
+
+  if (e.touches.length === 2) {
     const [t1, t2] = e.touches;
 
     const cx = (t1.clientX + t2.clientX) / 2;
     const cy = (t1.clientY + t2.clientY) / 2;
 
     const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-    const angle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
+    const ang = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
 
-    if (lastDist !== null && lastAngle !== null) {
-
-      /* --- ズーム --- */
+    if (lastDist !== null) {
       const scaleRatio = dist / lastDist;
-      targetScale *= scaleRatio;
-      targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
+      let newScale = targetScale * scaleRatio;
+      newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+      const appliedRatio = newScale / targetScale;
 
-      pinchVelocity = targetScale - lastScale;
-      lastScale = targetScale;
+      targetScale = newScale;
 
-      /* --- 回転 --- */
-      const angleDiff = angle - lastAngle;
-      const normalized = ((angleDiff + Math.PI) % (2 * Math.PI)) - Math.PI;
-      targetRotation += normalized;
-      rotationVelocity = normalized;
-
-      /* --- 移動（ピンチ中心移動） --- */
-      const moveX = cx - lastCx;
-      const moveY = cy - lastCy;
-      targetX += moveX;
-      targetY += moveY;
-
-      /* --- ピンチ中心ズーム補正（ibisPaintベース） --- */
-      targetX = cx - (cx - targetX) * scaleRatio;
-      targetY = cy - (cy - targetY) * scaleRatio;
-
-      /* --- 画像中心への弱い吸着補正（ibisPaintっぽさ） --- */
-      if (baseImage) {
-        const centerX = imgX + (baseImage.width * imgScale) / 2;
-        const centerY = imgY + (baseImage.height * imgScale) / 2;
-        const attract = 0.08; // 0.05〜0.12で調整
-
-        targetX += (centerX - targetX) * attract;
-        targetY += (centerY - targetY) * attract;
-      }
+      // ズーム中心を2本指の中心に保つ
+      targetPosX = cx - (cx - targetPosX) * appliedRatio;
+      targetPosY = cy - (cy - targetPosY) * appliedRatio;
     }
 
-    lastDist = dist;
+    if (lastAngle !== null) {
+      const diff = ang - lastAngle;
+      targetAngle += diff;
+    }
+
+    if (lastCx !== null) {
+      targetPosX += cx - lastCx;
+      targetPosY += cy - lastCy;
+    }
+
     lastCx = cx;
     lastCy = cy;
-    lastAngle = angle;
-
-    isPinching = true;
+    lastDist = dist;
+    lastAngle = ang;
   }
 }, { passive: false });
 
-canvas.addEventListener("touchend", () => {
-  isDragging = false;
-  isPinching = false;
-
-  lastDist = null;
-  lastAngle = null;
-});
+canvas.addEventListener("touchend", e => {
+  if (e.touches.length === 0) {
+    isDraggingTouch = false;
+    lastDist = null;
+    lastAngle = null;
+    lastCx = null;
+    lastCy = null;
+  }
+}, { passive: false });
 
 /* -----------------------------------------
    ホイールズーム（PC）
@@ -314,54 +285,24 @@ canvas.addEventListener("wheel", e => {
   const cy = e.clientY - rect.top;
 
   const delta = e.deltaY > 0 ? -0.05 : 0.05;
-  const newScale = targetScale + delta;
+  let newScale = targetScale + delta;
+  newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
 
   const scaleRatio = newScale / targetScale;
-
   targetScale = newScale;
-  targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
 
-  targetX = cx - (cx - targetX) * scaleRatio;
-  targetY = cy - (cy - targetY) * scaleRatio;
-
-  if (baseImage) {
-    const centerX = imgX + (baseImage.width * imgScale) / 2;
-    const centerY = imgY + (baseImage.height * imgScale) / 2;
-    const attract = 0.08;
-
-    targetX += (centerX - targetX) * attract;
-    targetY += (centerY - targetY) * attract;
-  }
-});
+  targetPosX = cx - (cx - targetPosX) * scaleRatio;
+  targetPosY = cy - (cy - targetPosY) * scaleRatio;
+}, { passive: false });
 
 /* -----------------------------------------
-   統合慣性アニメーション
+   アニメーション（追従補間のみ）
 ----------------------------------------- */
 function animate() {
-
-  if (!isDragging && !isPinching) {
-
-    /* --- 移動慣性 --- */
-    moveVX *= 0.92;
-    moveVY *= 0.92;
-    targetX += moveVX * 16;
-    targetY += moveVY * 16;
-
-    /* --- ズーム慣性 --- */
-    pinchVelocity *= 0.90;
-    targetScale += pinchVelocity;
-    targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
-
-    /* --- 回転慣性 --- */
-    rotationVelocity *= 0.90;
-    targetRotation += rotationVelocity;
-  }
-
-  /* --- 補間（自然な追従） --- */
-  imgScale += (targetScale - imgScale) * smooth;
-  imgX += (targetX - imgX) * smooth;
-  imgY += (targetY - imgY) * smooth;
-  rotation += (targetRotation - rotation) * smooth;
+  posX += (targetPosX - posX) * smooth;
+  posY += (targetPosY - posY) * smooth;
+  scale += (targetScale - scale) * smooth;
+  angle += (targetAngle - angle) * smooth;
 
   draw();
   requestAnimationFrame(animate);
@@ -390,6 +331,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   saveCanvas.height = baseSize * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
+  // 背景色を付けたくない場合はこの2行を消す
   sctx.fillStyle = "#cccccc";
   sctx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
 
@@ -398,9 +340,9 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.rect(innerX * scaleFactor, innerY * scaleFactor, innerW * scaleFactor, innerH * scaleFactor);
   sctx.clip();
 
-  sctx.translate(imgX * scaleFactor, imgY * scaleFactor);
-  sctx.scale(imgScale * scaleFactor, imgScale * scaleFactor);
-  sctx.rotate(rotation);
+  sctx.translate(posX * scaleFactor, posY * scaleFactor);
+  sctx.scale(scale * scaleFactor, scale * scaleFactor);
+  sctx.rotate(angle);
   sctx.drawImage(baseImage, 0, 0);
 
   sctx.restore();
@@ -422,14 +364,10 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
 
-  imgX = targetX = 0;
-  imgY = targetY = 0;
-  imgScale = targetScale = 1;
-  rotation = targetRotation = 0;
-
-  moveVX = moveVY = 0;
-  pinchVelocity = 0;
-  rotationVelocity = 0;
+  posX = targetPosX = 0;
+  posY = targetPosY = 0;
+  scale = targetScale = 1;
+  angle = targetAngle = 0;
 
   imageInput.value = "";
   frameSelect.value = "";
