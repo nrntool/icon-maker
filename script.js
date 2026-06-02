@@ -143,6 +143,8 @@ imageInput.addEventListener("change", e => {
       imgX = targetX = centerX - (baseImage.width * imgScale) / 2;
       imgY = targetY = centerY - (baseImage.height * imgScale) / 2;
 
+      rotation = targetRotation = 0;
+
       draw();
     };
     baseImage.src = reader.result;
@@ -178,7 +180,7 @@ canvas.addEventListener("mousemove", e => {
   if (!isDragging) return;
 
   const now = performance.now();
-  const dt = now - lastMoveTime;
+  const dt = now - lastMoveTime || 16;
 
   const newX = e.clientX - startX;
   const newY = e.clientY - startY;
@@ -222,7 +224,7 @@ canvas.addEventListener("touchmove", e => {
 
     const pos = getTouchPos(e.touches[0]);
     const now = performance.now();
-    const dt = now - lastMoveTime;
+    const dt = now - lastMoveTime || 16;
 
     const newX = pos.x - startX;
     const newY = pos.y - startY;
@@ -263,15 +265,25 @@ canvas.addEventListener("touchmove", e => {
       targetRotation += normalized;
       rotationVelocity = normalized;
 
-      /* --- 移動 --- */
+      /* --- 移動（ピンチ中心移動） --- */
       const moveX = cx - lastCx;
       const moveY = cy - lastCy;
       targetX += moveX;
       targetY += moveY;
 
-      /* --- ピンチ中心ズーム補正 --- */
+      /* --- ピンチ中心ズーム補正（ibisPaintベース） --- */
       targetX = cx - (cx - targetX) * scaleRatio;
       targetY = cy - (cy - targetY) * scaleRatio;
+
+      /* --- 画像中心への弱い吸着補正（ibisPaintっぽさ） --- */
+      if (baseImage) {
+        const centerX = imgX + (baseImage.width * imgScale) / 2;
+        const centerY = imgY + (baseImage.height * imgScale) / 2;
+        const attract = 0.08; // 0.05〜0.12で調整
+
+        targetX += (centerX - targetX) * attract;
+        targetY += (centerY - targetY) * attract;
+      }
     }
 
     lastDist = dist;
@@ -311,6 +323,15 @@ canvas.addEventListener("wheel", e => {
 
   targetX = cx - (cx - targetX) * scaleRatio;
   targetY = cy - (cy - targetY) * scaleRatio;
+
+  if (baseImage) {
+    const centerX = imgX + (baseImage.width * imgScale) / 2;
+    const centerY = imgY + (baseImage.height * imgScale) / 2;
+    const attract = 0.08;
+
+    targetX += (centerX - targetX) * attract;
+    targetY += (centerY - targetY) * attract;
+  }
 });
 
 /* -----------------------------------------
@@ -351,6 +372,8 @@ animate();
    保存（正方形・高解像度）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
+  if (!baseImage) return;
+
   const { w } = getCanvasDisplaySize();
 
   const baseSize = w;
@@ -403,6 +426,10 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   imgY = targetY = 0;
   imgScale = targetScale = 1;
   rotation = targetRotation = 0;
+
+  moveVX = moveVY = 0;
+  pinchVelocity = 0;
+  rotationVelocity = 0;
 
   imageInput.value = "";
   frameSelect.value = "";
