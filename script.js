@@ -1,7 +1,3 @@
-/* ============================================================
-   FrameLab – フレーム全表示・透過保存版
-============================================================ */
-
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
@@ -34,7 +30,7 @@ function loadFrames() {
 loadFrames();
 
 /* -----------------------------------------
-   現在値と目標値を分離
+   変換パラメータ（位置・拡大・回転）
 ----------------------------------------- */
 let imgX = 0, imgY = 0;
 let targetX = 0, targetY = 0;
@@ -42,7 +38,36 @@ let targetX = 0, targetY = 0;
 let imgScale = 1;
 let targetScale = 1;
 
+let rotation = 0;
+let targetRotation = 0;
+
 const smooth = 0.15;
+
+/* -----------------------------------------
+   制限値
+----------------------------------------- */
+const MIN_SCALE = 0.2;
+const MAX_SCALE = 6.0;
+
+/* -----------------------------------------
+   統合慣性エンジン
+----------------------------------------- */
+let moveVX = 0;
+let moveVY = 0;
+
+let pinchVelocity = 0;
+let rotationVelocity = 0;
+
+let lastMoveTime = 0;
+let lastScale = 1;
+let lastAngle = null;
+
+let lastCx = null;
+let lastCy = null;
+let lastDist = null;
+
+let isDragging = false;
+let isPinching = false;
 
 /* -----------------------------------------
    キャンバスサイズ（正方形）
@@ -54,7 +79,7 @@ function getCanvasDisplaySize() {
 }
 
 /* -----------------------------------------
-   描画（フレーム全表示）
+   描画
 ----------------------------------------- */
 function draw() {
   const { w, h } = getCanvasDisplaySize();
@@ -63,16 +88,28 @@ function draw() {
 
   ctx.clearRect(0, 0, w, h);
 
-  // 背景画像はキャンバス全体に描画
+  const innerScale = 0.80;
+  const innerW = w * innerScale;
+  const innerH = h * innerScale;
+  const innerX = (w - innerW) / 2;
+  const innerY = (h - innerH) / 2;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(innerX, innerY, innerW, innerH);
+  ctx.clip();
+
   if (baseImage) {
     ctx.save();
     ctx.translate(imgX, imgY);
     ctx.scale(imgScale, imgScale);
+    ctx.rotate(rotation);
     ctx.drawImage(baseImage, 0, 0);
     ctx.restore();
   }
 
-  // フレームはキャンバス全体に描画
+  ctx.restore();
+
   if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, w, h);
   }
@@ -90,14 +127,23 @@ imageInput.addEventListener("change", e => {
     baseImage.onload = () => {
       const { w, h } = getCanvasDisplaySize();
 
-      const scaleFit = Math.min(w / baseImage.width, h / baseImage.height);
+      const innerScale = 0.80;
+      const innerW = w * innerScale;
+      const innerH = h * innerScale;
+      const innerX = (w - innerW) / 2;
+      const innerY = (h - innerH) / 2;
+
+      const scaleFit = Math.min(innerW / baseImage.width, innerH / baseImage.height);
+
       imgScale = targetScale = scaleFit;
 
-      const centerX = w / 2;
-      const centerY = h / 2;
+      const centerX = innerX + innerW / 2;
+      const centerY = innerY + innerH / 2;
 
       imgX = targetX = centerX - (baseImage.width * imgScale) / 2;
       imgY = targetY = centerY - (baseImage.height * imgScale) / 2;
+
+      rotation = targetRotation = 0;
 
       draw();
     };
@@ -119,11 +165,41 @@ frameSelect.addEventListener("change", () => {
 });
 
 /* -----------------------------------------
-   ドラッグ
+   ドラッグ（移動）
 ----------------------------------------- */
-let isDragging = false;
 let startX = 0, startY = 0;
 
+canvas.addEventListener("mousedown", e => {
+  isDragging = true;
+  startX = e.clientX - targetX;
+  startY = e.clientY - targetY;
+  lastMoveTime = performance.now();
+});
+
+canvas.addEventListener("mousemove", e => {
+  if (!isDragging) return;
+
+  const now = performance.now();
+  const dt = now - lastMoveTime || 16;
+
+  const newX = e.clientX - startX;
+  const newY = e.clientY - startY;
+
+  moveVX = (newX - targetX) / dt;
+  moveVY = (newY - targetY) / dt;
+
+  targetX = newX;
+  targetY = newY;
+
+  lastMoveTime = now;
+});
+
+canvas.addEventListener("mouseup", () => isDragging = false);
+canvas.addEventListener("mouseleave", () => isDragging = false);
+
+/* -----------------------------------------
+   タッチ操作（移動＋ズーム＋回転）
+----------------------------------------- */
 function getTouchPos(touch) {
   const rect = canvas.getBoundingClientRect();
   return {
@@ -132,68 +208,99 @@ function getTouchPos(touch) {
   };
 }
 
-canvas.addEventListener("mousedown", e => {
-  isDragging = true;
-  startX = e.clientX - targetX;
-  startY = e.clientY - targetY;
-});
-
-canvas.addEventListener("mousemove", e => {
-  if (!isDragging) return;
-  targetX = e.clientX - startX;
-  targetY = e.clientY - startY;
-});
-
-canvas.addEventListener("mouseup", () => isDragging = false);
-canvas.addEventListener("mouseleave", () => isDragging = false);
-
-/* -----------------------------------------
-   タッチ操作（ピンチ中心ズーム対応）
------------------------------------------ */
-let lastDist = null;
-
 canvas.addEventListener("touchstart", e => {
   if (e.touches.length === 1) {
     const pos = getTouchPos(e.touches[0]);
     isDragging = true;
     startX = pos.x - targetX;
     startY = pos.y - targetY;
+    lastMoveTime = performance.now();
   }
 });
 
 canvas.addEventListener("touchmove", e => {
   if (e.touches.length === 1 && isDragging) {
     e.preventDefault();
+
     const pos = getTouchPos(e.touches[0]);
-    targetX = pos.x - startX;
-    targetY = pos.y - startY;
+    const now = performance.now();
+    const dt = now - lastMoveTime || 16;
+
+    const newX = pos.x - startX;
+    const newY = pos.y - startY;
+
+    moveVX = (newX - targetX) / dt;
+    moveVY = (newY - targetY) / dt;
+
+    targetX = newX;
+    targetY = newY;
+
+    lastMoveTime = now;
   }
 
   if (e.touches.length === 2) {
     e.preventDefault();
 
     const [t1, t2] = e.touches;
-    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
 
     const cx = (t1.clientX + t2.clientX) / 2;
     const cy = (t1.clientY + t2.clientY) / 2;
 
-    if (lastDist !== null) {
+    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    const angle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
+
+    if (lastDist !== null && lastAngle !== null) {
+
+      /* --- ズーム --- */
       const scaleRatio = dist / lastDist;
-
       targetScale *= scaleRatio;
+      targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
 
+      pinchVelocity = targetScale - lastScale;
+      lastScale = targetScale;
+
+      /* --- 回転 --- */
+      const angleDiff = angle - lastAngle;
+      const normalized = ((angleDiff + Math.PI) % (2 * Math.PI)) - Math.PI;
+      targetRotation += normalized;
+      rotationVelocity = normalized;
+
+      /* --- 移動（ピンチ中心移動） --- */
+      const moveX = cx - lastCx;
+      const moveY = cy - lastCy;
+      targetX += moveX;
+      targetY += moveY;
+
+      /* --- ピンチ中心ズーム補正（ibisPaintベース） --- */
       targetX = cx - (cx - targetX) * scaleRatio;
       targetY = cy - (cy - targetY) * scaleRatio;
+
+      /* --- 画像中心への弱い吸着補正（ibisPaintっぽさ） --- */
+      if (baseImage) {
+        const centerX = imgX + (baseImage.width * imgScale) / 2;
+        const centerY = imgY + (baseImage.height * imgScale) / 2;
+        const attract = 0.08; // 0.05〜0.12で調整
+
+        targetX += (centerX - targetX) * attract;
+        targetY += (centerY - targetY) * attract;
+      }
     }
 
     lastDist = dist;
+    lastCx = cx;
+    lastCy = cy;
+    lastAngle = angle;
+
+    isPinching = true;
   }
 }, { passive: false });
 
 canvas.addEventListener("touchend", () => {
   isDragging = false;
+  isPinching = false;
+
   lastDist = null;
+  lastAngle = null;
 });
 
 /* -----------------------------------------
@@ -212,17 +319,49 @@ canvas.addEventListener("wheel", e => {
   const scaleRatio = newScale / targetScale;
 
   targetScale = newScale;
+  targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
+
   targetX = cx - (cx - targetX) * scaleRatio;
   targetY = cy - (cy - targetY) * scaleRatio;
+
+  if (baseImage) {
+    const centerX = imgX + (baseImage.width * imgScale) / 2;
+    const centerY = imgY + (baseImage.height * imgScale) / 2;
+    const attract = 0.08;
+
+    targetX += (centerX - targetX) * attract;
+    targetY += (centerY - targetY) * attract;
+  }
 });
 
 /* -----------------------------------------
-   毎フレーム補間
+   統合慣性アニメーション
 ----------------------------------------- */
 function animate() {
+
+  if (!isDragging && !isPinching) {
+
+    /* --- 移動慣性 --- */
+    moveVX *= 0.92;
+    moveVY *= 0.92;
+    targetX += moveVX * 16;
+    targetY += moveVY * 16;
+
+    /* --- ズーム慣性 --- */
+    pinchVelocity *= 0.90;
+    targetScale += pinchVelocity;
+    targetScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, targetScale));
+
+    /* --- 回転慣性 --- */
+    rotationVelocity *= 0.90;
+    targetRotation += rotationVelocity;
+  }
+
+  /* --- 補間（自然な追従） --- */
   imgScale += (targetScale - imgScale) * smooth;
   imgX += (targetX - imgX) * smooth;
   imgY += (targetY - imgY) * smooth;
+  rotation += (targetRotation - rotation) * smooth;
 
   draw();
   requestAnimationFrame(animate);
@@ -230,35 +369,54 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（透過PNG・フレーム全表示）
+   保存（正方形・高解像度）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
+  if (!baseImage) return;
+
   const { w } = getCanvasDisplaySize();
 
+  const baseSize = w;
+  const scaleFactor = 3;
+
+  const innerScale = 0.80;
+  const innerW = baseSize * innerScale;
+  const innerH = baseSize * innerScale;
+  const innerX = (baseSize - innerW) / 2;
+  const innerY = (baseSize - innerH) / 2;
+
   const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = w;
-  saveCanvas.height = w;
+  saveCanvas.width = baseSize * scaleFactor;
+  saveCanvas.height = baseSize * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
-  // 背景透過（fillRectなし）
+  sctx.fillStyle = "#cccccc";
+  sctx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
+
   sctx.save();
-  sctx.translate(imgX, imgY);
-  sctx.scale(imgScale, imgScale);
+  sctx.beginPath();
+  sctx.rect(innerX * scaleFactor, innerY * scaleFactor, innerW * scaleFactor, innerH * scaleFactor);
+  sctx.clip();
+
+  sctx.translate(imgX * scaleFactor, imgY * scaleFactor);
+  sctx.scale(imgScale * scaleFactor, imgScale * scaleFactor);
+  sctx.rotate(rotation);
   sctx.drawImage(baseImage, 0, 0);
+
   sctx.restore();
 
   if (frameImage && frameImage.complete) {
-    sctx.drawImage(frameImage, 0, 0, w, w);
+    sctx.drawImage(frameImage, 0, 0, baseSize * scaleFactor, baseSize * scaleFactor);
   }
 
   const link = document.createElement("a");
-  link.download = "framed_transparent.png";
+  link.download = "framed_square.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 });
 
 /* -----------------------------------------
-   リセット（全部消える）
+   リセット
 ----------------------------------------- */
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
@@ -267,6 +425,11 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   imgX = targetX = 0;
   imgY = targetY = 0;
   imgScale = targetScale = 1;
+  rotation = targetRotation = 0;
+
+  moveVX = moveVY = 0;
+  pinchVelocity = 0;
+  rotationVelocity = 0;
 
   imageInput.value = "";
   frameSelect.value = "";
