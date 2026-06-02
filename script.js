@@ -1,6 +1,6 @@
 /* ============================================================
-   FrameLab – ibisPaint式 3軸統合慣性エンジン 完全版
-   （移動・ズーム・回転・補正・スナップ・減速 全部入り）
+   FrameLab – ibisPaint風 3軸統合慣性エンジン（軽量・最終版）
+   移動 / ズーム / 回転 / 中心補正 / 45°スナップ / 減速付き
 ============================================================ */
 
 const imageInput = document.getElementById("imageInput");
@@ -107,7 +107,6 @@ function draw() {
   if (baseImage) {
     ctx.save();
 
-    // ★ 画像中心（回転軸）
     const imgCenterX = imgX + (baseImage.width * imgScale) / 2;
     const imgCenterY = imgY + (baseImage.height * imgScale) / 2;
 
@@ -273,7 +272,7 @@ canvas.addEventListener("touchmove", e => {
 
       /* --- 回転（ズーム中は弱体化） --- */
       const zoomSpeedForRot = Math.abs(pinchVelocity);
-      const rotWeak = 1 - Math.min(zoomSpeedForRot * 1.4, 0.65);
+      const rotWeak = 1 - Math.min(zoomSpeedForRot * 0.9, 0.45);
 
       const angleDiff = angle - lastAngle;
       const normalized = ((angleDiff + Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -287,11 +286,11 @@ canvas.addEventListener("touchmove", e => {
       targetX += moveX;
       targetY += moveY;
 
-      /* --- ピンチ中心ズーム補正（ibisPaint式） --- */
+      /* --- ピンチ中心ズーム補正 --- */
       targetX = cx - (cx - targetX) * scaleRatio;
       targetY = cy - (cy - targetY) * scaleRatio;
 
-      /* --- 中心吸着補正（距離依存＋速度依存＋回転依存） --- */
+      /* --- 中心吸着補正（軽量版） --- */
       if (baseImage) {
         const centerX = imgX + (baseImage.width * imgScale) / 2;
         const centerY = imgY + (baseImage.height * imgScale) / 2;
@@ -303,13 +302,12 @@ canvas.addEventListener("touchmove", e => {
         const { w, h } = getCanvasDisplaySize();
         const diag = Math.hypot(w, h);
 
-        let attract = 0.06 * (distToCenter / diag);
-
+        let attract = 0.035 * (distToCenter / diag);
         const zoomSpeed = Math.abs(pinchVelocity);
-        attract += Math.min(zoomSpeed * 1.2, 0.12);
+        attract += Math.min(zoomSpeed * 0.8, 0.06);
 
         const rotSpeed = Math.abs(rotationVelocity);
-        attract *= 1 - Math.min(rotSpeed * 1.8, 0.75);
+        attract *= 1 - Math.min(rotSpeed * 1.2, 0.55);
 
         targetX += (centerX - targetX) * attract;
         targetY += (centerY - targetY) * attract;
@@ -360,7 +358,6 @@ canvas.addEventListener("wheel", e => {
 ----------------------------------------- */
 function animate() {
 
-  /* --- 慣性（指を離した後） --- */
   if (!isDragging && !isPinching) {
 
     moveVX *= 0.92;
@@ -376,7 +373,7 @@ function animate() {
     targetRotation += rotationVelocity;
   }
 
-  /* --- 回転スナップ（45°対応＋減速） --- */
+  /* --- 回転スナップ（45°対応＋減速・軽量版） --- */
   {
     const snapAngles = [
       0,
@@ -409,16 +406,15 @@ function animate() {
 
       if (minDiff < 0.17) {
 
-        const snapStrength = 0.25;
+        const snapStrength = 0.18;
         targetRotation += (nearest - norm) * snapStrength;
 
         const slowDown = 1 - (minDiff / 0.17);
-        rotationVelocity *= (0.35 + 0.65 * (1 - slowDown));
+        rotationVelocity *= (0.55 + 0.45 * (1 - slowDown));
       }
     }
   }
 
-  /* --- 補間 --- */
   imgScale += (targetScale - imgScale) * smooth;
   imgX += (targetX - imgX) * smooth;
   imgY += (targetY - imgY) * smooth;
@@ -459,12 +455,17 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.rect(innerX * scaleFactor, innerY * scaleFactor, innerW * scaleFactor, innerH * scaleFactor);
   sctx.clip();
 
-  sctx.translate(imgX * scaleFactor, imgY * scaleFactor);
-  sctx.scale(imgScale * scaleFactor, imgScale * scaleFactor);
-  sctx.rotate(rotation);
-  sctx.drawImage(baseImage, 0, 0);
+  if (baseImage) {
+    const imgCenterX = imgX * scaleFactor + (baseImage.width * imgScale * scaleFactor) / 2;
+    const imgCenterY = imgY * scaleFactor + (baseImage.height * imgScale * scaleFactor) / 2;
 
-  sctx.restore();
+    sctx.save();
+    sctx.translate(imgCenterX, imgCenterY);
+    sctx.rotate(rotation);
+    sctx.scale(imgScale * scaleFactor, imgScale * scaleFactor);
+    sctx.drawImage(baseImage, -baseImage.width / 2, -baseImage.height / 2);
+    sctx.restore();
+  }
 
   if (frameImage && frameImage.complete) {
     sctx.drawImage(frameImage, 0, 0, baseSize * scaleFactor, baseSize * scaleFactor);
