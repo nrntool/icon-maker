@@ -1,3 +1,7 @@
+/* -----------------------------------------
+   フレーム一覧
+----------------------------------------- */
+
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
