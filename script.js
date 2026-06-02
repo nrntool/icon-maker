@@ -34,7 +34,7 @@ function loadFrames() {
 loadFrames();
 
 /* -----------------------------------------
-   ibisPaint風：現在値と目標値を分離
+   現在値と目標値を分離した補間方式
 ----------------------------------------- */
 let imgX = 0, imgY = 0;
 let targetX = 0, targetY = 0;
@@ -85,7 +85,7 @@ function draw() {
 
   ctx.restore();
 
-  // ★ フレームはキャンバス全体に描画（clip外）
+  // フレームはキャンバス全体に描画
   if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, w, h);
   }
@@ -237,7 +237,7 @@ canvas.addEventListener("wheel", e => {
 });
 
 /* -----------------------------------------
-   毎フレーム補間（ibisPaint風）
+   毎フレーム補間
 ----------------------------------------- */
 function animate() {
   imgScale += (targetScale - imgScale) * smooth;
