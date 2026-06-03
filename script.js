@@ -176,7 +176,7 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（中心基準＋座標スケール自動補正）
+   保存（高解像度＋中心補正）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
@@ -185,17 +185,20 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   const fw = frameImage.width;
   const fh = frameImage.height;
 
-  const scaleFactorX = fw / displayRect.width;
-  const scaleFactorY = fh / displayRect.height;
+  // 🔧 解像度倍率（2〜4倍が現実的）
+  const upscale = 3;
+
+  const scaleFactorX = (fw * upscale) / displayRect.width;
+  const scaleFactorY = (fh * upscale) / displayRect.height;
 
   const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = fw;
-  saveCanvas.height = fh;
+  saveCanvas.width = fw * upscale;
+  saveCanvas.height = fh * upscale;
   const sctx = saveCanvas.getContext("2d");
 
   // 写真（中心基準で補正）
   sctx.save();
-  sctx.translate(fw / 2, fh / 2);
+  sctx.translate(saveCanvas.width / 2, saveCanvas.height / 2);
   sctx.scale(scale * scaleFactorX, scale * scaleFactorY);
   sctx.rotate(angle);
   sctx.drawImage(
@@ -206,10 +209,10 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.restore();
 
   // フレーム
-  sctx.drawImage(frameImage, 0, 0, fw, fh);
+  sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
 
   const link = document.createElement("a");
-  link.download = "framed.png";
+  link.download = "framed_highres.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 });
