@@ -176,28 +176,33 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存
+   保存（座標スケール自動補正方式）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
 
+  const displayRect = canvas.getBoundingClientRect();
   const fw = frameImage.width;
   const fh = frameImage.height;
-  const scaleFactor = 3;
+
+  const scaleFactorX = fw / displayRect.width;
+  const scaleFactorY = fh / displayRect.height;
 
   const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = fw * scaleFactor;
-  saveCanvas.height = fh * scaleFactor;
+  saveCanvas.width = fw;
+  saveCanvas.height = fh;
   const sctx = saveCanvas.getContext("2d");
 
+  // 写真
   sctx.save();
-  sctx.translate(posX * scaleFactor, posY * scaleFactor);
-  sctx.scale(scale * scaleFactor, scale * scaleFactor);
+  sctx.translate(posX * scaleFactorX, posY * scaleFactorY);
+  sctx.scale(scale * scaleFactorX, scale * scaleFactorY);
   sctx.rotate(angle);
   sctx.drawImage(baseImage, 0, 0);
   sctx.restore();
 
-  sctx.drawImage(frameImage, 0, 0, fw * scaleFactor, fh * scaleFactor);
+  // フレーム
+  sctx.drawImage(frameImage, 0, 0, fw, fh);
 
   const link = document.createElement("a");
   link.download = "framed.png";
