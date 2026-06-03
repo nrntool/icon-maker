@@ -209,7 +209,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
 
   sctx.restore();
 
-  // フレーム描画
+  // フレーム描画（透過PNG対応）
   sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
 
   const link = document.createElement("a");
