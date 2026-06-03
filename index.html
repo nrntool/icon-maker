@@ -8,40 +8,32 @@
 </head>
 <body>
 
-  <!-- タイトル -->
   <h1>FrameLab</h1>
   <p class="description">画像にフレームを合成して、アイコンを作成できます。</p>
 
-  <!-- 注意事項 -->
   <h2 class="notice-title">注意事項</h2>
   <div class="notice-box">
     ・画像はサーバーに保存されません。<br>
-    ・ブラウザ内だけで処理されます<br>
+    ・ブラウザ内だけで処理されます。<br>
   </div>
 
-  <!-- メインコンテナ -->
   <div class="container">
 
-    <!-- 画像選択 -->
     <label>画像を選択</label>
     <input type="file" id="imageInput" accept="image/*">
 
-    <!-- フレーム選択 -->
     <label>フレームを選択</label>
     <select id="frameSelect">
       <option value="">選択してください</option>
     </select>
 
-    <!-- キャンバス -->
     <canvas id="canvas"></canvas>
 
-    <!-- ボタン -->
     <button class="btn-save" id="saveBtn">保存</button>
     <button class="btn-reset" id="resetBtn">リセット</button>
 
   </div>
 
-  <!-- JS -->
   <script src="script.js"></script>
 </body>
 </html>
