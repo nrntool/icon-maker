@@ -7,18 +7,21 @@ let baseImage = null;
 let frameImage = null;
 
 /* -----------------------------------------
-   スマホ最適化：高DPI対応
+   高DPI対応：描画はCSS座標で統一
 ----------------------------------------- */
-function resizeCanvasForDPR() {
+function setupCanvas() {
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
 
   canvas.width = rect.width * dpr;
   canvas.height = rect.width * dpr; // 正方形
-
-  ctx.scale(dpr, dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // 以降の描画はCSS px基準
 }
-resizeCanvasForDPR();
+setupCanvas();
+window.addEventListener("resize", () => {
+  setupCanvas();
+  draw();
+});
 
 /* -----------------------------------------
    フレーム一覧
@@ -66,7 +69,7 @@ const MAX_SCALE = 6.0;
 function draw() {
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
-  const h = rect.width;
+  const h = rect.width; // 正方形
 
   ctx.clearRect(0, 0, w, h);
 
@@ -151,7 +154,7 @@ frameSelect.addEventListener("change", () => {
 });
 
 /* -----------------------------------------
-   タッチ座標 → キャンバス座標変換
+   タッチ座標 → キャンバス座標
 ----------------------------------------- */
 function getTouchPos(touch) {
   const rect = canvas.getBoundingClientRect();
@@ -257,6 +260,41 @@ canvas.addEventListener("touchend", e => {
 }, { passive: false });
 
 /* -----------------------------------------
+   マウス操作（PC）
+----------------------------------------- */
+let isDraggingMouse = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+canvas.addEventListener("mousedown", e => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  isDraggingMouse = true;
+  dragOffsetX = x - targetPosX;
+  dragOffsetY = y - targetPosY;
+});
+
+canvas.addEventListener("mousemove", e => {
+  if (!isDraggingMouse) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  targetPosX = x - dragOffsetX;
+  targetPosY = y - dragOffsetY;
+});
+
+canvas.addEventListener("mouseup", () => {
+  isDraggingMouse = false;
+});
+
+canvas.addEventListener("mouseleave", () => {
+  isDraggingMouse = false;
+});
+
+/* -----------------------------------------
    ホイールズーム（PC）
 ----------------------------------------- */
 canvas.addEventListener("wheel", e => {
@@ -292,7 +330,7 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（円クリップ方式）
+   保存（画面と完全一致させる円クリップ）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
@@ -300,6 +338,9 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   const fw = frameImage.width;
   const fh = frameImage.height;
   const scaleFactor = 3;
+
+  const rect = canvas.getBoundingClientRect();
+  const displaySize = rect.width; // 画面上のフレーム描画サイズ（正方形）
 
   const saveCanvas = document.createElement("canvas");
   saveCanvas.width = fw * scaleFactor;
@@ -315,9 +356,15 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.arc(cx, cy, radius, 0, Math.PI * 2);
   sctx.clip();
 
+  // 画面座標 → フレーム実サイズ座標へマッピング
+  const ratio = fw / displaySize; // CSS px → フレームpx
+  const posX_scaled = posX * ratio * scaleFactor;
+  const posY_scaled = posY * ratio * scaleFactor;
+  const scale_scaled = scale * ratio * scaleFactor;
+
   sctx.save();
-  sctx.translate(posX * scaleFactor, posY * scaleFactor);
-  sctx.scale(scale * scaleFactor, scale * scaleFactor);
+  sctx.translate(posX_scaled, posY_scaled);
+  sctx.scale(scale_scaled, scale_scaled);
   sctx.rotate(angle);
   sctx.drawImage(baseImage, 0, 0);
   sctx.restore();
@@ -347,6 +394,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   imageInput.value = "";
   frameSelect.value = "";
 
-  resizeCanvasForDPR();
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  setupCanvas();
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.width);
 });
