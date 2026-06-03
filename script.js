@@ -7,7 +7,7 @@ let baseImage = null;
 let frameImage = null;
 
 /* -----------------------------------------
-   高DPI対応（あなたのCSSに完全フィット）
+   高DPI対応
 ----------------------------------------- */
 function setupCanvas() {
   const rect = canvas.getBoundingClientRect();
@@ -24,20 +24,23 @@ window.addEventListener("resize", () => {
 });
 
 /* -----------------------------------------
-   フレーム一覧（ここに追加するだけでOK）
+   frames.json を読み込んでフレーム一覧を生成
 ----------------------------------------- */
-const frameFiles = [
-  "01_yoyaku.png",
-  "02_test.png"
-];
+async function loadFrames() {
+  try {
+    const res = await fetch("./frames.json");
+    const frameFiles = await res.json();
 
-function loadFrames() {
-  frameFiles.forEach(filename => {
-    const option = document.createElement("option");
-    option.value = `./frames/${filename}`;
-    option.textContent = filename;
-    frameSelect.appendChild(option);
-  });
+    frameFiles.forEach(filename => {
+      const option = document.createElement("option");
+      option.value = `./frames/${filename}`;
+      option.textContent = filename.replace(".png", "");
+      frameSelect.appendChild(option);
+    });
+
+  } catch (err) {
+    console.error("フレーム一覧の読み込みに失敗:", err);
+  }
 }
 loadFrames();
 
@@ -52,7 +55,7 @@ const MIN_SCALE = 0.2;
 const MAX_SCALE = 6.0;
 
 /* -----------------------------------------
-   描画（画面表示）
+   描画
 ----------------------------------------- */
 function draw() {
   const rect = canvas.getBoundingClientRect();
@@ -60,7 +63,6 @@ function draw() {
 
   ctx.clearRect(0, 0, w, w);
 
-  // 写真（フレームの透明部分から見える）
   if (baseImage) {
     ctx.save();
     ctx.translate(posX, posY);
@@ -70,7 +72,6 @@ function draw() {
     ctx.restore();
   }
 
-  // フレーム（外側不透明・内側透明）
   if (frameImage) {
     ctx.drawImage(frameImage, 0, 0, w, w);
   }
@@ -90,7 +91,6 @@ imageInput.addEventListener("change", e => {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width;
 
-      // 写真をフレーム内側にフィットさせる
       const scaleFit = w / baseImage.width;
       scale = targetScale = scaleFit;
 
@@ -116,7 +116,7 @@ frameSelect.addEventListener("change", () => {
 });
 
 /* -----------------------------------------
-   マウス操作（移動・ズーム）
+   マウス操作
 ----------------------------------------- */
 function getCanvasPos(e) {
   const rect = canvas.getBoundingClientRect();
@@ -176,7 +176,7 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（フレームの透明部分にだけ写真が見える）
+   保存
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
@@ -190,7 +190,6 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   saveCanvas.height = fh * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
-  // 写真
   sctx.save();
   sctx.translate(posX * scaleFactor, posY * scaleFactor);
   sctx.scale(scale * scaleFactor, scale * scaleFactor);
@@ -198,7 +197,6 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.drawImage(baseImage, 0, 0);
   sctx.restore();
 
-  // フレーム
   sctx.drawImage(frameImage, 0, 0, fw * scaleFactor, fh * scaleFactor);
 
   const link = document.createElement("a");
