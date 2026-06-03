@@ -272,11 +272,13 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   saveCanvas.height = fh * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
-  // 画面座標 → 保存座標へ変換
-  const ratio = fw / displaySize;
-  const posX_scaled = posX * ratio * scaleFactor;
-  const posY_scaled = posY * ratio * scaleFactor;
-  const scale_scaled = scale * ratio * scaleFactor;
+  // 画面座標 → 保存座標へ変換（縦横比補正）
+  const ratioX = fw / displaySize;
+  const ratioY = fh / displaySize;
+
+  const posX_scaled = posX * ratioX * scaleFactor;
+  const posY_scaled = posY * ratioY * scaleFactor;
+  const scale_scaled = scale * ratioX * scaleFactor;
 
   // 内側画像を描画（画面と同じ構図）
   sctx.save();
