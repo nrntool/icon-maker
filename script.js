@@ -13,7 +13,7 @@ function setupCanvas() {
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
   canvas.width = rect.width * dpr;
-  canvas.height = rect.width * dpr;
+  canvas.height = rect.width * dpr; // 正方形
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 setupCanvas();
@@ -54,6 +54,7 @@ const MIN_SCALE = 0.2, MAX_SCALE = 6.0;
 function draw() {
   const rect = canvas.getBoundingClientRect();
   const w = rect.width, h = rect.width;
+
   ctx.clearRect(0, 0, w, h);
 
   const innerScale = 0.80;
@@ -75,7 +76,10 @@ function draw() {
   }
 
   ctx.restore();
-  if (frameImage && frameImage.complete) ctx.drawImage(frameImage, 0, 0, w, h);
+
+  if (frameImage && frameImage.complete) {
+    ctx.drawImage(frameImage, 0, 0, w, h);
+  }
 }
 
 /* -----------------------------------------
@@ -84,20 +88,25 @@ function draw() {
 imageInput.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
+
   const reader = new FileReader();
   reader.onload = () => {
     baseImage = new Image();
     baseImage.onload = () => {
       const rect = canvas.getBoundingClientRect();
-      const w = rect.width, h = rect.width;
+      const w = rect.width;
+
       const innerScale = 0.80;
-      const innerW = w * innerScale, innerH = h * innerScale;
-      const innerX = (w - innerW) / 2, innerY = (h - innerH) / 2;
+      const innerW = w * innerScale, innerH = w * innerScale;
+      const innerX = (w - innerW) / 2, innerY = (w - innerH) / 2;
+
       const scaleFit = Math.min(innerW / baseImage.width, innerH / baseImage.height);
       scale = targetScale = scaleFit;
+
       const centerX = innerX + innerW / 2, centerY = innerY + innerH / 2;
       posX = targetPosX = centerX - (baseImage.width * scale) / 2;
       posY = targetPosY = centerY - (baseImage.height * scale) / 2;
+
       angle = targetAngle = 0;
       draw();
     };
@@ -137,11 +146,13 @@ canvas.addEventListener("touchstart", e => {
     touchDragOffsetX = t.x - targetPosX;
     touchDragOffsetY = t.y - targetPosY;
   }
+
   if (e.touches.length === 2) {
     const p1 = getTouchPos(e.touches[0]), p2 = getTouchPos(e.touches[1]);
     const cx = (p1.x + p2.x) / 2, cy = (p1.y + p2.y) / 2;
     const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
     const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+
     lastCx = cx; lastCy = cy; lastDist = dist; lastAngle = ang;
     isDraggingTouch = false;
   }
@@ -149,16 +160,19 @@ canvas.addEventListener("touchstart", e => {
 
 canvas.addEventListener("touchmove", e => {
   e.preventDefault();
+
   if (e.touches.length === 1 && isDraggingTouch) {
     const t = getTouchPos(e.touches[0]);
     targetPosX = t.x - touchDragOffsetX;
     targetPosY = t.y - touchDragOffsetY;
   }
+
   if (e.touches.length === 2) {
     const p1 = getTouchPos(e.touches[0]), p2 = getTouchPos(e.touches[1]);
     const cx = (p1.x + p2.x) / 2, cy = (p1.y + p2.y) / 2;
     const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
     const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+
     if (lastDist !== null) {
       const scaleRatio = dist / lastDist;
       let newScale = targetScale * scaleRatio;
@@ -168,11 +182,13 @@ canvas.addEventListener("touchmove", e => {
       targetPosX = cx - (cx - targetPosX) * appliedRatio;
       targetPosY = cy - (cy - targetPosY) * appliedRatio;
     }
+
     if (lastAngle !== null) targetAngle += ang - lastAngle;
     if (lastCx !== null) {
       targetPosX += cx - lastCx;
       targetPosY += cy - lastCy;
     }
+
     lastCx = cx; lastCy = cy; lastDist = dist; lastAngle = ang;
   }
 }, { passive: false });
@@ -204,4 +220,81 @@ canvas.addEventListener("wheel", e => {
    アニメーション
 ----------------------------------------- */
 function animate() {
-  pos
+  posX += (targetPosX - posX) * smooth;
+  posY += (targetPosY - posY) * smooth;
+  scale += (targetScale - scale) * smooth;
+  angle += (targetAngle - angle) * smooth;
+  draw();
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* -----------------------------------------
+   保存（フレーム内側だけを残す円クリップ）
+----------------------------------------- */
+document.getElementById("saveBtn").addEventListener("click", () => {
+  if (!baseImage || !frameImage) return;
+
+  const fw = frameImage.width;
+  const fh = frameImage.height;
+  const scaleFactor = 3;
+
+  const rect = canvas.getBoundingClientRect();
+  const displaySize = rect.width;
+
+  const saveCanvas = document.createElement("canvas");
+  saveCanvas.width = fw * scaleFactor;
+  saveCanvas.height = fh * scaleFactor;
+  const sctx = saveCanvas.getContext("2d");
+
+  // フレーム内側だけを残す円（外側に絶対はみ出さない）
+  const cx = (fw * scaleFactor) / 2;
+  const cy = (fh * scaleFactor) / 2;
+  const radius = (fw * scaleFactor) / 2 * 0.80; // 内側80%
+
+  sctx.save();
+  sctx.beginPath();
+  sctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  sctx.clip();
+
+  // 画面座標 → 保存座標へ変換
+  const ratio = fw / displaySize;
+  const posX_scaled = posX * ratio * scaleFactor;
+  const posY_scaled = posY * ratio * scaleFactor;
+  const scale_scaled = scale * ratio * scaleFactor;
+
+  // 内側画像
+  sctx.save();
+  sctx.translate(posX_scaled, posY_scaled);
+  sctx.scale(scale_scaled, scale_scaled);
+  sctx.rotate(angle);
+  sctx.drawImage(baseImage, 0, 0);
+  sctx.restore();
+
+  // フレーム
+  sctx.drawImage(frameImage, 0, 0, fw * scaleFactor, fh * scaleFactor);
+
+  sctx.restore();
+
+  const link = document.createElement("a");
+  link.download = "framed_inner.png";
+  link.href = saveCanvas.toDataURL("image/png");
+  link.click();
+});
+
+/* -----------------------------------------
+   リセット
+----------------------------------------- */
+document.getElementById("resetBtn").addEventListener("click", () => {
+  baseImage = null;
+  frameImage = null;
+  posX = targetPosX = 0;
+  posY = targetPosY = 0;
+  scale = targetScale = 1;
+  angle = targetAngle = 0;
+  imageInput.value = "";
+  frameSelect.value = "";
+  setupCanvas();
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.width);
+});
