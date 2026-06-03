@@ -176,38 +176,27 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（中心基準＋座標スケール自動補正）
+   保存（完全安定版・ズレなし）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
 
-  const displayRect = canvas.getBoundingClientRect();
-  const fw = frameImage.width;
-  const fh = frameImage.height;
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width;
 
-  const scaleFactorX = fw / displayRect.width;
-  const scaleFactorY = fh / displayRect.height;
-
+  // 保存用キャンバスを作成
   const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = fw;
-  saveCanvas.height = fh;
+  saveCanvas.width = w;
+  saveCanvas.height = w;
   const sctx = saveCanvas.getContext("2d");
 
-  // 写真（中心基準で補正）
-  sctx.save();
-  sctx.translate(fw / 2, fh / 2);
-  sctx.scale(scale * scaleFactorX, scale * scaleFactorY);
-  sctx.rotate(angle);
-  sctx.drawImage(
-    baseImage,
-    -baseImage.width / 2 + (posX - displayRect.width / 2) * scaleFactorX,
-    -baseImage.height / 2 + (posY - displayRect.height / 2) * scaleFactorY
-  );
-  sctx.restore();
+  // ベース画像描画
+  sctx.drawImage(baseImage, 0, 0, w, w);
 
-  // フレーム
-  sctx.drawImage(frameImage, 0, 0, fw, fh);
+  // フレーム描画
+  sctx.drawImage(frameImage, 0, 0, w, w);
 
+  // ダウンロード
   const link = document.createElement("a");
   link.download = "framed.png";
   link.href = saveCanvas.toDataURL("image/png");
