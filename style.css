@@ -1,140 +1,116 @@
 /* -----------------------------------------
-   全体の背景（透明感 × 青紫グラデ）
+   ページ全体（背景・フォント・レイアウト）
 ----------------------------------------- */
-body {
+html, body {
+  touch-action: pan-y; /* キャンバス外のピンチズーム禁止 */
+  overflow: auto;
   margin: 0;
   padding: 0;
-  font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
-  background: linear-gradient(135deg, #c7d8ff 0%, #e8cfff 100%);
-  background-attachment: fixed;
-  color: #333;
+  height: 100%;
+  background-color: #fafafa; /* 白に近いグレー */
+  color: #222;
+  font-family: "Noto Sans JP", sans-serif;
+  text-align: center;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* -----------------------------------------
-   タイトル
+   タイトル（FrameLab 風）
 ----------------------------------------- */
 h1 {
-  text-align: center;
-  margin-top: 30px;
-  font-size: 32px;
-  font-weight: 700;
-  color: #5a4fa3;
-  text-shadow: 0 2px 8px rgba(120, 90, 200, 0.3);
-}
-
-.description {
-  text-align: center;
-  color: #6d5fb8;
-  margin-bottom: 20px;
-}
-
-/* -----------------------------------------
-   注意ボックス
------------------------------------------ */
-.notice-title {
-  text-align: center;
-  color: #6d5fb8;
+  font-size: 2.2em;
   font-weight: 600;
+  margin-top: 40px;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
 }
 
-.notice-box {
-  width: 90%;
-  max-width: 480px;
-  margin: 0 auto 20px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.45);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(120, 90, 200, 0.15);
-  color: #4a3f8f;
-  font-size: 14px;
+h1::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 3px;
+  background-color: #0078d4; /* 青い下線 */
+  margin: 8px auto 0;
+  border-radius: 2px;
 }
 
 /* -----------------------------------------
-   メインコンテナ（透明カード）
+   注意事項カード（青みグレー影・柔らかい）
 ----------------------------------------- */
-.container {
-  width: 90%;
-  max-width: 480px;
-  margin: 0 auto 40px;
+.notice-box {
+  background-color: #fff;
+  border-radius: 12px;
+
+  /* ★ 青みグレーの柔らかい影（完成版） */
+  box-shadow: 0 8px 28px rgba(0, 40, 80, 0.12);
+
   padding: 20px;
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 20px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 8px 30px rgba(120, 90, 200, 0.25);
+  margin: 20px auto;
+  width: 90%;
+  max-width: 500px;
+  text-align: left;
+  line-height: 1.6;
 }
 
 /* -----------------------------------------
-   ラベル
+   入力フォーム（ファイル選択・セレクト）
 ----------------------------------------- */
 label {
   display: block;
-  margin-top: 15px;
+  font-weight: 500;
+  margin-top: 20px;
   margin-bottom: 6px;
-  font-weight: 600;
-  color: #5a4fa3;
 }
 
-/* -----------------------------------------
-   セレクト・ファイル選択
------------------------------------------ */
 input[type="file"],
 select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(120, 90, 200, 0.3);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 6px rgba(120, 90, 200, 0.15);
-  font-size: 14px;
-  color: #4a3f8f;
-}
-
-/* -----------------------------------------
-   キャンバス
------------------------------------------ */
-#canvas {
-  width: 100%;
-  margin-top: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(120, 90, 200, 0.25);
-  background: rgba(255, 255, 255, 0.4);
-}
-
-/* -----------------------------------------
-   ボタン（青紫 × 透明感）
------------------------------------------ */
-.btn-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 4%;
-}
-
-button {
-  width: 48%;
-  padding: 12px 0;
-  margin-top: 20px;
-  border: none;
-  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 15px;
-  font-weight: 600;
+  background-color: #fff;
+}
+
+/* -----------------------------------------
+   ボタン（FrameLab 風）
+----------------------------------------- */
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0078d4;
+  color: #fff;
   cursor: pointer;
-  transition: 0.25s;
-  color: white;
-  background: linear-gradient(135deg, #8f7bff, #b38dff);
-  box-shadow: 0 4px 12px rgba(120, 90, 200, 0.3);
 }
 
 button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(120, 90, 200, 0.4);
+  background-color: #005fa3;
 }
 
-.btn-save {
-  background: linear-gradient(135deg, #7a6bff, #a88bff);
+/* -----------------------------------------
+   キャンバス（操作系）
+----------------------------------------- */
+canvas {
+  touch-action: none; /* ブラウザ標準のピンチズーム無効 */
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+  background-color: transparent;
 }
 
-.btn-reset {
-  background: linear-gradient(135deg, #c38dff, #e0b3ff);
+/* -----------------------------------------
+   全体コンテナ
+----------------------------------------- */
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 60px;
 }
