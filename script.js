@@ -176,7 +176,7 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（座標スケール自動補正方式）
+   保存（中心基準＋座標スケール自動補正）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
@@ -193,12 +193,16 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   saveCanvas.height = fh;
   const sctx = saveCanvas.getContext("2d");
 
-  // 写真
+  // 写真（中心基準で補正）
   sctx.save();
-  sctx.translate(posX * scaleFactorX, posY * scaleFactorY);
+  sctx.translate(fw / 2, fh / 2);
   sctx.scale(scale * scaleFactorX, scale * scaleFactorY);
   sctx.rotate(angle);
-  sctx.drawImage(baseImage, 0, 0);
+  sctx.drawImage(
+    baseImage,
+    -baseImage.width / 2 + (posX - displayRect.width / 2) * scaleFactorX,
+    -baseImage.height / 2 + (posY - displayRect.height / 2) * scaleFactorY
+  );
   sctx.restore();
 
   // フレーム
