@@ -1,134 +1,136 @@
-/* -----------------------------------------
-   全体の背景（透明感 × 青紫グラデ）
------------------------------------------ */
-body {
+html, body {
   margin: 0;
   padding: 0;
-  font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
-  background: linear-gradient(135deg, #c7d8ff 0%, #e8cfff 100%);
-  background-attachment: fixed;
-  color: #333;
+  font-family: "Noto Sans JP", sans-serif;
+  background-color: #f5f5f5;
+  color: #222;
+  text-align: center;
 }
 
-/* -----------------------------------------
-   タイトル
------------------------------------------ */
+/* タイトル */
 h1 {
-  text-align: center;
-  margin-top: 30px;
-  font-size: 32px;
-  font-weight: 700;
-  color: #5a4fa3;
-  text-shadow: 0 2px 8px rgba(120, 90, 200, 0.3);
+  font-size: 2.2em;
+  font-weight: 600;
+  margin-top: 40px;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
 }
 
+h1::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 3px;
+  background-color: #0078d4;
+  margin: 8px auto 0;
+  border-radius: 2px;
+}
+
+/* 説明文 */
 .description {
-  text-align: center;
-  color: #6d5fb8;
+  font-size: 1em;
+  color: #333;
   margin-bottom: 20px;
 }
 
-/* -----------------------------------------
-   注意ボックス
------------------------------------------ */
+/* 注意事項タイトル */
 .notice-title {
-  text-align: center;
-  color: #6d5fb8;
+  font-size: 1.1em;
   font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  border-bottom: 2px solid #0078d4;
+  display: inline-block;
+  padding-bottom: 2px;
 }
 
+/* 注意事項ボックス */
 .notice-box {
-  width: 90%;
-  max-width: 480px;
-  margin: 0 auto 20px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.45);
+  background-color: #fff;
   border-radius: 12px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(120, 90, 200, 0.15);
-  color: #4a3f8f;
-  font-size: 14px;
-}
-
-/* -----------------------------------------
-   メインコンテナ（透明カード）
------------------------------------------ */
-.container {
-  width: 90%;
-  max-width: 480px;
-  margin: 0 auto 40px;
+  box-shadow: 0 8px 28px rgba(0, 40, 80, 0.12);
   padding: 20px;
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 20px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 8px 30px rgba(120, 90, 200, 0.25);
+  margin: 20px auto;
+  width: 90%;
+  max-width: 500px;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 15px;
 }
 
-/* -----------------------------------------
-   ラベル
------------------------------------------ */
+/* 入力フォーム */
 label {
   display: block;
-  margin-top: 15px;
+  font-weight: 500;
+  margin-top: 20px;
   margin-bottom: 6px;
-  font-weight: 600;
-  color: #5a4fa3;
 }
 
-/* -----------------------------------------
-   セレクト・ファイル選択
------------------------------------------ */
 input[type="file"],
 select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(120, 90, 200, 0.3);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 6px rgba(120, 90, 200, 0.15);
-  font-size: 14px;
-  color: #4a3f8f;
-}
-
-/* -----------------------------------------
-   キャンバス
------------------------------------------ */
-#canvas {
-  width: 100%;
-  margin-top: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(120, 90, 200, 0.25);
-  background: rgba(255, 255, 255, 0.4);
-}
-
-/* -----------------------------------------
-   ボタン（青紫 × 透明感）
------------------------------------------ */
-button {
-  width: 48%;
-  padding: 12px 0;
-  margin-top: 20px;
-  border: none;
-  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s;
-  color: white;
-  background: linear-gradient(135deg, #8f7bff, #b38dff);
-  box-shadow: 0 4px 12px rgba(120, 90, 200, 0.3);
+  background-color: #fff;
 }
 
-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(120, 90, 200, 0.4);
+/* キャンバス */
+canvas {
+  touch-action: none;
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 40, 80, 0.08);
 }
 
+/* ボタン */
 .btn-save {
-  background: linear-gradient(135deg, #7a6bff, #a88bff);
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0078d4;
+  color: #fff;
+  cursor: pointer;
+  width: 90%;
+  max-width: 400px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #005fa3;
+  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
 }
 
 .btn-reset {
-  background: linear-gradient(135deg, #c38dff, #e0b3ff);
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #e5e5e5;
+  color: #333;
+  cursor: pointer;
+  width: 90%;
+  max-width: 400px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-reset:hover {
+  background-color: #d5d5d5;
+}
+
+/* コンテナ */
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 60px;
 }
