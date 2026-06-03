@@ -9,53 +9,23 @@ html, body {
 
 /* タイトル */
 h1 {
-  font-size: 2.2em;
+  font-size: 2em;
   font-weight: 600;
-  margin-top: 40px;
+  margin-top: 30px;
   margin-bottom: 10px;
-  letter-spacing: 0.02em;
 }
 
-h1::after {
-  content: "";
-  display: block;
-  width: 80px;
-  height: 3px;
-  background-color: #0078d4;
-  margin: 8px auto 0;
-  border-radius: 2px;
-}
-
-/* 説明文 */
 .description {
   font-size: 1em;
-  color: #333;
   margin-bottom: 20px;
 }
 
-/* 注意事項タイトル */
-.notice-title {
-  font-size: 1.1em;
-  font-weight: 600;
-  margin-top: 10px;
-  margin-bottom: 6px;
-  border-bottom: 2px solid #0078d4;
-  display: inline-block;
-  padding-bottom: 2px;
-}
-
-/* 注意事項ボックス */
-.notice-box {
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(0, 40, 80, 0.12);
-  padding: 20px;
-  margin: 20px auto;
-  width: 90%;
-  max-width: 500px;
-  text-align: left;
-  line-height: 1.6;
-  font-size: 15px;
+/* コンテナ */
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 60px;
 }
 
 /* 入力フォーム */
@@ -70,10 +40,9 @@ input[type="file"],
 select {
   width: 90%;
   max-width: 400px;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 15px;
   background-color: #fff;
 }
 
@@ -90,47 +59,45 @@ canvas {
 }
 
 /* ボタン */
-.btn-save {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 15px;
-  border: none;
-  border-radius: 6px;
-  background-color: #0078d4;
-  color: #fff;
-  cursor: pointer;
+button {
   width: 90%;
   max-width: 400px;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 12px;
+  cursor: pointer;
 }
 
-.btn-save:hover {
-  background-color: #005fa3;
-  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
+.btn-save {
+  background-color: #0078d4;
+  color: #fff;
 }
 
 .btn-reset {
-  margin-top: 12px;
-  padding: 10px 20px;
-  font-size: 15px;
-  border: none;
-  border-radius: 6px;
   background-color: #e5e5e5;
   color: #333;
-  cursor: pointer;
-  width: 90%;
-  max-width: 400px;
-  transition: background-color 0.2s ease;
 }
 
-.btn-reset:hover {
-  background-color: #d5d5d5;
-}
+/* スマホ最適化 */
+@media (max-width: 600px) {
+  body {
+    padding: 1em;
+    font-size: 16px;
+  }
 
-/* コンテナ */
-.container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding-bottom: 60px;
+  h1 {
+    font-size: 1.6em;
+  }
+
+  input[type="file"],
+  select {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    font-size: 1.1em;
+  }
 }
