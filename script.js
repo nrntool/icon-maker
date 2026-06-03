@@ -312,7 +312,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   saveCanvas.height = fh * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
-  // ① フレーム画像をオフスクリーンに描画して透明部分を取得
+  // フレーム画像をオフスクリーンに描画して透明部分を取得
   const maskCanvas = document.createElement("canvas");
   maskCanvas.width = fw;
   maskCanvas.height = fh;
@@ -322,7 +322,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   const imgData = mctx.getImageData(0, 0, fw, fh);
   const data = imgData.data;
 
-  // ② 透明部分をクリップパスとして作成
+  // 透明部分をクリップパスとして作成（α値を厳密に判定）
   sctx.save();
   sctx.beginPath();
 
@@ -331,20 +331,15 @@ document.getElementById("saveBtn").addEventListener("click", () => {
       const idx = (y * fw + x) * 4;
       const alpha = data[idx + 3];
 
-      if (alpha > 0) {
-        sctx.rect(
-          x * scaleFactor,
-          y * scaleFactor,
-          scaleFactor,
-          scaleFactor
-        );
+      if (alpha > 200) {
+        sctx.rect(x * scaleFactor, y * scaleFactor, scaleFactor, scaleFactor);
       }
     }
   }
 
   sctx.clip();
 
-  // ③ 内側画像を描画
+  // 内側画像を描画
   sctx.save();
   sctx.translate(posX * scaleFactor, posY * scaleFactor);
   sctx.scale(scale * scaleFactor, scale * scaleFactor);
@@ -352,12 +347,12 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.drawImage(baseImage, 0, 0);
   sctx.restore();
 
-  // ④ フレームを上に描画
+  // フレームを上に描画
   sctx.drawImage(frameImage, 0, 0, fw * scaleFactor, fh * scaleFactor);
 
-  // ⑤ 保存
+  // PNGとして保存（透過あり）
   const link = document.createElement("a");
-  link.download = "framed_masked.png";
+  link.download = "framed_transparent.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 });
