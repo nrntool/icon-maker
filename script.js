@@ -176,40 +176,44 @@ function animate() {
 animate();
 
 /* -----------------------------------------
-   保存（中心基準＋座標スケール自動補正）
+   保存（高解像度＋中心補正・完全版）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
 
-  const displayRect = canvas.getBoundingClientRect();
+  const rect = canvas.getBoundingClientRect();
   const fw = frameImage.width;
   const fh = frameImage.height;
 
-  const scaleFactorX = fw / displayRect.width;
-  const scaleFactorY = fh / displayRect.height;
+  const upscale = 3;
+
+  const scaleFactorX = (fw * upscale) / rect.width;
+  const scaleFactorY = (fh * upscale) / rect.height;
 
   const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = fw;
-  saveCanvas.height = fh;
+  saveCanvas.width = fw * upscale;
+  saveCanvas.height = fh * upscale;
   const sctx = saveCanvas.getContext("2d");
 
-  // 写真（中心基準で補正）
+  // 🔧 中心補正（完全修正版）
   sctx.save();
-  sctx.translate(fw / 2, fh / 2);
+  sctx.translate(saveCanvas.width / 2, saveCanvas.height / 2);
   sctx.scale(scale * scaleFactorX, scale * scaleFactorY);
   sctx.rotate(angle);
+
   sctx.drawImage(
     baseImage,
-    -baseImage.width / 2 + (posX - displayRect.width / 2) * scaleFactorX,
-    -baseImage.height / 2 + (posY - displayRect.height / 2) * scaleFactorY
+    -baseImage.width / 2 + (targetPosX - rect.width / 2) * scaleFactorX,
+    -baseImage.height / 2 + (targetPosY - rect.height / 2) * scaleFactorY
   );
+
   sctx.restore();
 
-  // フレーム
-  sctx.drawImage(frameImage, 0, 0, fw, fh);
+  // フレーム描画（透過PNG対応）
+  sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
 
   const link = document.createElement("a");
-  link.download = "framed.png";
+  link.download = "framed_highres.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 });
