@@ -12,6 +12,7 @@ let frameImage = null;
 function setupCanvas() {
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
+
   canvas.width = rect.width * dpr;
   canvas.height = rect.width * dpr; // 正方形
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -26,9 +27,11 @@ window.addEventListener("resize", () => {
    フレーム一覧
 ----------------------------------------- */
 const frameFiles = ["01_yoyaku.png"];
+
 function makeLabelFromFilename(filename) {
   return filename.replace(/^\d+_?/, "").replace(/\.[^/.]+$/, "").replace(/_/g, " ");
 }
+
 function loadFrames() {
   frameFiles.forEach(filename => {
     const path = `./frames/${filename}`;
@@ -45,21 +48,25 @@ loadFrames();
 ----------------------------------------- */
 let posX = 0, posY = 0, scale = 1, angle = 0;
 let targetPosX = 0, targetPosY = 0, targetScale = 1, targetAngle = 0;
+
 const smooth = 0.15;
-const MIN_SCALE = 0.2, MAX_SCALE = 6.0;
+const MIN_SCALE = 0.2;
+const MAX_SCALE = 6.0;
 
 /* -----------------------------------------
-   描画
+   描画（画面表示）
 ----------------------------------------- */
 function draw() {
   const rect = canvas.getBoundingClientRect();
-  const w = rect.width, h = rect.width;
+  const w = rect.width;
 
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, w, w);
 
   const innerScale = 0.80;
-  const innerW = w * innerScale, innerH = h * innerScale;
-  const innerX = (w - innerW) / 2, innerY = (h - innerH) / 2;
+  const innerW = w * innerScale;
+  const innerH = w * innerScale;
+  const innerX = (w - innerW) / 2;
+  const innerY = (w - innerH) / 2;
 
   ctx.save();
   ctx.beginPath();
@@ -78,7 +85,7 @@ function draw() {
   ctx.restore();
 
   if (frameImage && frameImage.complete) {
-    ctx.drawImage(frameImage, 0, 0, w, h);
+    ctx.drawImage(frameImage, 0, 0, w, w);
   }
 }
 
@@ -97,17 +104,22 @@ imageInput.addEventListener("change", e => {
       const w = rect.width;
 
       const innerScale = 0.80;
-      const innerW = w * innerScale, innerH = w * innerScale;
-      const innerX = (w - innerW) / 2, innerY = (w - innerH) / 2;
+      const innerW = w * innerScale;
+      const innerH = w * innerScale;
+      const innerX = (w - innerW) / 2;
+      const innerY = (w - innerH) / 2;
 
       const scaleFit = Math.min(innerW / baseImage.width, innerH / baseImage.height);
       scale = targetScale = scaleFit;
 
-      const centerX = innerX + innerW / 2, centerY = innerY + innerH / 2;
+      const centerX = innerX + innerW / 2;
+      const centerY = innerY + innerH / 2;
+
       posX = targetPosX = centerX - (baseImage.width * scale) / 2;
       posY = targetPosY = centerY - (baseImage.height * scale) / 2;
 
       angle = targetAngle = 0;
+
       draw();
     };
     baseImage.src = reader.result;
@@ -134,7 +146,7 @@ function getTouchPos(touch) {
 }
 
 /* -----------------------------------------
-   タッチ操作（移動＋ズーム＋回転）
+   タッチ操作（移動・ズーム・回転）
 ----------------------------------------- */
 let lastDist = null, lastAngle = null, lastCx = null, lastCy = null;
 let isDraggingTouch = false, touchDragOffsetX = 0, touchDragOffsetY = 0;
@@ -148,8 +160,11 @@ canvas.addEventListener("touchstart", e => {
   }
 
   if (e.touches.length === 2) {
-    const p1 = getTouchPos(e.touches[0]), p2 = getTouchPos(e.touches[1]);
-    const cx = (p1.x + p2.x) / 2, cy = (p1.y + p2.y) / 2;
+    const p1 = getTouchPos(e.touches[0]);
+    const p2 = getTouchPos(e.touches[1]);
+
+    const cx = (p1.x + p2.x) / 2;
+    const cy = (p1.y + p2.y) / 2;
     const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
     const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 
@@ -168,8 +183,12 @@ canvas.addEventListener("touchmove", e => {
   }
 
   if (e.touches.length === 2) {
-    const p1 = getTouchPos(e.touches[0]), p2 = getTouchPos(e.touches[1]);
-    const cx = (p1.x + p2.x) / 2, cy = (p1.y + p2.y) / 2;
+    const p1 = getTouchPos(e.touches[0]);
+    const p2 = getTouchPos(e.touches[1]);
+
+    const cx = (p1.x + p2.x) / 2;
+    const cy = (p1.y + p2.y) / 2;
+
     const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
     const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 
@@ -184,6 +203,7 @@ canvas.addEventListener("touchmove", e => {
     }
 
     if (lastAngle !== null) targetAngle += ang - lastAngle;
+
     if (lastCx !== null) {
       targetPosX += cx - lastCx;
       targetPosY += cy - lastCy;
@@ -206,12 +226,16 @@ canvas.addEventListener("touchend", e => {
 canvas.addEventListener("wheel", e => {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
-  const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+
   const delta = e.deltaY > 0 ? -0.05 : 0.05;
   let newScale = targetScale + delta;
   newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+
   const scaleRatio = newScale / targetScale;
   targetScale = newScale;
+
   targetPosX = cx - (cx - targetPosX) * scaleRatio;
   targetPosY = cy - (cy - targetPosY) * scaleRatio;
 }, { passive: false });
@@ -224,13 +248,14 @@ function animate() {
   posY += (targetPosY - posY) * smooth;
   scale += (targetScale - scale) * smooth;
   angle += (targetAngle - angle) * smooth;
+
   draw();
   requestAnimationFrame(animate);
 }
 animate();
 
 /* -----------------------------------------
-   保存（フレーム内側だけを残す円クリップ）
+   保存（再合成方式）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
@@ -247,23 +272,13 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   saveCanvas.height = fh * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
-  // フレーム内側だけを残す円（外側に絶対はみ出さない）
-  const cx = (fw * scaleFactor) / 2;
-  const cy = (fh * scaleFactor) / 2;
-  const radius = (fw * scaleFactor) / 2 * 0.80; // 内側80%
-
-  sctx.save();
-  sctx.beginPath();
-  sctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  sctx.clip();
-
   // 画面座標 → 保存座標へ変換
   const ratio = fw / displaySize;
   const posX_scaled = posX * ratio * scaleFactor;
   const posY_scaled = posY * ratio * scaleFactor;
   const scale_scaled = scale * ratio * scaleFactor;
 
-  // 内側画像
+  // 内側画像を描画（画面と同じ構図）
   sctx.save();
   sctx.translate(posX_scaled, posY_scaled);
   sctx.scale(scale_scaled, scale_scaled);
@@ -271,13 +286,12 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   sctx.drawImage(baseImage, 0, 0);
   sctx.restore();
 
-  // フレーム
+  // フレームを上に重ねる（透明部分は透過のまま）
   sctx.drawImage(frameImage, 0, 0, fw * scaleFactor, fh * scaleFactor);
 
-  sctx.restore();
-
+  // PNG保存
   const link = document.createElement("a");
-  link.download = "framed_inner.png";
+  link.download = "framed_composite.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 });
