@@ -105,6 +105,12 @@ select {
 /* -----------------------------------------
    ボタン（青紫 × 透明感）
 ----------------------------------------- */
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 4%;
+}
+
 button {
   width: 48%;
   padding: 12px 0;
