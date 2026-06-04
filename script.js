@@ -58,12 +58,31 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
-/* 描画処理 */
+/* 描画処理（中央トリミング） */
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (baseImage) {
-    ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+    const imgAspect = baseImage.width / baseImage.height;
+    const canvasAspect = canvas.width / canvas.height;
+
+    let sx, sy, sWidth, sHeight;
+
+    if (imgAspect > canvasAspect) {
+      // 横長 → 左右をカット
+      sHeight = baseImage.height;
+      sWidth = baseImage.height * canvasAspect;
+      sx = (baseImage.width - sWidth) / 2;
+      sy = 0;
+    } else {
+      // 縦長 → 上下をカット
+      sWidth = baseImage.width;
+      sHeight = baseImage.width / canvasAspect;
+      sx = 0;
+      sy = (baseImage.height - sHeight) / 2;
+    }
+
+    ctx.drawImage(baseImage, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
   }
 
   if (frameImage) {
