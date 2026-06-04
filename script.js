@@ -8,7 +8,7 @@ let frameImage = null;
 
 /* ズーム・移動用 */
 let scale = 1;
-let minScale = 0.3;
+let minScale = 0.3;   // ← 縮小できる下限
 let maxScale = 4;
 
 let offsetX = 0;
@@ -54,12 +54,9 @@ imageInput.addEventListener("change", (e) => {
     baseImage.onload = () => {
       scale = 1;
 
-      // 読み込み時に画像を中央に配置
-      const drawW = baseImage.width * scale;
-      const drawH = baseImage.height * scale;
-
-      offsetX = (canvas.width - drawW) / 2;
-      offsetY = (canvas.height - drawH) / 2;
+      // 🎯 読み込み時に画像の中心をキャンバス中央へ
+      offsetX = canvas.width  / 2 - (baseImage.width  * scale) / 2;
+      offsetY = canvas.height / 2 - (baseImage.height * scale) / 2;
 
       redraw();
     };
@@ -114,7 +111,7 @@ canvas.addEventListener("touchstart", (e) => {
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
-  /* ピンチズーム */
+  /* 🎯 ピンチズーム（縮小も確実に動く） */
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
     const center = getCenter(e.touches);
@@ -125,10 +122,13 @@ canvas.addEventListener("touchmove", (e) => {
 
     const oldScale = scale;
     const delta = (dist - lastDist) * 0.004;
+
+    // scale 更新（縮小もOK）
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
     const zoomRatio = scale / oldScale;
 
+    // 🎯 ズーム中心補正（指の位置が中心になる）
     offsetX = cx - (cx - offsetX) * zoomRatio;
     offsetY = cy - (cy - offsetY) * zoomRatio;
 
@@ -173,7 +173,7 @@ function redraw() {
   }
 }
 
-/* 高解像度保存 */
+/* 🎯 高解像度保存（3倍） */
 function saveHighRes() {
   if (!baseImage) return;
 
