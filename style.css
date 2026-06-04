@@ -1,211 +1,43 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: "Noto Sans JP", sans-serif;
-  background: #f3f5f8;
-  color: #222;
-  text-align: center;
-  line-height: 1.6;
-}
-
-/* カード全体 */
-.app-card {
-  width: 92%;
-  max-width: 420px;
-  margin: 1.6em auto;
-  background: #fff;
-  border-radius: 18px;
-  padding: 1.6em 1.2em;
-  box-shadow: 0 6px 20px rgba(0, 40, 80, 0.08);
-}
-
-/* ヘッダー */
-header {
-  margin-bottom: 1.2em;
-}
-
-header h1 {
-  font-size: 1.8em;
-  font-weight: 600;
-  margin: 0;
-  letter-spacing: 0.03em;
-}
-
-header h1::after {
-  content: "";
-  display: block;
-  width: 70px;
-  height: 3px;
-  background: #999;
-  margin: 10px auto 0;
-  border-radius: 2px;
-}
-
-.description {
-  font-size: 0.9em;
-  color: #444;
-  margin-top: 0.4em;
-}
-
-/* 注意事項 */
-.notice {
-  margin: 1.2em auto;
-  text-align: left;
-}
-
-.notice h2 {
-  font-size: 0.95em;
-  font-weight: 600;
-  border-bottom: 2px solid #bbb;
-  display: inline-block;
-  padding-bottom: 2px;
-  margin-bottom: 0.3em;
-}
-
-.notice p {
-  background: #f9f9f9;
-  padding: 0.9em;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 40, 80, 0.06);
-  font-size: 0.85em;
-  margin-top: 0;
-}
-
-/* ラベル */
-label {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  margin: 1em 0 0.3em;
-  font-size: 0.9em;
-  letter-spacing: 0.02em;
-}
-
-/* グレー細線 × 角丸の番号バッジ */
-.step-badge {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-
-  width: 1.6em;
-  height: 1.6em;
-  margin-right: 0.5em;
-
-  font-size: 0.85em;
-  font-weight: 600;
-  color: #333;
-
+#saveBtn {
+  background-color: #0078d4;
+  color: #fff;
+  border: none;
   border-radius: 6px;
-  border: 1.5px solid #999;
-  background: #f5f5f5;
-}
-
-/* 入力フォーム（中性的） */
-input[type="file"],
-select {
-  width: 100%;
+  padding: 12px 20px;
+  font-size: 16px;
+  width: 90%;
   max-width: 400px;
-  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
 
-  padding: 0.7em 0.9em;
-  font-size: 0.9em;
+#saveBtn:hover {
+  background-color: #005fa3;
+  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
+}
+
+#saveBtn:active {
+  background-color: #004f8a;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
+}
+
+#resetBtn {
+  background-color: #e5e5e5;
   color: #333;
-
-  background: #ffffff;
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-input[type="file"]:hover,
-select:hover {
-  background: #fafafa;
-  border-color: #bbb;
-}
-
-input[type="file"]:focus,
-select:focus {
-  outline: none;
-  border-color: #999;
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-}
-
-/* ファイル選択ボタン */
-input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
-  padding: 0.6em 1em;
-
-  background: #f2f2f2;
-  border: 1px solid #ccc;
+  border: none;
   border-radius: 6px;
-  color: #333;
-
+  padding: 12px 20px;
+  font-size: 16px;
+  width: 90%;
+  max-width: 400px;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
-input[type="file"]::-webkit-file-upload-button:hover {
-  background: #eaeaea;
-  border-color: #bbb;
+#resetBtn:hover {
+  background-color: #d5d5d5;
 }
 
-input[type="file"]::-webkit-file-upload-button:active {
-  background: #e0e0e0;
-  border-color: #aaa;
-}
-
-/* キャンバス */
-canvas {
-  width: 100%;
-  max-width: 360px;
-  aspect-ratio: 1 / 1;
-  display: block;
-  margin: 1.2em auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 3px 12px rgba(0, 40, 80, 0.08);
-  touch-action: none;
-}
-
-/* ボタン（中性的） */
-.button-row {
-  display: flex;
-  gap: 0.6em;
-  margin-top: 1.2em;
-}
-
-.button-row button {
-  flex: 1;
-  padding: 0.9em;
-  font-size: 0.95em;
-  border-radius: 8px;
-  cursor: pointer;
-
-  background: #ffffff;
-  color: #333;
-  border: 1.5px solid #ccc;
-
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition:
-    background 0.2s ease,
-    transform 0.1s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.button-row button:hover {
-  background: #f7f7f7;
-  border-color: #bbb;
-}
-
-.button-row button:active {
-  transform: scale(0.97);
-  background: #f0f0f0;
-  border-color: #aaa;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+#resetBtn:active {
+  background-color: #c8c8c8;
 }
