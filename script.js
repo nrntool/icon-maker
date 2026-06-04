@@ -8,7 +8,7 @@ let frameImage = null;
 
 /* ズーム・移動用 */
 let scale = 1;
-let minScale = 0.3;   // ← 縮小できる下限
+let minScale = 0.3;   // ← 元サイズ以下にも縮小できる
 let maxScale = 4;
 
 let offsetX = 0;
@@ -173,7 +173,7 @@ function redraw() {
   }
 }
 
-/* 🎯 高解像度保存（3倍） */
+/* 🎯 高解像度保存（3倍）＋ 日時ファイル名 */
 function saveHighRes() {
   if (!baseImage) return;
 
@@ -199,8 +199,19 @@ function saveHighRes() {
     sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
   }
 
+  // 🎯 日時入りファイル名
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mi = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+
+  const filename = `${yyyy}${mm}${dd}_${hh}${mi}${ss}.png`;
+
   const link = document.createElement("a");
-  link.download = "framelab_highres.png";
+  link.download = filename;
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 }
