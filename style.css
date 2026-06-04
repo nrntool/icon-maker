@@ -1,4 +1,3 @@
-/* 全体レイアウト */
 body {
   margin: 0;
   padding: 0;
@@ -9,7 +8,6 @@ body {
   align-items: center;
 }
 
-/* コンテナ */
 .container {
   width: 100%;
   max-width: 480px;
@@ -17,7 +15,6 @@ body {
   box-sizing: border-box;
 }
 
-/* キャンバス */
 #canvas {
   width: 100%;
   height: auto;
@@ -27,7 +24,6 @@ body {
   touch-action: none;
 }
 
-/* セレクトボックス */
 select, input[type="file"] {
   width: 100%;
   padding: 12px;
@@ -38,7 +34,6 @@ select, input[type="file"] {
   box-sizing: border-box;
 }
 
-/* 保存ボタン */
 #saveBtn {
   background-color: #0078d4;
   color: #fff;
@@ -62,7 +57,6 @@ select, input[type="file"] {
   box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
 }
 
-/* リセットボタン */
 #resetBtn {
   background-color: #e5e5e5;
   color: #333;
