@@ -1,32 +1,25 @@
-/* -----------------------------------------
-   ベース（スマホ中心）
------------------------------------------ */
 html, body {
   margin: 0;
   padding: 0;
   font-family: "Noto Sans JP", sans-serif;
-  background: #eef1f5; /* アプリ背景色 */
+  background: #f3f5f8; /* 柔らかいアプリ背景 */
   color: #222;
   text-align: center;
   line-height: 1.6;
 }
 
-/* -----------------------------------------
-   アプリ全体を包むカード
------------------------------------------ */
+/* カード全体 */
 .app-card {
   width: 92%;
   max-width: 480px;
-  margin: 2.2em auto;
+  margin: 2.4em auto;
   background: #fff;
   border-radius: 18px;
   padding: 2em 1.4em;
-  box-shadow: 0 8px 28px rgba(0, 40, 80, 0.12);
+  box-shadow: 0 6px 20px rgba(0, 40, 80, 0.08);
 }
 
-/* -----------------------------------------
-   ヘッダー
------------------------------------------ */
+/* ヘッダー */
 header h1 {
   font-size: 1.9em;
   font-weight: 600;
@@ -50,9 +43,7 @@ header h1::after {
   margin-top: 0.6em;
 }
 
-/* -----------------------------------------
-   注意事項（カード内のサブカード）
------------------------------------------ */
+/* 注意事項 */
 .notice {
   margin: 1.8em auto;
   text-align: left;
@@ -75,9 +66,7 @@ header h1::after {
   font-size: 0.9em;
 }
 
-/* -----------------------------------------
-   メイン操作エリア
------------------------------------------ */
+/* メイン操作エリア */
 main {
   width: 100%;
   max-width: 480px;
@@ -101,9 +90,7 @@ select {
   font-size: 0.95em;
 }
 
-/* -----------------------------------------
-   キャンバス（正方形・アプリ風）
------------------------------------------ */
+/* キャンバス */
 canvas {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -115,15 +102,13 @@ canvas {
   touch-action: none;
 }
 
-/* -----------------------------------------
-   ボタン（アプリ風）
------------------------------------------ */
+/* ボタン */
 button {
   width: 100%;
   padding: 1em;
   font-size: 1em;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   margin-top: 1em;
   transition: background 0.2s ease, transform 0.1s ease;
@@ -143,9 +128,7 @@ button:active {
   color: #333;
 }
 
-/* -----------------------------------------
-   スマホ専用微調整
------------------------------------------ */
+/* スマホ微調整 */
 @media (max-width: 600px) {
   header {
     padding-top: 2em;
