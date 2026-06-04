@@ -36,7 +36,7 @@ header h1::after {
   display: block;
   width: 70px;
   height: 3px;
-  background: #007aff;
+  background: #00bfff; /* サイバーブルー */
   margin: 10px auto 0;
   border-radius: 2px;
 }
@@ -56,7 +56,7 @@ header h1::after {
 .notice h2 {
   font-size: 0.95em;
   font-weight: 600;
-  border-bottom: 2px solid #007aff;
+  border-bottom: 2px solid #00bfff;
   display: inline-block;
   padding-bottom: 2px;
   margin-bottom: 0.3em;
@@ -73,31 +73,36 @@ header h1::after {
 
 /* ラベル */
 label {
-  display: block;
+  display: flex;
+  align-items: center;
   font-weight: 600;
-  margin: 1.2em 0 0.4em;
+  margin: 1em 0 0.3em;
   font-size: 0.9em;
   letter-spacing: 0.02em;
 }
 
-/* かっこいい番号バッジ */
+/* 青×黒サイバー番号バッジ */
 .step-badge {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  vertical-align: middle;
 
   width: 1.6em;
   height: 1.6em;
-  margin-right: 0.45em;
+  margin-right: 0.5em;
 
   font-size: 0.85em;
   font-weight: 700;
-  color: #222;
+  color: #00bfff;
 
   border-radius: 6px;
-  border: 1.5px solid #444;
-  background: #f2f2f2;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  border: 1.5px solid #00bfff;
+  background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+  box-shadow:
+    0 0 6px rgba(0, 191, 255, 0.6),
+    inset 0 0 4px rgba(0, 191, 255, 0.4);
+  text-shadow: 0 0 4px rgba(0, 191, 255, 0.6);
 }
 
 /* 入力フォーム */
@@ -141,7 +146,7 @@ canvas {
   touch-action: none;
 }
 
-/* 横並びボタン */
+/* 横並びボタン（サイバー系） */
 .button-row {
   display: flex;
   gap: 0.6em;
@@ -155,6 +160,15 @@ canvas {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+
+  background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+  color: #00bfff;
+  border: 1.5px solid #00bfff;
+
+  box-shadow:
+    0 0 8px rgba(0, 191, 255, 0.6),
+    inset 0 0 6px rgba(0, 191, 255, 0.4);
+
   transition:
     background 0.2s ease,
     transform 0.1s ease,
@@ -162,29 +176,10 @@ canvas {
 }
 
 .button-row button:active {
-  transform: scale(0.97);
-}
-
-/* 保存ボタン */
-.btn-save {
-  background: #007aff;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
-}
-
-.btn-save:active {
-  background: #0063cc;
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
-}
-
-/* リセットボタン */
-.btn-reset {
-  background: #e5e5ea;
-  color: #333;
-}
-
-.btn-reset:active {
-  background: #d1d1d6;
+  transform: scale(0.96);
+  box-shadow:
+    0 0 4px rgba(0, 191, 255, 0.4),
+    inset 0 0 4px rgba(0, 191, 255, 0.6);
 }
 
 /* スマホ微調整 */
