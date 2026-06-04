@@ -1,186 +1,47 @@
-/* -----------------------------------------
-   ベース（スマホ中心）
------------------------------------------ */
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: "Noto Sans JP", sans-serif;
-  background: #f3f5f8; /* 柔らかいアプリ背景 */
-  color: #222;
-  text-align: center;
-  line-height: 1.6;
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FrameLab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-/* -----------------------------------------
-   アプリ全体を包むカード
------------------------------------------ */
-.app-card {
-  width: 92%;
-  max-width: 420px;
-  margin: 2.4em auto;
-  background: #fff;
-  border-radius: 18px;
-  padding: 2em 1.4em;
-  box-shadow: 0 6px 20px rgba(0, 40, 80, 0.08);
-}
+  <div class="app-card">
 
-/* -----------------------------------------
-   ヘッダー
------------------------------------------ */
-header h1 {
-  font-size: 1.9em;
-  font-weight: 600;
-  margin: 0;
-  letter-spacing: 0.03em;
-}
+    <header>
+      <h1>FrameLab</h1>
+      <p class="description">画像にフレームを合成して、アイコンを作成できます。</p>
+    </header>
 
-header h1::after {
-  content: "";
-  display: block;
-  width: 70px;
-  height: 3px;
-  background: #007aff;
-  margin: 10px auto 0;
-  border-radius: 2px;
-}
+    <section class="notice">
+      <h2>注意事項</h2>
+      <p>
+        ・画像はサーバーに保存されません。<br>
+        ・ブラウザ内だけで処理されます。
+      </p>
+    </section>
 
-.description {
-  font-size: 0.95em;
-  color: #444;
-  margin-top: 0.6em;
-}
+    <main>
+      <label><span class="step-badge">1</span> 画像を選択</label>
+      <input type="file" id="imageInput" accept="image/*">
 
-/* -----------------------------------------
-   注意事項
------------------------------------------ */
-.notice {
-  margin: 1.8em auto;
-  text-align: left;
-}
+      <label><span class="step-badge">2</span> フレームを選択</label>
+      <select id="frameSelect">
+        <option value="">選択してください</option>
+      </select>
 
-.notice h2 {
-  font-size: 1em;
-  font-weight: 600;
-  border-bottom: 2px solid #007aff;
-  display: inline-block;
-  padding-bottom: 2px;
-  margin-bottom: 0.3em; /* ← 距離を詰める */
-}
+      <canvas id="canvas"></canvas>
 
-.notice p {
-  background: #f9f9f9;
-  padding: 1em;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 40, 80, 0.06);
-  font-size: 0.9em;
-  margin-top: 0; /* ← タイトルとの距離をゼロに */
-}
+      <div class="button-row">
+        <button id="saveBtn" class="btn-save">保存</button>
+        <button id="resetBtn" class="btn-reset">リセット</button>
+      </div>
+    </main>
 
-/* -----------------------------------------
-   メイン操作エリア
------------------------------------------ */
-main {
-  width: 100%;
-  max-width: 420px;
-  margin: 2em auto 4em;
-}
+  </div>
 
-label {
-  display: block;
-  font-weight: 500;
-  margin: 1.6em 0 0.5em;
-  font-size: 0.95em;
-}
-
-/* 入力フォーム（角丸統一） */
-input[type="file"],
-select {
-  width: 100%;
-  max-width: 400px;
-  padding: 0.85em;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 0.95em;
-}
-
-/* -----------------------------------------
-   キャンバス（角丸統一）
------------------------------------------ */
-canvas {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  display: block;
-  margin: 1.6em auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 3px 12px rgba(0, 40, 80, 0.08);
-  touch-action: none;
-}
-
-/* -----------------------------------------
-   横並びボタン
------------------------------------------ */
-.button-row {
-  display: flex;
-  gap: 0.8em;
-  margin-top: 1.4em;
-}
-
-.button-row button {
-  flex: 1;
-  padding: 1em;
-  font-size: 1em;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.1s ease,
-    box-shadow 0.2s ease;
-}
-
-.button-row button:active {
-  transform: scale(0.97);
-}
-
-/* 保存ボタン（メイン） */
-.btn-save {
-  background: #007aff;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
-}
-
-.btn-save:active {
-  background: #0063cc;
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
-}
-
-/* リセットボタン（サブ） */
-.btn-reset {
-  background: #e5e5ea;
-  color: #333;
-}
-
-.btn-reset:active {
-  background: #d1d1d6;
-}
-
-/* -----------------------------------------
-   スマホ微調整
------------------------------------------ */
-@media (max-width: 600px) {
-  header {
-    padding-top: 2em;
-    padding-bottom: 1.4em;
-  }
-
-  main {
-    margin-top: 1.8em;
-    margin-bottom: 3.6em;
-  }
-
-  button {
-    font-size: 1.05em;
-  }
-}
+  <script src="script.js"></script>
+</body>
+</html>
