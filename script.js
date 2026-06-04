@@ -161,7 +161,13 @@ function redraw() {
   }
 
   if (frameImage) {
-    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+    const cw = canvas.width;
+    const ch = canvas.height;
+    const size = Math.min(cw, ch);
+    const x = (cw - size) / 2;
+    const y = (ch - size) / 2;
+
+    ctx.drawImage(frameImage, x, y, size, size);
   }
 }
 
@@ -187,7 +193,13 @@ function saveHighRes() {
   sctx.drawImage(baseImage, x, y, drawW, drawH);
 
   if (frameImage) {
-    sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
+    const cw = saveCanvas.width;
+    const ch = saveCanvas.height;
+    const size = Math.min(cw, ch);
+    const fx = (cw - size) / 2;
+    const fy = (ch - size) / 2;
+
+    sctx.drawImage(frameImage, fx, fy, size, size);
   }
 
   const now = new Date();
