@@ -7,7 +7,6 @@ html, body {
   text-align: center;
 }
 
-/* タイトル */
 h1 {
   font-size: 2em;
   font-weight: 600;
@@ -20,7 +19,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* コンテナ */
 .container {
   width: 100%;
   max-width: 600px;
@@ -28,7 +26,6 @@ h1 {
   padding-bottom: 60px;
 }
 
-/* 入力フォーム */
 label {
   display: block;
   font-weight: 500;
@@ -46,7 +43,6 @@ select {
   background-color: #fff;
 }
 
-/* キャンバス */
 canvas {
   touch-action: none;
   display: block;
@@ -58,7 +54,6 @@ canvas {
   box-shadow: 0 4px 20px rgba(0, 40, 80, 0.08);
 }
 
-/* ボタン */
 button {
   width: 90%;
   max-width: 400px;
