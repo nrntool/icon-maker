@@ -8,7 +8,7 @@ let frameImage = null;
 
 /* ズーム・移動用 */
 let scale = 1;
-let minScale = 0.3;   // ← ここ重要：縮小できる下限を下げる
+let minScale = 0.3;
 let maxScale = 4;
 
 let offsetX = 0;
@@ -118,12 +118,11 @@ canvas.addEventListener("touchmove", (e) => {
     const cy = center.y - rect.top;
 
     const oldScale = scale;
-    const delta = (dist - lastDist) * 0.004; // ← 縮小しやすい感度
+    const delta = (dist - lastDist) * 0.004;
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
     const zoomRatio = scale / oldScale;
 
-    // ズーム中心補正
     offsetX = cx - (cx - offsetX) * zoomRatio;
     offsetY = cy - (cy - offsetY) * zoomRatio;
 
@@ -168,13 +167,44 @@ function redraw() {
   }
 }
 
-/* 保存 */
-document.getElementById("saveBtn").addEventListener("click", () => {
+/* 高解像度保存 */
+function saveHighRes() {
+  if (!baseImage) return;
+
+  const scaleFactor = 3; // ← 高解像度倍率
+
+  const saveCanvas = document.createElement("canvas");
+  saveCanvas.width = canvas.width * scaleFactor;
+  saveCanvas.height = canvas.height * scaleFactor;
+  const sctx = saveCanvas.getContext("2d");
+
+  // 背景白
+  sctx.fillStyle = "#ffffff";
+  sctx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
+
+  // 画像描画（ズーム・移動を反映）
+  const drawW = baseImage.width * scale * scaleFactor;
+  const drawH = baseImage.height * scale * scaleFactor;
+
+  const x = offsetX * scaleFactor;
+  const y = offsetY * scaleFactor;
+
+  sctx.drawImage(baseImage, x, y, drawW, drawH);
+
+  // フレーム描画
+  if (frameImage) {
+    sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
+  }
+
+  // 保存
   const link = document.createElement("a");
-  link.download = "framelab.png";
-  link.href = canvas.toDataURL("image/png");
+  link.download = "framelab_highres.png";
+  link.href = saveCanvas.toDataURL("image/png");
   link.click();
-});
+}
+
+/* 保存ボタン */
+document.getElementById("saveBtn").addEventListener("click", saveHighRes);
 
 /* リセット */
 document.getElementById("resetBtn").addEventListener("click", () => {
