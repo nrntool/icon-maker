@@ -8,17 +8,20 @@
 </head>
 <body>
 
-  <h1>FrameLab</h1>
-  <p class="description">画像にフレームを合成して、アイコンを作成できます。</p>
+  <header class="header">
+    <h1>FrameLab</h1>
+    <p class="description">画像にフレームを合成して、アイコンを作成できます。</p>
+  </header>
 
-  <h2 class="notice-title">注意事項</h2>
-  <div class="notice-box">
-    ・画像はサーバーに保存されません。<br>
-    ・ブラウザ内だけで処理されます。<br>
-  </div>
+  <section class="notice">
+    <h2>注意事項</h2>
+    <p>
+      ・画像はサーバーに保存されません。<br>
+      ・ブラウザ内だけで処理されます。
+    </p>
+  </section>
 
-  <div class="container">
-
+  <main class="main">
     <label>画像を選択</label>
     <input type="file" id="imageInput" accept="image/*">
 
@@ -29,10 +32,9 @@
 
     <canvas id="canvas"></canvas>
 
-    <button class="btn-save" id="saveBtn">保存</button>
-    <button class="btn-reset" id="resetBtn">リセット</button>
-
-  </div>
+    <button id="saveBtn" class="btn-save">保存</button>
+    <button id="resetBtn" class="btn-reset">リセット</button>
+  </main>
 
   <script src="script.js"></script>
 </body>
