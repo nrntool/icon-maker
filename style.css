@@ -100,7 +100,7 @@ label {
   background: #f5f5f5;
 }
 
-/* 入力フォーム（中性的） */
+/* 入力フォーム */
 input[type="file"],
 select {
   width: 100%;
@@ -172,7 +172,7 @@ canvas {
   touch-action: none;
 }
 
-/* ボタン（中性的） */
+/* ボタン行 */
 .button-row {
   display: flex;
   gap: 0.6em;
@@ -208,4 +208,28 @@ canvas {
   background: #f0f0f0;
   border-color: #aaa;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 保存ボタンだけ色をつける */
+#saveBtn {
+  background: #0078d4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9em;
+  font-size: 0.95em;
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.15);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+#saveBtn:hover {
+  background: #005fa3;
+  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
+}
+
+#saveBtn:active {
+  background: #004f8a;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
 }
