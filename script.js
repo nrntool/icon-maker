@@ -6,6 +6,12 @@ const ctx = canvas.getContext("2d");
 let baseImage = null;
 let frameImage = null;
 
+/* ズーム関連 */
+let scale = 1;
+let minScale = 1;
+let maxScale = 3;
+let lastDist = 0;
+
 /* キャンバス自動リサイズ */
 function resizeCanvas() {
   const size = canvas.clientWidth;
@@ -27,8 +33,7 @@ fetch("frames.json")
       option.textContent = file.replace(".png", "");
       frameSelect.appendChild(option);
     });
-  })
-  .catch((error) => console.error("フレーム一覧の読み込みに失敗しました:", error));
+  });
 
 /* 画像読み込み */
 imageInput.addEventListener("change", (e) => {
@@ -38,7 +43,10 @@ imageInput.addEventListener("change", (e) => {
   const reader = new FileReader();
   reader.onload = () => {
     baseImage = new Image();
-    baseImage.onload = redraw;
+    baseImage.onload = () => {
+      scale = 1; // 初期化
+      redraw();
+    };
     baseImage.src = reader.result;
   };
   reader.readAsDataURL(file);
@@ -58,7 +66,36 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
-/* 描画処理（中央トリミング） */
+/* ピンチ距離を計算 */
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/* ピンチズーム */
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 2) {
+    lastDist = getDistance(e.touches);
+  }
+});
+
+canvas.addEventListener("touchmove", (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+
+    const dist = getDistance(e.touches);
+    const delta = (dist - lastDist) * 0.005; // ズーム感度
+    scale += delta;
+
+    scale = Math.max(minScale, Math.min(maxScale, scale));
+    lastDist = dist;
+
+    redraw();
+  }
+});
+
+/* 描画処理（中央トリミング＋ズーム） */
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -69,20 +106,25 @@ function redraw() {
     let sx, sy, sWidth, sHeight;
 
     if (imgAspect > canvasAspect) {
-      // 横長 → 左右をカット
+      // 横長 → 左右カット
       sHeight = baseImage.height;
       sWidth = baseImage.height * canvasAspect;
       sx = (baseImage.width - sWidth) / 2;
       sy = 0;
     } else {
-      // 縦長 → 上下をカット
+      // 縦長 → 上下カット
       sWidth = baseImage.width;
       sHeight = baseImage.width / canvasAspect;
       sx = 0;
       sy = (baseImage.height - sHeight) / 2;
     }
 
-    ctx.drawImage(baseImage, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+    const drawW = canvas.width * scale;
+    const drawH = canvas.height * scale;
+    const offsetX = (canvas.width - drawW) / 2;
+    const offsetY = (canvas.height - drawH) / 2;
+
+    ctx.drawImage(baseImage, sx, sy, sWidth, sHeight, offsetX, offsetY, drawW, drawH);
   }
 
   if (frameImage) {
@@ -102,6 +144,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
+  scale = 1;
   imageInput.value = "";
   frameSelect.value = "";
   redraw();
