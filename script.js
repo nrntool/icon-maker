@@ -8,7 +8,7 @@ let frameImage = null;
 
 /* ズーム・移動用 */
 let scale = 1;
-let minScale = 0.3;   // ← 元サイズ以下にも縮小できる
+let minScale = 0.3;
 let maxScale = 4;
 
 let offsetX = 0;
@@ -52,11 +52,21 @@ imageInput.addEventListener("change", (e) => {
   reader.onload = () => {
     baseImage = new Image();
     baseImage.onload = () => {
-      scale = 1;
 
-      // 🎯 読み込み時に画像の中心をキャンバス中央へ
-      offsetX = canvas.width  / 2 - (baseImage.width  * scale) / 2;
-      offsetY = canvas.height / 2 - (baseImage.height * scale) / 2;
+      /* 🎯 読み込み時に自動フィット＋中央配置 */
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const iw = baseImage.width;
+      const ih = baseImage.height;
+
+      // 画像がキャンバスに収まる最小スケール
+      const fitScale = Math.min(cw / iw, ch / ih);
+
+      scale = fitScale;
+      minScale = fitScale * 0.3; // ← フィット後の縮小下限を自然に
+
+      offsetX = cw / 2 - (iw * scale) / 2;
+      offsetY = ch / 2 - (ih * scale) / 2;
 
       redraw();
     };
@@ -123,12 +133,10 @@ canvas.addEventListener("touchmove", (e) => {
     const oldScale = scale;
     const delta = (dist - lastDist) * 0.004;
 
-    // scale 更新（縮小もOK）
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
     const zoomRatio = scale / oldScale;
 
-    // 🎯 ズーム中心補正（指の位置が中心になる）
     offsetX = cx - (cx - offsetX) * zoomRatio;
     offsetY = cy - (cy - offsetY) * zoomRatio;
 
