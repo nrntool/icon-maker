@@ -59,11 +59,10 @@ imageInput.addEventListener("change", (e) => {
       const iw = baseImage.width;
       const ih = baseImage.height;
 
-      // 画像がキャンバスに収まる最小スケール
       const fitScale = Math.min(cw / iw, ch / ih);
 
       scale = fitScale;
-      minScale = fitScale * 0.3; // ← フィット後の縮小下限を自然に
+      minScale = fitScale * 0.3;
 
       offsetX = cw / 2 - (iw * scale) / 2;
       offsetY = ch / 2 - (ih * scale) / 2;
