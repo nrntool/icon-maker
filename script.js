@@ -121,12 +121,10 @@ canvas.addEventListener("touchmove", (e) => {
 
     const zoomRatio = scale / oldScale;
 
-    // キャンバス座標に変換
     const rect = canvas.getBoundingClientRect();
     const cx = center.x - rect.left;
     const cy = center.y - rect.top;
 
-    // ズーム中心補正（これが重要）
     offsetX = cx - (cx - offsetX) * zoomRatio;
     offsetY = cy - (cy - offsetY) * zoomRatio;
 
@@ -155,21 +153,15 @@ canvas.addEventListener("touchend", () => {
   isDragging = false;
 });
 
-/* 描画処理（中央トリミングなし） */
+/* 描画処理（中央トリミングなし・カットなし） */
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (baseImage) {
-    const imgW = baseImage.width;
-    const imgH = baseImage.height;
+    const drawW = baseImage.width * scale;
+    const drawH = baseImage.height * scale;
 
-    const drawW = imgW * scale;
-    const drawH = imgH * scale;
-
-    const x = offsetX + (canvas.width - drawW) / 2;
-    const y = offsetY + (canvas.height - drawH) / 2;
-
-    ctx.drawImage(baseImage, x, y, drawW, drawH);
+    ctx.drawImage(baseImage, offsetX, offsetY, drawW, drawH);
   }
 
   if (frameImage) {
@@ -177,7 +169,7 @@ function redraw() {
   }
 }
 
-/* 保存（高解像度対応しているならここを差し替え） */
+/* 保存 */
 document.getElementById("saveBtn").addEventListener("click", () => {
   const link = document.createElement("a");
   link.download = "framelab.png";
