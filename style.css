@@ -33,7 +33,7 @@ h1::after {
   margin-bottom: 20px;
 }
 
-/* 注意事項タイトル */
+/* 注意事項 */
 .notice-title {
   font-size: 1.1em;
   font-weight: 600;
@@ -44,7 +44,6 @@ h1::after {
   padding-bottom: 2px;
 }
 
-/* 注意事項ボックス */
 .notice-box {
   background-color: #fff;
   border-radius: 12px;
@@ -83,6 +82,7 @@ canvas {
   display: block;
   width: 100%;
   max-width: 500px;
+  aspect-ratio: 1 / 1; /* 正方形を保証 */
   margin: 20px auto;
   background-color: #fff;
   border-radius: 12px;
@@ -90,47 +90,24 @@ canvas {
 }
 
 /* ボタン */
-.btn-save {
-  margin-top: 20px;
+.btn-save,
+.btn-reset {
+  width: 90%;
+  max-width: 400px;
   padding: 10px 20px;
   font-size: 15px;
   border: none;
   border-radius: 6px;
-  background-color: #0078d4;
-  color: #fff;
   cursor: pointer;
-  width: 90%;
-  max-width: 400px;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 12px;
 }
 
-.btn-save:hover {
-  background-color: #005fa3;
-  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
+.btn-save {
+  background-color: #0078d4;
+  color: #fff;
 }
 
 .btn-reset {
-  margin-top: 12px;
-  padding: 10px 20px;
-  font-size: 15px;
-  border: none;
-  border-radius: 6px;
   background-color: #e5e5e5;
   color: #333;
-  cursor: pointer;
-  width: 90%;
-  max-width: 400px;
-  transition: background-color 0.2s ease;
-}
-
-.btn-reset:hover {
-  background-color: #d5d5d5;
-}
-
-/* コンテナ */
-.container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding-bottom: 60px;
 }
