@@ -6,7 +6,6 @@ const ctx = canvas.getContext("2d");
 let baseImage = null;
 let frameImage = null;
 
-/* ズーム・移動用 */
 let scale = 1;
 let minScale = 0.3;
 let maxScale = 4;
@@ -20,7 +19,6 @@ let lastY = 0;
 let lastDist = 0;
 let isDragging = false;
 
-/* キャンバス自動リサイズ */
 function resizeCanvas() {
   const size = canvas.clientWidth;
   canvas.width = size;
@@ -31,7 +29,6 @@ function resizeCanvas() {
 window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
 
-/* フレーム一覧を読み込む（キャッシュ対策付き） */
 fetch("frames.json?ver=" + Date.now())
   .then((response) => response.json())
   .then((frames) => {
@@ -43,7 +40,6 @@ fetch("frames.json?ver=" + Date.now())
     });
   });
 
-/* 画像読み込み */
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -52,8 +48,6 @@ imageInput.addEventListener("change", (e) => {
   reader.onload = () => {
     baseImage = new Image();
     baseImage.onload = () => {
-
-      /* 🎯 読み込み時に自動フィット＋中央配置 */
       const cw = canvas.width;
       const ch = canvas.height;
       const iw = baseImage.width;
@@ -74,7 +68,6 @@ imageInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-/* フレーム選択 */
 frameSelect.addEventListener("change", () => {
   const value = frameSelect.value;
   if (!value) {
@@ -88,14 +81,12 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
-/* ピンチ距離 */
 function getDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-/* ピンチ中心 */
 function getCenter(touches) {
   return {
     x: (touches[0].clientX + touches[1].clientX) / 2,
@@ -103,7 +94,6 @@ function getCenter(touches) {
   };
 }
 
-/* タッチ開始 */
 canvas.addEventListener("touchstart", (e) => {
   if (e.touches.length === 1) {
     isDragging = true;
@@ -116,11 +106,9 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
-/* タッチ移動 */
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
-  /* 🎯 ピンチズーム（縮小も確実に動く） */
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
     const center = getCenter(e.touches);
@@ -144,7 +132,6 @@ canvas.addEventListener("touchmove", (e) => {
     return;
   }
 
-  /* ドラッグ移動 */
   if (e.touches.length === 1 && isDragging) {
     const x = e.touches[0].clientX;
     const y = e.touches[0].clientY;
@@ -159,12 +146,10 @@ canvas.addEventListener("touchmove", (e) => {
   }
 });
 
-/* タッチ終了 */
 canvas.addEventListener("touchend", () => {
   isDragging = false;
 });
 
-/* 描画処理（カットなし） */
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -180,7 +165,6 @@ function redraw() {
   }
 }
 
-/* 🎯 高解像度保存（3倍）＋ 日時ファイル名 */
 function saveHighRes() {
   if (!baseImage) return;
 
@@ -206,7 +190,6 @@ function saveHighRes() {
     sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
   }
 
-  // 🎯 日時入りファイル名
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -225,7 +208,6 @@ function saveHighRes() {
 
 document.getElementById("saveBtn").addEventListener("click", saveHighRes);
 
-/* リセット */
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
