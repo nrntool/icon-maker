@@ -7,14 +7,14 @@ let baseImage = null;
 let frameImage = null;
 
 /* -----------------------------------------
-   高DPI対応
+   高DPI対応 + 正方形内部解像度
 ----------------------------------------- */
 function setupCanvas() {
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
 
   canvas.width = rect.width * dpr;
-  canvas.height = rect.width * dpr;
+  canvas.height = rect.width * dpr; // 正方形固定
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 setupCanvas();
@@ -24,7 +24,7 @@ window.addEventListener("resize", () => {
 });
 
 /* -----------------------------------------
-   frames.json を読み込んでフレーム一覧を生成
+   frames.json 読み込み
 ----------------------------------------- */
 async function loadFrames() {
   try {
@@ -39,20 +39,18 @@ async function loadFrames() {
     });
 
   } catch (err) {
-    console.error("フレーム一覧の読み込みに失敗:", err);
+    console.error("フレーム読み込み失敗:", err);
   }
 }
 loadFrames();
 
 /* -----------------------------------------
-   変換パラメータ
+   描画パラメータ
 ----------------------------------------- */
 let posX = 0, posY = 0, scale = 1, angle = 0;
 let targetPosX = 0, targetPosY = 0, targetScale = 1, targetAngle = 0;
 
 const smooth = 0.15;
-const MIN_SCALE = 0.2;
-const MAX_SCALE = 6.0;
 
 /* -----------------------------------------
    描画
@@ -60,8 +58,9 @@ const MAX_SCALE = 6.0;
 function draw() {
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
+  const h = rect.width;
 
-  ctx.clearRect(0, 0, w, w);
+  ctx.clearRect(0, 0, w, h);
 
   if (baseImage) {
     ctx.save();
@@ -73,7 +72,7 @@ function draw() {
   }
 
   if (frameImage) {
-    ctx.drawImage(frameImage, 0, 0, w, w);
+    ctx.drawImage(frameImage, 0, 0, w, h);
   }
 }
 
@@ -116,87 +115,33 @@ frameSelect.addEventListener("change", () => {
 });
 
 /* -----------------------------------------
-   マウス操作
------------------------------------------ */
-function getCanvasPos(e) {
-  const rect = canvas.getBoundingClientRect();
-  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-}
-
-let dragging = false;
-let dragOffsetX = 0;
-let dragOffsetY = 0;
-
-canvas.addEventListener("mousedown", e => {
-  dragging = true;
-  const p = getCanvasPos(e);
-  dragOffsetX = p.x - targetPosX;
-  dragOffsetY = p.y - targetPosY;
-});
-
-canvas.addEventListener("mousemove", e => {
-  if (!dragging) return;
-  const p = getCanvasPos(e);
-  targetPosX = p.x - dragOffsetX;
-  targetPosY = p.y - dragOffsetY;
-});
-
-canvas.addEventListener("mouseup", () => dragging = false);
-canvas.addEventListener("mouseleave", () => dragging = false);
-
-canvas.addEventListener("wheel", e => {
-  e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  const cx = e.clientX - rect.left;
-  const cy = e.clientY - rect.top;
-
-  const delta = e.deltaY > 0 ? -0.05 : 0.05;
-  let newScale = targetScale + delta;
-  newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
-
-  const ratio = newScale / targetScale;
-  targetScale = newScale;
-
-  targetPosX = cx - (cx - targetPosX) * ratio;
-  targetPosY = cy - (cy - targetPosY) * ratio;
-});
-
-/* -----------------------------------------
-   アニメーション
------------------------------------------ */
-function animate() {
-  posX += (targetPosX - posX) * smooth;
-  posY += (targetPosY - posY) * smooth;
-  scale += (targetScale - scale) * smooth;
-  angle += (targetAngle - angle) * smooth;
-
-  draw();
-  requestAnimationFrame(animate);
-}
-animate();
-
-/* -----------------------------------------
-   保存（完全安定版・ズレなし）
+   保存（正方形・画面と完全一致）
 ----------------------------------------- */
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!baseImage || !frameImage) return;
 
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
+  const h = rect.width;
 
-  // 保存用キャンバスを作成
   const saveCanvas = document.createElement("canvas");
   saveCanvas.width = w;
-  saveCanvas.height = w;
+  saveCanvas.height = h;
   const sctx = saveCanvas.getContext("2d");
 
-  // ベース画像描画
-  sctx.drawImage(baseImage, 0, 0, w, w);
+  sctx.clearRect(0, 0, w, h);
+
+  // 画面と同じ変形を再現
+  sctx.save();
+  sctx.translate(posX, posY);
+  sctx.scale(scale, scale);
+  sctx.rotate(angle);
+  sctx.drawImage(baseImage, 0, 0);
+  sctx.restore();
 
   // フレーム描画
-  sctx.drawImage(frameImage, 0, 0, w, w);
+  sctx.drawImage(frameImage, 0, 0, w, h);
 
-  // ダウンロード
   const link = document.createElement("a");
   link.download = "framed.png";
   link.href = saveCanvas.toDataURL("image/png");
@@ -216,6 +161,5 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   imageInput.value = "";
   frameSelect.value = "";
   setupCanvas();
-  const rect = canvas.getBoundingClientRect();
-  ctx.clearRect(0, 0, rect.width, rect.width);
+  draw();
 });
