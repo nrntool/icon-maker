@@ -6,11 +6,19 @@ const ctx = canvas.getContext("2d");
 let baseImage = null;
 let frameImage = null;
 
-/* ズーム関連 */
+/* ズーム・移動用 */
 let scale = 1;
 let minScale = 1;
-let maxScale = 3;
+let maxScale = 4;
+
+let offsetX = 0;
+let offsetY = 0;
+
+let lastX = 0;
+let lastY = 0;
+
 let lastDist = 0;
+let isDragging = false;
 
 /* キャンバス自動リサイズ */
 function resizeCanvas() {
@@ -44,7 +52,9 @@ imageInput.addEventListener("change", (e) => {
   reader.onload = () => {
     baseImage = new Image();
     baseImage.onload = () => {
-      scale = 1; // 初期化
+      scale = 1;
+      offsetX = 0;
+      offsetY = 0;
       redraw();
     };
     baseImage.src = reader.result;
@@ -66,36 +76,64 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
-/* ピンチ距離を計算 */
+/* ピンチ距離 */
 function getDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-/* ピンチズーム */
+/* タッチ開始 */
 canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    isDragging = true;
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  }
+
   if (e.touches.length === 2) {
     lastDist = getDistance(e.touches);
   }
 });
 
+/* タッチ移動 */
 canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+
+  /* ピンチズーム */
   if (e.touches.length === 2) {
-    e.preventDefault();
-
     const dist = getDistance(e.touches);
-    const delta = (dist - lastDist) * 0.005; // ズーム感度
-    scale += delta;
+    const delta = (dist - lastDist) * 0.005;
 
+    scale += delta;
     scale = Math.max(minScale, Math.min(maxScale, scale));
+
     lastDist = dist;
+    redraw();
+    return;
+  }
+
+  /* ドラッグ移動 */
+  if (e.touches.length === 1 && isDragging) {
+    const x = e.touches[0].clientX;
+    const y = e.touches[0].clientY;
+
+    offsetX += (x - lastX);
+    offsetY += (y - lastY);
+
+    lastX = x;
+    lastY = y;
 
     redraw();
   }
 });
 
-/* 描画処理（中央トリミング＋ズーム） */
+/* タッチ終了 */
+canvas.addEventListener("touchend", () => {
+  isDragging = false;
+});
+
+/* 描画処理（中央トリミング + ズーム + 移動） */
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -106,13 +144,11 @@ function redraw() {
     let sx, sy, sWidth, sHeight;
 
     if (imgAspect > canvasAspect) {
-      // 横長 → 左右カット
       sHeight = baseImage.height;
       sWidth = baseImage.height * canvasAspect;
       sx = (baseImage.width - sWidth) / 2;
       sy = 0;
     } else {
-      // 縦長 → 上下カット
       sWidth = baseImage.width;
       sHeight = baseImage.width / canvasAspect;
       sx = 0;
@@ -121,10 +157,15 @@ function redraw() {
 
     const drawW = canvas.width * scale;
     const drawH = canvas.height * scale;
-    const offsetX = (canvas.width - drawW) / 2;
-    const offsetY = (canvas.height - drawH) / 2;
 
-    ctx.drawImage(baseImage, sx, sy, sWidth, sHeight, offsetX, offsetY, drawW, drawH);
+    ctx.drawImage(
+      baseImage,
+      sx, sy, sWidth, sHeight,
+      offsetX + (canvas.width - drawW) / 2,
+      offsetY + (canvas.height - drawH) / 2,
+      drawW,
+      drawH
+    );
   }
 
   if (frameImage) {
@@ -145,6 +186,8 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
   scale = 1;
+  offsetX = 0;
+  offsetY = 0;
   imageInput.value = "";
   frameSelect.value = "";
   redraw();
