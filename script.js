@@ -14,7 +14,7 @@ function setupCanvas() {
   const dpr = window.devicePixelRatio || 1;
 
   canvas.width = rect.width * dpr;
-  canvas.height = rect.width * dpr;
+  canvas.height = rect.width * dpr; // 正方形に固定
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 setupCanvas();
@@ -58,20 +58,21 @@ const smooth = 0.15;
 function draw() {
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
+  const h = rect.height;
 
-  ctx.clearRect(0, 0, w, w);
+  ctx.clearRect(0, 0, w, h);
 
   if (baseImage) {
     ctx.save();
     ctx.translate(posX, posY);
     ctx.scale(scale, scale);
     ctx.rotate(angle);
-    ctx.drawImage(baseImage, 0, 0);
+    ctx.drawImage(baseImage, 0, 0, w, h);
     ctx.restore();
   }
 
   if (frameImage) {
-    ctx.drawImage(frameImage, 0, 0, w, w);
+    ctx.drawImage(frameImage, 0, 0, w, h);
   }
 }
 
@@ -88,67 +89,6 @@ imageInput.addEventListener("change", e => {
     baseImage.onload = () => {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width;
+      const h = rect.height;
 
-      const scaleFit = w / baseImage.width;
-      scale = targetScale = scaleFit;
-
-      posX = targetPosX = (w - baseImage.width * scale) / 2;
-      posY = targetPosY = (w - baseImage.height * scale) / 2;
-
-      angle = targetAngle = 0;
-
-      draw();
-    };
-    baseImage.src = reader.result;
-  };
-  reader.readAsDataURL(file);
-});
-
-/* -----------------------------------------
-   フレーム読み込み
------------------------------------------ */
-frameSelect.addEventListener("change", () => {
-  frameImage = new Image();
-  frameImage.onload = () => draw();
-  frameImage.src = frameSelect.value;
-});
-
-/* -----------------------------------------
-   保存（ズレなし安定版）
------------------------------------------ */
-document.getElementById("saveBtn").addEventListener("click", () => {
-  if (!baseImage || !frameImage) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const w = rect.width;
-
-  const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = w;
-  saveCanvas.height = w;
-  const sctx = saveCanvas.getContext("2d");
-
-  sctx.drawImage(baseImage, 0, 0, w, w);
-  sctx.drawImage(frameImage, 0, 0, w, w);
-
-  const link = document.createElement("a");
-  link.download = "framed.png";
-  link.href = saveCanvas.toDataURL("image/png");
-  link.click();
-});
-
-/* -----------------------------------------
-   リセット
------------------------------------------ */
-document.getElementById("resetBtn").addEventListener("click", () => {
-  baseImage = null;
-  frameImage = null;
-  posX = targetPosX = 0;
-  posY = targetPosY = 0;
-  scale = targetScale = 1;
-  angle = targetAngle = 0;
-  imageInput.value = "";
-  frameSelect.value = "";
-  setupCanvas();
-  const rect = canvas.getBoundingClientRect();
-  ctx.clearRect(0, 0, rect.width, rect.width);
-});
+      const scaleFit =
