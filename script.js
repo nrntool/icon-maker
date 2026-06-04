@@ -31,8 +31,8 @@ function resizeCanvas() {
 window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
 
-/* フレーム一覧を読み込む */
-fetch("frames.json")
+/* フレーム一覧を読み込む（キャッシュ対策付き） */
+fetch("frames.json?ver=" + Date.now())
   .then((response) => response.json())
   .then((frames) => {
     frames.forEach((file) => {
@@ -53,8 +53,14 @@ imageInput.addEventListener("change", (e) => {
     baseImage = new Image();
     baseImage.onload = () => {
       scale = 1;
-      offsetX = 0;
-      offsetY = 0;
+
+      // 読み込み時に画像を中央に配置
+      const drawW = baseImage.width * scale;
+      const drawH = baseImage.height * scale;
+
+      offsetX = (canvas.width - drawW) / 2;
+      offsetY = (canvas.height - drawH) / 2;
+
       redraw();
     };
     baseImage.src = reader.result;
@@ -171,18 +177,16 @@ function redraw() {
 function saveHighRes() {
   if (!baseImage) return;
 
-  const scaleFactor = 3; // ← 高解像度倍率
+  const scaleFactor = 3;
 
   const saveCanvas = document.createElement("canvas");
   saveCanvas.width = canvas.width * scaleFactor;
   saveCanvas.height = canvas.height * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
-  // 背景白
   sctx.fillStyle = "#ffffff";
   sctx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
 
-  // 画像描画（ズーム・移動を反映）
   const drawW = baseImage.width * scale * scaleFactor;
   const drawH = baseImage.height * scale * scaleFactor;
 
@@ -191,19 +195,16 @@ function saveHighRes() {
 
   sctx.drawImage(baseImage, x, y, drawW, drawH);
 
-  // フレーム描画
   if (frameImage) {
     sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
   }
 
-  // 保存
   const link = document.createElement("a");
   link.download = "framelab_highres.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 }
 
-/* 保存ボタン */
 document.getElementById("saveBtn").addEventListener("click", saveHighRes);
 
 /* リセット */
