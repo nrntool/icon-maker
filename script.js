@@ -83,6 +83,14 @@ function getDistance(touches) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+/* ピンチ中心（指2本の中心） */
+function getCenter(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  };
+}
+
 /* タッチ開始 */
 canvas.addEventListener("touchstart", (e) => {
   if (e.touches.length === 1) {
@@ -100,13 +108,27 @@ canvas.addEventListener("touchstart", (e) => {
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
-  /* ピンチズーム */
+  /* ピンチズーム（指位置を中心に補正） */
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
+    const center = getCenter(e.touches);
+
     const delta = (dist - lastDist) * 0.005;
+    const oldScale = scale;
 
     scale += delta;
     scale = Math.max(minScale, Math.min(maxScale, scale));
+
+    const zoomRatio = scale / oldScale;
+
+    // キャンバス座標に変換
+    const rect = canvas.getBoundingClientRect();
+    const cx = center.x - rect.left;
+    const cy = center.y - rect.top;
+
+    // ズーム中心補正（これが重要）
+    offsetX = cx - (cx - offsetX) * zoomRatio;
+    offsetY = cy - (cy - offsetY) * zoomRatio;
 
     lastDist = dist;
     redraw();
@@ -133,39 +155,21 @@ canvas.addEventListener("touchend", () => {
   isDragging = false;
 });
 
-/* 描画処理（中央トリミング + ズーム + 移動） */
+/* 描画処理（中央トリミングなし） */
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (baseImage) {
-    const imgAspect = baseImage.width / baseImage.height;
-    const canvasAspect = 1; // 正方形
+    const imgW = baseImage.width;
+    const imgH = baseImage.height;
 
-    let sx, sy, sWidth, sHeight;
+    const drawW = imgW * scale;
+    const drawH = imgH * scale;
 
-    if (imgAspect > canvasAspect) {
-      sHeight = baseImage.height;
-      sWidth = baseImage.height * canvasAspect;
-      sx = (baseImage.width - sWidth) / 2;
-      sy = 0;
-    } else {
-      sWidth = baseImage.width;
-      sHeight = baseImage.width / canvasAspect;
-      sx = 0;
-      sy = (baseImage.height - sHeight) / 2;
-    }
+    const x = offsetX + (canvas.width - drawW) / 2;
+    const y = offsetY + (canvas.height - drawH) / 2;
 
-    const drawW = canvas.width * scale;
-    const drawH = canvas.height * scale;
-
-    ctx.drawImage(
-      baseImage,
-      sx, sy, sWidth, sHeight,
-      offsetX + (canvas.width - drawW) / 2,
-      offsetY + (canvas.height - drawH) / 2,
-      drawW,
-      drawH
-    );
+    ctx.drawImage(baseImage, x, y, drawW, drawH);
   }
 
   if (frameImage) {
@@ -173,7 +177,7 @@ function redraw() {
   }
 }
 
-/* 保存 */
+/* 保存（高解像度対応しているならここを差し替え） */
 document.getElementById("saveBtn").addEventListener("click", () => {
   const link = document.createElement("a");
   link.download = "framelab.png";
