@@ -139,7 +139,7 @@ function redraw() {
 
   if (baseImage) {
     const imgAspect = baseImage.width / baseImage.height;
-    const canvasAspect = canvas.width / canvas.height;
+    const canvasAspect = 1; // 正方形
 
     let sx, sy, sWidth, sHeight;
 
