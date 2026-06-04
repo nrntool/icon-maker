@@ -8,7 +8,7 @@ let frameImage = null;
 
 /* ズーム・移動用 */
 let scale = 1;
-let minScale = 1;
+let minScale = 0.3;   // ← ここ重要：縮小できる下限を下げる
 let maxScale = 4;
 
 let offsetX = 0;
@@ -83,7 +83,7 @@ function getDistance(touches) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-/* ピンチ中心（指2本の中心） */
+/* ピンチ中心 */
 function getCenter(touches) {
   return {
     x: (touches[0].clientX + touches[1].clientX) / 2,
@@ -108,23 +108,22 @@ canvas.addEventListener("touchstart", (e) => {
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
-  /* ピンチズーム（指位置を中心に補正） */
+  /* ピンチズーム */
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
     const center = getCenter(e.touches);
-
-    const delta = (dist - lastDist) * 0.005;
-    const oldScale = scale;
-
-    scale += delta;
-    scale = Math.max(minScale, Math.min(maxScale, scale));
-
-    const zoomRatio = scale / oldScale;
 
     const rect = canvas.getBoundingClientRect();
     const cx = center.x - rect.left;
     const cy = center.y - rect.top;
 
+    const oldScale = scale;
+    const delta = (dist - lastDist) * 0.004; // ← 縮小しやすい感度
+    scale = Math.max(minScale, Math.min(maxScale, scale + delta));
+
+    const zoomRatio = scale / oldScale;
+
+    // ズーム中心補正
     offsetX = cx - (cx - offsetX) * zoomRatio;
     offsetY = cy - (cy - offsetY) * zoomRatio;
 
@@ -153,7 +152,7 @@ canvas.addEventListener("touchend", () => {
   isDragging = false;
 });
 
-/* 描画処理（中央トリミングなし・カットなし） */
+/* 描画処理（カットなし） */
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
