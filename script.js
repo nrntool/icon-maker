@@ -17,6 +17,19 @@ function resizeCanvas() {
 window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
 
+/* フレーム一覧を読み込む */
+fetch("frames.json")
+  .then((response) => response.json())
+  .then((frames) => {
+    frames.forEach((file) => {
+      const option = document.createElement("option");
+      option.value = `frames/${file}`;
+      option.textContent = file.replace(".png", "");
+      frameSelect.appendChild(option);
+    });
+  })
+  .catch((error) => console.error("フレーム一覧の読み込みに失敗しました:", error));
+
 /* 画像読み込み */
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
