@@ -1,3 +1,19 @@
+// ▼▼▼ フレームURLを直接埋め込む（難読化なし） ▼▼▼
+const SECRET_FRAMES = [
+  "frames/01_test.png",
+  "frames/02_test.png"
+];
+
+// セレクトボックスに反映
+SECRET_FRAMES.forEach((url, index) => {
+  const option = document.createElement("option");
+  option.value = url;
+  option.textContent = `フレーム ${index + 1}`;
+  frameSelect.appendChild(option);
+});
+// ▲▲▲ ここまでフレーム設定 ▲▲▲
+
+
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
@@ -28,17 +44,6 @@ function resizeCanvas() {
 
 window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
-
-fetch("frames.json?ver=" + Date.now())
-  .then((response) => response.json())
-  .then((frames) => {
-    frames.forEach((file) => {
-      const option = document.createElement("option");
-      option.value = `frames/${file}`;
-      option.textContent = file.replace(".png", "");
-      frameSelect.appendChild(option);
-    });
-  });
 
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
