@@ -3,6 +3,20 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// ▼▼▼ 追加：フレームURLを直接埋め込む ▼▼▼
+const SECRET_FRAMES = [
+  "frames/01_test.png",
+  "frames/02_test.png"
+];
+
+SECRET_FRAMES.forEach((url, index) => {
+  const option = document.createElement("option");
+  option.value = url;
+  option.textContent = `フレーム ${index + 1}`;
+  frameSelect.appendChild(option);
+});
+// ▲▲▲ ここまで追加 ▲▲▲
+
 let baseImage = null;
 let frameImage = null;
 
@@ -29,16 +43,19 @@ function resizeCanvas() {
 window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
 
-fetch("frames.json?ver=" + Date.now())
-  .then((response) => response.json())
-  .then((frames) => {
-    frames.forEach((file) => {
-      const option = document.createElement("option");
-      option.value = `frames/${file}`;
-      option.textContent = file.replace(".png", "");
-      frameSelect.appendChild(option);
-    });
-  });
+// ▼▼▼ 削除：frames.json を読み込む fetch ▼▼▼
+// （このブロックは完全に削除してOK）
+// fetch("frames.json?ver=" + Date.now())
+//   .then((response) => response.json())
+//   .then((frames) => {
+//     frames.forEach((file) => {
+//       const option = document.createElement("option");
+//       option.value = `frames/${file}`;
+//       option.textContent = file.replace(".png", "");
+//       frameSelect.appendChild(option);
+//     });
+//   });
+// ▲▲▲ ここまで削除 ▲▲▲
 
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
