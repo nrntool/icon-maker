@@ -51,6 +51,11 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
+  // ▼ ローディング開始
+  uploadBtn.disabled = true;
+  uploadBtn.classList.add("loading");
+  uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
+
   resultBox.textContent = "⏳ アップロード中...";
 
   try {
@@ -74,7 +79,7 @@ uploadBtn.addEventListener("click", async () => {
         <a href="${data.url}" target="_blank">${data.url}</a>
       `;
 
-      // ▼ ボタンを光らせる
+      // ▼ ボタン光る
       uploadBtn.classList.add("upload-glow");
 
       // ▼ 入力欄アニメーション
@@ -102,4 +107,9 @@ uploadBtn.addEventListener("click", async () => {
     console.error(err);
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
   }
+
+  // ▼ ローディング解除
+  uploadBtn.disabled = false;
+  uploadBtn.classList.remove("loading");
+  uploadBtn.innerHTML = "アップロード";
 });
