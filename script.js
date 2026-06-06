@@ -3,7 +3,16 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼▼▼ GitHub APIからフレーム一覧を取得 ▼▼▼
+// ▼ 日本語ファイル名を整形（例：予約バトル.png → 予約バトル）
+function formatFrameName(name) {
+  return name
+    .replace(".png", "")
+    .replace(/[_\-]/g, " ")   // _ や - をスペースに
+    .replace(/\s+/g, " ")     // 連続スペースを1つに
+    .trim();
+}
+
+// ▼ GitHub APIからフレーム一覧を取得
 async function loadFrames() {
   const repo = "framesynth/icon-maker";
   const apiUrl = `https://api.github.com/repos/${repo}/contents/frames`;
@@ -23,8 +32,13 @@ async function loadFrames() {
     data.forEach(item => {
       if (item.name.endsWith(".png")) {
         const option = document.createElement("option");
+
+        // GitHub の raw URL
         option.value = item.download_url;
-        option.textContent = item.name.replace(".png", "");
+
+        // ★ 管理画面で入力した名前がそのまま表示される
+        option.textContent = formatFrameName(item.name);
+
         frameSelect.appendChild(option);
       }
     });
@@ -33,9 +47,7 @@ async function loadFrames() {
   }
 }
 
-// ページ読み込み時に実行
 window.addEventListener("DOMContentLoaded", loadFrames);
-// ▲▲▲ ここまで追加 ▲▲▲
 
 let baseImage = null;
 let frameImage = null;
