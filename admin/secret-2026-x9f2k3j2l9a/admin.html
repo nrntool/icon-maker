@@ -1,133 +1,62 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>FrameLab 管理パネル</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+// ================================
+// FrameLab 管理パネル用 admin.js（最終完全版）
+// ================================
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Noto Sans JP", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f3f5f8;
-      color: #222;
-      line-height: 1.6;
+// Cloudflare Worker のエンドポイントURL（あなたの Worker に置き換える）
+const WORKER_ENDPOINT = "https://your-worker-name.workers.dev";
+
+// UI 要素
+const uploadBtn = document.getElementById("uploadBtn");
+const frameInput = document.getElementById("frameInput");
+const resultBox = document.getElementById("result");
+
+// ファイルを Base64（ヘッダー付き）に変換
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result); // data:image/png;base64,xxxx
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// アップロード処理
+uploadBtn.addEventListener("click", async () => {
+  const file = frameInput.files[0];
+  if (!file) {
+    resultBox.textContent = "⚠ ファイルが選択されていません。";
+    return;
+  }
+
+  resultBox.textContent = "⏳ アップロード中...";
+
+  try {
+    // Base64（ヘッダー付き）に変換
+    const base64Data = await toBase64(file);
+
+    // Cloudflare Worker に送信
+    const response = await fetch(WORKER_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: file.name,
+        content: base64Data
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      resultBox.innerHTML = `
+        ✅ アップロード完了！<br>
+        GitHub に保存されました。<br>
+        <a href="${data.url}" target="_blank">${data.url}</a>
+      `;
+    } else {
+      resultBox.textContent = `❌ エラー: ${data.message || "アップロードに失敗しました。"}`;
     }
-
-    .admin-card {
-      max-width: 420px;
-      margin: 2.4em auto;
-      background: #fff;
-      border-radius: 18px;
-      padding: 1.8em 1.4em;
-      box-shadow: 0 6px 20px rgba(0, 40, 80, 0.08);
-    }
-
-    h1 {
-      font-size: 1.4em;
-      margin: 0 0 0.4em;
-      text-align: center;
-    }
-
-    h1::after {
-      content: "";
-      display: block;
-      width: 70px;
-      height: 3px;
-      background: #999;
-      margin: 10px auto 0;
-      border-radius: 2px;
-    }
-
-    .desc {
-      font-size: 0.85em;
-      color: #555;
-      text-align: center;
-      margin-bottom: 1.4em;
-    }
-
-    label {
-      display: block;
-      font-size: 0.9em;
-      font-weight: 600;
-      margin-bottom: 0.4em;
-    }
-
-    input[type="file"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.7em 0.9em;
-      font-size: 0.9em;
-      border-radius: 8px;
-      border: 1.5px solid #ccc;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    input[type="file"]::-webkit-file-upload-button {
-      margin-right: 0.6em;
-      padding: 0.6em 1em;
-      background: #f2f2f2;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      color: #333;
-      cursor: pointer;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 1.2em;
-      padding: 0.9em;
-      font-size: 0.95em;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background: #0078d4;
-      color: #fff;
-      box-shadow: 0 2px 6px rgba(0, 40, 80, 0.15);
-      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-    }
-
-    button:hover {
-      background: #005fa3;
-      box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
-    }
-
-    button:active {
-      background: #004f8a;
-      transform: scale(0.98);
-      box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
-    }
-
-    .result {
-      margin-top: 1.4em;
-      font-size: 0.85em;
-      padding: 0.8em;
-      border-radius: 10px;
-      background: #f9fafc;
-      border: 1px solid #dde3ee;
-      min-height: 2.4em;
-      white-space: pre-wrap;
-    }
-  </style>
-</head>
-<body>
-  <div class="admin-card">
-    <h1>FrameLab 管理パネル</h1>
-    <p class="desc">
-      フレーム画像をアップロードして、<br>
-      FrameLab に反映します。
-    </p>
-
-    <label for="frameInput">フレーム画像を選択</label>
-    <input type="file" id="frameInput" accept="image/png,image/jpeg">
-
-    <button id="uploadBtn">アップロード</button>
-
-    <div id="result" class="result">まだアップロードは実行されていません。</div>
-  </div>
-
-  <script src="admin.js"></script>
-</body>
-</html>
+  } catch (err) {
+    console.error(err);
+    resultBox.textContent = "⚠ 通信エラーが発生しました。";
+  }
+});
