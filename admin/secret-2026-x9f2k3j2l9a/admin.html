@@ -22,14 +22,21 @@
       フレーム画像を GitHub にアップロードできます。
     </p>
 
-    <!-- STEP 1 -->
+    <!-- STEP 0：フレーム名入力 -->
+    <label>
+      <span class="step-badge">0</span>
+      フレーム名を入力
+    </label>
+    <input type="text" id="frameName" placeholder="例：予約バトル" />
+
+    <!-- STEP 1：画像選択 -->
     <label>
       <span class="step-badge">1</span>
       アップロードする画像を選択
     </label>
     <input type="file" id="frameInput" accept="image/*" />
 
-    <!-- STEP 2 -->
+    <!-- STEP 2：アップロード -->
     <button id="uploadBtn">アップロード</button>
 
     <!-- 結果表示 -->
