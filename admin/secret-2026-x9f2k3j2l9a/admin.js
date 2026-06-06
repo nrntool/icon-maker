@@ -1,32 +1,48 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（最終完全版）
+// FrameLab 管理パネル用 admin.js（完全版）
 // ================================
 
-// Cloudflare Worker のエンドポイントURL
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
 // UI 要素
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
-const frameNameInput = document.getElementById("frameName"); // ★ 追加
+const frameNameInput = document.getElementById("frameName");
 const resultBox = document.getElementById("result");
+const previewImage = document.getElementById("previewImage");
 
-// ファイルを Base64（ヘッダー付き）に変換
+// ファイルを Base64 に変換
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result); // data:image/png;base64,xxxx
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 }
 
-// アップロード処理
+// ▼ 選択した画像のサムネイル表示
+frameInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) {
+    previewImage.style.display = "none";
+    previewImage.src = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    previewImage.src = reader.result;
+    previewImage.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+});
+
+// ▼ アップロード処理
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
-  const frameName = frameNameInput.value.trim(); // ★ 入力されたフレーム名
+  const frameName = frameNameInput.value.trim();
 
-  // ▼ 入力チェック
   if (!frameName) {
     resultBox.textContent = "⚠ フレーム名を入力してください。";
     return;
@@ -39,10 +55,8 @@ uploadBtn.addEventListener("click", async () => {
   resultBox.textContent = "⏳ アップロード中...";
 
   try {
-    // Base64（ヘッダー付き）に変換
     const base64Data = await toBase64(file);
 
-    // Cloudflare Worker に送信
     const response = await fetch(WORKER_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
