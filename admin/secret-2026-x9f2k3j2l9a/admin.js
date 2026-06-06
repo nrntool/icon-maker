@@ -10,6 +10,7 @@ const frameNameInput = document.getElementById("frameName");
 const resultBox = document.getElementById("result");
 const previewImage = document.getElementById("previewImage");
 
+// Base64 変換
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -19,6 +20,7 @@ function toBase64(file) {
   });
 }
 
+// ▼ サムネイル表示
 frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
@@ -35,6 +37,7 @@ frameInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
+// ▼ アップロード処理
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
@@ -70,6 +73,28 @@ uploadBtn.addEventListener("click", async () => {
         GitHub に保存されました。<br>
         <a href="${data.url}" target="_blank">${data.url}</a>
       `;
+
+      // ▼ ボタンを光らせる
+      uploadBtn.classList.add("upload-glow");
+
+      // ▼ 入力欄アニメーション
+      previewImage.classList.add("reset-anim");
+      frameNameInput.classList.add("reset-anim");
+      frameInput.classList.add("reset-anim");
+
+      // ▼ アニメーション終了後にリセット
+      setTimeout(() => {
+        frameNameInput.value = "";
+        frameInput.value = "";
+        previewImage.src = "";
+        previewImage.style.display = "none";
+
+        previewImage.classList.remove("reset-anim");
+        frameNameInput.classList.remove("reset-anim");
+        frameInput.classList.remove("reset-anim");
+
+        uploadBtn.classList.remove("upload-glow");
+      }, 600);
     } else {
       resultBox.textContent = `❌ エラー: ${data.message || "アップロードに失敗しました。"}`;
     }
