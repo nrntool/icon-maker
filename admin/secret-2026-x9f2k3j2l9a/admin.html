@@ -4,47 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FrameLab Uploader</title>
-
-  <!-- 管理パネル専用CSS -->
   <link rel="stylesheet" href="admin.css" />
 </head>
 
 <body>
   <div class="app-card">
-
-    <!-- ヘッダー -->
     <header>
       <h1>FrameLab Uploader</h1>
     </header>
 
-    <!-- 説明文 -->
     <p style="font-size: 0.9em; color: #444; margin-top: -0.4em;">
       フレーム画像を GitHub にアップロードできます。
     </p>
 
-    <!-- STEP 0：フレーム名入力 -->
+    <!-- STEP 2：フレーム名入力 -->
     <label>
-      <span class="step-badge">0</span>
+      <span class="step-badge">2</span>
       フレーム名を入力
     </label>
     <input type="text" id="frameName" placeholder="例：予約バトル" />
 
-    <!-- STEP 1：画像選択 -->
+    <!-- STEP 3：画像選択 -->
     <label>
-      <span class="step-badge">1</span>
+      <span class="step-badge">3</span>
       アップロードする画像を選択
     </label>
     <input type="file" id="frameInput" accept="image/*" />
 
-    <!-- STEP 2：アップロード -->
+    <!-- サムネイル表示 -->
+    <div id="previewBox" style="margin-top: 10px; text-align: center;">
+      <img id="previewImage" src="" alt="プレビュー" style="max-width: 100%; display: none; border-radius: 6px;" />
+    </div>
+
+    <!-- STEP 4：アップロード -->
     <button id="uploadBtn">アップロード</button>
 
     <!-- 結果表示 -->
     <div id="result"></div>
-
   </div>
 
-  <!-- 管理パネル用スクリプト -->
   <script src="admin.js"></script>
 </body>
 </html>
