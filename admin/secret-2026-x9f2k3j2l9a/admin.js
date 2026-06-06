@@ -2,12 +2,13 @@
 // FrameLab 管理パネル用 admin.js（最終完全版）
 // ================================
 
-// Cloudflare Worker のエンドポイントURL（あなたの Worker に置き換える）
+// Cloudflare Worker のエンドポイントURL
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
 // UI 要素
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
+const frameNameInput = document.getElementById("frameName"); // ★ 追加
 const resultBox = document.getElementById("result");
 
 // ファイルを Base64（ヘッダー付き）に変換
@@ -23,6 +24,13 @@ function toBase64(file) {
 // アップロード処理
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
+  const frameName = frameNameInput.value.trim(); // ★ 入力されたフレーム名
+
+  // ▼ 入力チェック
+  if (!frameName) {
+    resultBox.textContent = "⚠ フレーム名を入力してください。";
+    return;
+  }
   if (!file) {
     resultBox.textContent = "⚠ ファイルが選択されていません。";
     return;
@@ -39,7 +47,7 @@ uploadBtn.addEventListener("click", async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: file.name,
+        filename: `${frameName}.png`, // ★ 入力した名前で保存
         content: base64Data
       })
     });
