@@ -3,7 +3,7 @@
 // ================================
 
 // Cloudflare Worker のエンドポイントURL（あなたの Worker に置き換える）
-const WORKER_ENDPOINT = "https://your-worker-name.workers.dev";
+const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
 // UI 要素
 const uploadBtn = document.getElementById("uploadBtn");
