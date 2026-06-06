@@ -3,18 +3,38 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼▼▼ 追加：フレームURLを直接埋め込む ▼▼▼
-const SECRET_FRAMES = [
-  "frames/01_test.png",
-  "frames/02_test.png"
-];
+// ▼▼▼ GitHub APIからフレーム一覧を取得 ▼▼▼
+async function loadFrames() {
+  const repo = "framesynth/icon-maker";
+  const apiUrl = `https://api.github.com/repos/${repo}/contents/frames`;
 
-SECRET_FRAMES.forEach((url, index) => {
-  const option = document.createElement("option");
-  option.value = url;
-  option.textContent = `フレーム ${index + 1}`;
-  frameSelect.appendChild(option);
-});
+  try {
+    const response = await fetch(apiUrl, {
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "FrameLab-Client"
+      }
+    });
+
+    const data = await response.json();
+
+    frameSelect.innerHTML = '<option value="">選択してください</option>';
+
+    data.forEach(item => {
+      if (item.name.endsWith(".png")) {
+        const option = document.createElement("option");
+        option.value = item.download_url;
+        option.textContent = item.name.replace(".png", "");
+        frameSelect.appendChild(option);
+      }
+    });
+  } catch (err) {
+    console.error("フレーム一覧取得エラー:", err);
+  }
+}
+
+// ページ読み込み時に実行
+window.addEventListener("DOMContentLoaded", loadFrames);
 // ▲▲▲ ここまで追加 ▲▲▲
 
 let baseImage = null;
@@ -42,20 +62,6 @@ function resizeCanvas() {
 
 window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
-
-// ▼▼▼ 削除：frames.json を読み込む fetch ▼▼▼
-// （このブロックは完全に削除してOK）
-// fetch("frames.json?ver=" + Date.now())
-//   .then((response) => response.json())
-//   .then((frames) => {
-//     frames.forEach((file) => {
-//       const option = document.createElement("option");
-//       option.value = `frames/${file}`;
-//       option.textContent = file.replace(".png", "");
-//       frameSelect.appendChild(option);
-//     });
-//   });
-// ▲▲▲ ここまで削除 ▲▲▲
 
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
