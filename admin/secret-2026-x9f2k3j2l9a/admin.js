@@ -1,16 +1,16 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（完全版）
+// FrameLab 管理パネル用 admin.js（最終完全版）
 // ================================
 
 // Cloudflare Worker のエンドポイントURL（あなたの Worker に置き換える）
 const WORKER_ENDPOINT = "https://your-worker-name.workers.dev";
 
-// アップロードボタンと結果表示要素
+// UI 要素
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
 const resultBox = document.getElementById("result");
 
-// ファイルをBase64に変換する関数（ヘッダー付きのまま返す）
+// ファイルを Base64（ヘッダー付き）に変換
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -31,7 +31,7 @@ uploadBtn.addEventListener("click", async () => {
   resultBox.textContent = "⏳ アップロード中...";
 
   try {
-    // ファイルをBase64化（ヘッダー付き）
+    // Base64（ヘッダー付き）に変換
     const base64Data = await toBase64(file);
 
     // Cloudflare Worker に送信
@@ -47,7 +47,11 @@ uploadBtn.addEventListener("click", async () => {
     const data = await response.json();
 
     if (response.ok) {
-      resultBox.innerHTML = `✅ アップロード完了！<br>GitHub に保存されました。<br><a href="${data.url}" target="_blank">${data.url}</a>`;
+      resultBox.innerHTML = `
+        ✅ アップロード完了！<br>
+        GitHub に保存されました。<br>
+        <a href="${data.url}" target="_blank">${data.url}</a>
+      `;
     } else {
       resultBox.textContent = `❌ エラー: ${data.message || "アップロードに失敗しました。"}`;
     }
