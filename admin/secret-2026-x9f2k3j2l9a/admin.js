@@ -99,9 +99,6 @@ uploadBtn.addEventListener("click", async () => {
         frameInput.classList.remove("reset-anim");
 
         uploadBtn.classList.remove("upload-glow");
-
-        // 一覧を更新
-        loadFrameList();
       }, 600);
     } else {
       resultBox.textContent = `❌ エラー: ${data.message || "アップロードに失敗しました。"}`;
@@ -116,65 +113,3 @@ uploadBtn.addEventListener("click", async () => {
   uploadBtn.classList.remove("loading");
   uploadBtn.innerHTML = "アップロード";
 });
-
-// ================================
-// ▼ フレーム一覧を読み込む
-// ================================
-async function loadFrameList() {
-  const listBox = document.getElementById("frameList");
-  listBox.textContent = "読み込み中…";
-
-  try {
-    const res = await fetch("https://api.github.com/repos/framesynth/icon-maker/contents/frames");
-    const data = await res.json();
-
-    listBox.innerHTML = "";
-
-    data.forEach(item => {
-      if (!item.name.endsWith(".png")) return;
-
-      const row = document.createElement("div");
-      row.className = "frame-item";
-
-      row.innerHTML = `
-        <span>${item.name}</span>
-        <button class="delete-btn" data-name="${item.name}">削除</button>
-      `;
-
-      listBox.appendChild(row);
-    });
-
-    // 削除ボタンにイベント付与
-    document.querySelectorAll(".delete-btn").forEach(btn => {
-      btn.addEventListener("click", () => deleteFrame(btn.dataset.name));
-    });
-
-  } catch (err) {
-    listBox.textContent = "読み込みエラー";
-  }
-}
-
-// ================================
-// ▼ フレーム削除処理
-// ================================
-async function deleteFrame(filename) {
-  if (!confirm(`${filename} を削除しますか？`)) return;
-
-  const res = await fetch(WORKER_ENDPOINT, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ filename })
-  });
-
-  const data = await res.json();
-
-  if (res.ok) {
-    alert("削除しました");
-    loadFrameList();
-  } else {
-    alert("削除に失敗しました");
-  }
-}
-
-// 初回読み込み
-loadFrameList();
