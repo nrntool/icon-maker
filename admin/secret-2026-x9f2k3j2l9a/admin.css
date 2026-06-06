@@ -1,3 +1,161 @@
+/* 全体レイアウト */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Noto Sans JP", sans-serif;
+  background: #f3f5f8;
+  color: #222;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* カード全体 */
+.app-card {
+  width: 92%;
+  max-width: 420px;
+  margin: 1.6em auto;
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.6em 1.2em;
+  box-shadow: 0 6px 20px rgba(0, 40, 80, 0.08);
+}
+
+/* ヘッダー */
+header {
+  margin-bottom: 1.2em;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 1.6em;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+header h1::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: #999;
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+/* ラベル */
+label {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  margin: 1em 0 0.3em;
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+}
+
+/* 番号バッジ */
+.step-badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 1.6em;
+  height: 1.6em;
+  margin-right: 0.5em;
+
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #333;
+
+  border-radius: 6px;
+  border: 1.5px solid #999;
+  background: #f5f5f5;
+}
+
+/* 入力フォーム */
+input[type="file"] {
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+
+  padding: 0.7em 0.9em;
+  font-size: 0.9em;
+  color: #333;
+
+  background: #ffffff;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+input[type="file"]:hover {
+  background: #fafafa;
+  border-color: #bbb;
+}
+
+input[type="file"]:focus {
+  outline: none;
+  border-color: #999;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* ファイル選択ボタン */
+input[type="file"]::-webkit-file-upload-button {
+  margin-right: 0.6em;
+  padding: 0.6em 1em;
+
+  background: #f2f2f2;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  color: #333;
+
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background: #eaeaea;
+  border-color: #bbb;
+}
+
+input[type="file"]::-webkit-file-upload-button:active {
+  background: #e0e0e0;
+  border-color: #aaa;
+}
+
+/* アップロードボタン */
+#uploadBtn {
+  width: 100%;
+  padding: 0.9em;
+  margin-top: 1.2em;
+
+  background: #0078d4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+
+  font-size: 0.95em;
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.15);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+#uploadBtn:hover {
+  background: #005fa3;
+  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
+}
+
+#uploadBtn:active {
+  background: #004f8a;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
+}
+
 /* アップロード結果表示エリア */
 #result {
   margin-top: 1.4em;
