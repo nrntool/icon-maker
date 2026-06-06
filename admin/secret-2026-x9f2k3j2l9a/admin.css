@@ -231,3 +231,46 @@ input[type="file"]::-webkit-file-upload-button:active {
   cursor: not-allowed;
   opacity: 0.9;
 }
+
+/* ▼ フレーム一覧の行 */
+.frame-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.7em 1em;
+  margin-bottom: 0.7em;
+
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 40, 80, 0.06);
+
+  font-size: 0.9em;
+  color: #333;
+}
+
+/* ▼ 削除ボタン */
+.delete-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+
+  padding: 0.45em 0.9em;
+  border-radius: 6px;
+
+  font-size: 0.8em;
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.delete-btn:active {
+  background: #a83226;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
