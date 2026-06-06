@@ -4,14 +4,12 @@
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
-// UI 要素
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
 const frameNameInput = document.getElementById("frameName");
 const resultBox = document.getElementById("result");
 const previewImage = document.getElementById("previewImage");
 
-// ファイルを Base64 に変換
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -21,7 +19,6 @@ function toBase64(file) {
   });
 }
 
-// ▼ 選択した画像のサムネイル表示
 frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
@@ -38,17 +35,16 @@ frameInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-// ▼ アップロード処理
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
 
-  if (!frameName) {
-    resultBox.textContent = "⚠ フレーム名を入力してください。";
-    return;
-  }
   if (!file) {
     resultBox.textContent = "⚠ ファイルが選択されていません。";
+    return;
+  }
+  if (!frameName) {
+    resultBox.textContent = "⚠ フレーム名を入力してください。";
     return;
   }
 
@@ -61,7 +57,7 @@ uploadBtn.addEventListener("click", async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: `${frameName}.png`, // ★ 入力した名前で保存
+        filename: `${frameName}.png`,
         content: base64Data
       })
     });
