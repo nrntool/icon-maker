@@ -3,12 +3,12 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼ 日本語ファイル名を整形（例：予約バトル.png → 予約バトル）
+// ▼ 日本語ファイル名を整形
 function formatFrameName(name) {
   return name
     .replace(".png", "")
-    .replace(/[_\-]/g, " ")   // _ や - をスペースに
-    .replace(/\s+/g, " ")     // 連続スペースを1つに
+    .replace(/[_\-]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -32,13 +32,8 @@ async function loadFrames() {
     data.forEach(item => {
       if (item.name.endsWith(".png")) {
         const option = document.createElement("option");
-
-        // GitHub の raw URL
         option.value = item.download_url;
-
-        // ★ 管理画面で入力した名前がそのまま表示される
         option.textContent = formatFrameName(item.name);
-
         frameSelect.appendChild(option);
       }
     });
@@ -47,7 +42,10 @@ async function loadFrames() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", loadFrames);
+window.addEventListener("DOMContentLoaded", () => {
+  loadFrames();
+  resizeCanvas(); // ← ここが重要（canvas.width=0問題の修正）
+});
 
 let baseImage = null;
 let frameImage = null;
@@ -66,15 +64,18 @@ let lastDist = 0;
 let isDragging = false;
 
 function resizeCanvas() {
-  const size = canvas.clientWidth;
+  const size = canvas.clientWidth; // CSSで決まった見た目の幅
+  if (size === 0) return; // レイアウト未確定対策
+
   canvas.width = size;
   canvas.height = size;
+
   redraw();
 }
 
-window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
 
+// ▼ 画像読み込み
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -103,6 +104,7 @@ imageInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
+// ▼ フレーム読み込み
 frameSelect.addEventListener("change", () => {
   const value = frameSelect.value;
   if (!value) {
@@ -116,12 +118,14 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
+// ▼ ピンチ距離
 function getDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+// ▼ ピンチ中心
 function getCenter(touches) {
   return {
     x: (touches[0].clientX + touches[1].clientX) / 2,
@@ -129,6 +133,7 @@ function getCenter(touches) {
   };
 }
 
+// ▼ タッチ開始
 canvas.addEventListener("touchstart", (e) => {
   if (e.touches.length === 1) {
     isDragging = true;
@@ -141,6 +146,7 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
+// ▼ タッチ移動
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
@@ -181,10 +187,12 @@ canvas.addEventListener("touchmove", (e) => {
   }
 });
 
+// ▼ タッチ終了
 canvas.addEventListener("touchend", () => {
   isDragging = false;
 });
 
+// ▼ 描画
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -206,6 +214,7 @@ function redraw() {
   }
 }
 
+// ▼ 保存処理（高解像度）
 function saveHighRes() {
   if (!baseImage) return;
 
