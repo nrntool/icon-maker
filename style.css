@@ -81,7 +81,7 @@ label {
   letter-spacing: 0.02em;
 }
 
-/* グレー細線 × 角丸の番号バッジ */
+/* 番号バッジ */
 .step-badge {
   display: inline-flex;
   justify-content: center;
@@ -122,47 +122,11 @@ select {
     box-shadow 0.2s ease;
 }
 
-input[type="file"]:hover,
-select:hover {
-  background: #fafafa;
-  border-color: #bbb;
-}
-
-input[type="file"]:focus,
-select:focus {
-  outline: none;
-  border-color: #999;
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-}
-
-/* ファイル選択ボタン */
-input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
-  padding: 0.6em 1em;
-
-  background: #f2f2f2;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  color: #333;
-
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-input[type="file"]::-webkit-file-upload-button:hover {
-  background: #eaeaea;
-  border-color: #bbb;
-}
-
-input[type="file"]::-webkit-file-upload-button:active {
-  background: #e0e0e0;
-  border-color: #aaa;
-}
-
-/* キャンバス */
+/* キャンバス（保存バグ修正版） */
 canvas {
   width: 100%;
   max-width: 360px;
+  height: auto;        /* ← 追加（重要） */
   aspect-ratio: 1 / 1;
   display: block;
   margin: 1.2em auto;
@@ -198,19 +162,7 @@ canvas {
     border-color 0.2s ease;
 }
 
-.button-row button:hover {
-  background: #f7f7f7;
-  border-color: #bbb;
-}
-
-.button-row button:active {
-  transform: scale(0.97);
-  background: #f0f0f0;
-  border-color: #aaa;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* 保存ボタンだけ色をつける */
+/* 保存ボタン */
 #saveBtn {
   background: #0078d4;
   color: #fff;
@@ -222,14 +174,4 @@ canvas {
 
   box-shadow: 0 2px 6px rgba(0, 40, 80, 0.15);
   transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-
-#saveBtn:hover {
-  background: #005fa3;
-  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
-}
-
-#saveBtn:active {
-  background: #004f8a;
-  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
 }
