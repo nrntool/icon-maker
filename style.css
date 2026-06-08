@@ -17,33 +17,36 @@ html, body {
   border-radius: 18px;
   padding: 1.6em 1.2em;
   box-shadow: 0 6px 20px rgba(0, 40, 80, 0.08);
-  overflow: visible; /* ← キャンバスが潰れないように */
+  overflow: visible;
 }
 
-/* キャンバス（保存バグ完全対策） */
+/* キャンバス（スマホ安定版） */
 canvas {
   width: 100%;
   max-width: 360px;
-  height: auto;          /* ← 高さを自動調整 */
-  min-height: 300px;     /* ← aspect-ratioが効かない端末対策 */
-  aspect-ratio: 1 / 1;
   display: block;
   margin: 1.2em auto;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 3px 12px rgba(0, 40, 80, 0.08);
   touch-action: none;
+
+  /* aspect-ratio は削除して高さを固定 */
+  height: 360px;
 }
 
 /* ボタン行 */
 .button-row {
   display: flex;
-  gap: 0.6em;
-  margin-top: 1.2em;
+  justify-content: center;
+  gap: 0.8em;
+  margin-top: 1.4em;
+  flex-wrap: wrap;
 }
 
 .button-row button {
   flex: 1;
+  min-width: 120px;
   padding: 0.9em;
   font-size: 0.95em;
   border-radius: 8px;
