@@ -8,6 +8,7 @@ const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
 const frameNameInput = document.getElementById("frameName");
 const resultBox = document.getElementById("result");
+const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
 
 // Base64 変換
@@ -20,19 +21,26 @@ function toBase64(file) {
   });
 }
 
-// ▼ サムネイル表示
+// ▼ サムネイル表示（ふわっと表示）
 frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
-    previewImage.style.display = "none";
+    previewBox.style.display = "none";
     previewImage.src = "";
+    previewImage.classList.remove("show");
     return;
   }
 
   const reader = new FileReader();
   reader.onload = () => {
     previewImage.src = reader.result;
-    previewImage.style.display = "block";
+
+    previewBox.style.display = "block";
+    previewImage.classList.remove("show");
+
+    setTimeout(() => {
+      previewImage.classList.add("show");
+    }, 10);
   };
   reader.readAsDataURL(file);
 });
@@ -51,7 +59,6 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
-  // ▼ ローディング開始
   uploadBtn.disabled = true;
   uploadBtn.classList.add("loading");
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
@@ -75,24 +82,20 @@ uploadBtn.addEventListener("click", async () => {
     if (response.ok) {
       resultBox.innerHTML = `
         ✅ アップロード完了！<br>
-        GitHub に保存されました。<br>
         <a href="${data.url}" target="_blank">${data.url}</a>
       `;
 
-      // ▼ ボタン光る
       uploadBtn.classList.add("upload-glow");
 
-      // ▼ 入力欄アニメーション
       previewImage.classList.add("reset-anim");
       frameNameInput.classList.add("reset-anim");
       frameInput.classList.add("reset-anim");
 
-      // ▼ アニメーション終了後にリセット
       setTimeout(() => {
         frameNameInput.value = "";
         frameInput.value = "";
         previewImage.src = "";
-        previewImage.style.display = "none";
+        previewBox.style.display = "none";
 
         previewImage.classList.remove("reset-anim");
         frameNameInput.classList.remove("reset-anim");
@@ -108,7 +111,6 @@ uploadBtn.addEventListener("click", async () => {
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
   }
 
-  // ▼ ローディング解除
   uploadBtn.disabled = false;
   uploadBtn.classList.remove("loading");
   uploadBtn.innerHTML = "アップロード";
