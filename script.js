@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 保存バグ完全対策版 script.js
+// FrameLab 完全安定版（GitHub API 不使用）
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -7,69 +7,41 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼ 日本語ファイル名整形
-function formatFrameName(name) {
-  return name
-    .replace(".png", "")
-    .replace(/[_\-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+// ▼ ローカル frames フォルダからフレーム一覧を読み込む
+function loadFramesLocal() {
+  const frames = [
+    "frames/フレーム1.png",
+    "frames/フレーム2.png",
+    "frames/フレーム3.png"
+  ];
+
+  frameSelect.innerHTML = '<option value="">選択してください</option>';
+
+  frames.forEach(path => {
+    const name = path.split("/").pop().replace(".png", "");
+    const option = document.createElement("option");
+    option.value = path;
+    option.textContent = name;
+    frameSelect.appendChild(option);
+  });
 }
 
-// ▼ GitHub APIからフレーム一覧取得（安全版）
-async function loadFrames() {
-  const repo = "framesynth/icon-maker";
-  const apiUrl = `https://api.github.com/repos/${repo}/contents/frames`;
-
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-
-    if (!Array.isArray(data)) {
-      console.error("GitHub API error:", data);
-      frameSelect.innerHTML = '<option value="">読み込みエラー</option>';
-      return;
-    }
-
-    frameSelect.innerHTML = '<option value="">選択してください</option>';
-
-    data.forEach(item => {
-      if (item.name.endsWith(".png")) {
-        const option = document.createElement("option");
-        option.value = item.download_url;
-        option.textContent = formatFrameName(item.name);
-        frameSelect.appendChild(option);
-      }
-    });
-  } catch (err) {
-    console.error("フレーム一覧取得エラー:", err);
-    frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
-  }
-}
-
-// ▼ Canvas サイズを確実にセットする関数
-function forceCanvasSize() {
+// ▼ Canvas サイズ調整
+function resizeCanvas() {
   const size = canvas.clientWidth;
-
-  if (size === 0) {
-    console.warn("Canvas size is 0 → 再試行");
-    setTimeout(forceCanvasSize, 50);
-    return;
-  }
-
+  if (size === 0) return;
   canvas.width = size;
   canvas.height = size;
   redraw();
 }
 
-// ▼ 初期化（レイアウト確定後に実行）
 window.addEventListener("DOMContentLoaded", () => {
-  loadFrames();
-  setTimeout(forceCanvasSize, 50);
+  loadFramesLocal();
+  setTimeout(resizeCanvas, 50);
 });
 
 window.addEventListener("resize", () => {
-  setTimeout(forceCanvasSize, 50);
+  setTimeout(resizeCanvas, 50);
 });
 
 let baseImage = null;
@@ -81,12 +53,6 @@ let maxScale = 4;
 
 let offsetX = 0;
 let offsetY = 0;
-
-let lastX = 0;
-let lastY = 0;
-
-let lastDist = 0;
-let isDragging = false;
 
 // ▼ 画像読み込み
 imageInput.addEventListener("change", (e) => {
@@ -130,77 +96,6 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
-// ▼ ピンチ距離
-function getDistance(touches) {
-  const dx = touches[0].clientX - touches[1].clientX;
-  const dy = touches[0].clientY - touches[1].clientY;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-// ▼ ピンチ中心
-function getCenter(touches) {
-  return {
-    x: (touches[0].clientX + touches[1].clientX) / 2,
-    y: (touches[0].clientY + touches[1].clientY) / 2
-  };
-}
-
-// ▼ タッチ開始
-canvas.addEventListener("touchstart", (e) => {
-  if (e.touches.length === 1) {
-    isDragging = true;
-    lastX = e.touches[0].clientX;
-    lastY = e.touches[0].clientY;
-  }
-  if (e.touches.length === 2) {
-    lastDist = getDistance(e.touches);
-  }
-});
-
-// ▼ タッチ移動
-canvas.addEventListener("touchmove", (e) => {
-  e.preventDefault();
-
-  if (e.touches.length === 2) {
-    const dist = getDistance(e.touches);
-    const center = getCenter(e.touches);
-
-    const rect = canvas.getBoundingClientRect();
-    const cx = center.x - rect.left;
-    const cy = center.y - rect.top;
-
-    const oldScale = scale;
-    const delta = (dist - lastDist) * 0.004;
-
-    scale = Math.max(minScale, Math.min(maxScale, scale + delta));
-
-    const zoomRatio = scale / oldScale;
-    offsetX = cx - (cx - offsetX) * zoomRatio;
-    offsetY = cy - (cy - offsetY) * zoomRatio;
-
-    lastDist = dist;
-    redraw();
-    return;
-  }
-
-  if (e.touches.length === 1 && isDragging) {
-    const x = e.touches[0].clientX;
-    const y = e.touches[0].clientY;
-
-    offsetX += (x - lastX);
-    offsetY += (y - lastY);
-
-    lastX = x;
-    lastY = y;
-
-    redraw();
-  }
-});
-
-canvas.addEventListener("touchend", () => {
-  isDragging = false;
-});
-
 // ▼ 描画
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -221,16 +116,8 @@ function redraw() {
   }
 }
 
-// ▼ 保存処理（高解像度）
+// ▼ 保存処理
 function saveHighRes() {
-  // ▼ 保存前に canvas サイズを再チェック
-  if (canvas.width === 0 || canvas.height === 0) {
-    console.warn("Canvas size 0 → 再計算して保存");
-    forceCanvasSize();
-    setTimeout(saveHighRes, 50);
-    return;
-  }
-
   if (!baseImage) {
     alert("画像が選択されていません。");
     return;
@@ -261,16 +148,12 @@ function saveHighRes() {
     sctx.drawImage(frameImage, fx, fy, size, size);
   }
 
-  const now = new Date();
-  const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
-
   const link = document.createElement("a");
-  link.download = filename;
+  link.download = "framelab.png";
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 }
 
-// ▼ ボタン
 document.getElementById("saveBtn").addEventListener("click", saveHighRes);
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
