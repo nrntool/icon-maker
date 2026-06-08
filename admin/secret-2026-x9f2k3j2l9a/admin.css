@@ -1,8 +1,8 @@
 /* ================================
-   フル控えめテーマ（管理画面）
+   管理画面テーマ
 ================================ */
 
-/* 背景：グレー */
+/* 背景 */
 body {
   background: #f2f3f5;
   margin: 0;
@@ -27,7 +27,7 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* カード全体 */
+/* カード */
 .app-card {
   width: 92%;
   max-width: 420px;
@@ -39,7 +39,7 @@ body {
   box-shadow: 0 6px 20px rgba(0, 40, 80, 0.05);
 }
 
-/* 見出し */
+/* タイトル */
 header h1 {
   font-size: 1.6em;
   font-weight: 600;
@@ -47,24 +47,24 @@ header h1 {
   letter-spacing: 0.03em;
 }
 
-/* ▼ タイトル下線の位置調整 */
+/* タイトル下線（距離調整済み） */
 header h1::after {
   content: "";
   display: block;
   width: 60px;
   height: 3px;
   background: #999;
-  margin: 10px auto 0; /* ← 下線を少し下げて余白を広げる */
+  margin: 12px auto 0;
   border-radius: 2px;
   position: relative;
-  top: 0; /* ← 自然な位置に戻す */
+  top: 0;
 }
 
-/* ▼ タイトル下の説明文 */
+/* タイトル下の説明文 */
 .subtext {
   font-size: 0.9em;
   color: #444;
-  margin-top: 0.6em; /* ← タイトルとの間隔を広げる */
+  margin-top: 0.8em;
 }
 
 /* ラベル */
@@ -93,7 +93,7 @@ label {
   background: #f5f5f5;
 }
 
-/* 入力欄（file / text）統一 */
+/* 入力欄（file / text） */
 input[type="file"],
 input[type="text"] {
   width: 100%;
@@ -132,7 +132,6 @@ input[type="file"]::-webkit-file-upload-button {
   border-radius: 6px;
   color: #333;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 /* プレビュー画像 */
@@ -201,4 +200,38 @@ input[type="file"]::-webkit-file-upload-button {
 
 @keyframes fadeOutUp {
   0% { opacity: 1; transform: translateY(0); }
-  100% { opacity:
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.upload-glow {
+  animation: glowFlash 0.8s ease-out;
+}
+
+@keyframes glowFlash {
+  0% { box-shadow: 0 0 0 rgba(0,120,212,0); transform: scale(1); }
+  40% { box-shadow: 0 0 18px rgba(0,120,212,0.55); transform: scale(1.03); }
+  100% { box-shadow: 0 0 0 rgba(0,120,212,0); transform: scale(1); }
+}
+
+/* ローディングスピナー */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading {
+  background: #0064b8 !important;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
