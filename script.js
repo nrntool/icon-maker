@@ -1,18 +1,22 @@
+// ================================
+// FrameLab 安全版 script.js（完全ファイル）
+// ================================
+
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼ 日本語ファイル名を整形（例：予約バトル.png → 予約バトル）
+// ▼ 日本語ファイル名を整形
 function formatFrameName(name) {
   return name
     .replace(".png", "")
-    .replace(/[_\-]/g, " ")   // _ や - をスペースに
-    .replace(/\s+/g, " ")     // 連続スペースを1つに
+    .replace(/[_\-]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-// ▼ GitHub APIからフレーム一覧を取得
+// ▼ GitHub APIからフレーム一覧を取得（安全版）
 async function loadFrames() {
   const repo = "framesynth/icon-maker";
   const apiUrl = `https://api.github.com/repos/${repo}/contents/frames`;
@@ -27,27 +31,34 @@ async function loadFrames() {
 
     const data = await response.json();
 
+    // ▼ APIエラー時の安全処理
+    if (!Array.isArray(data)) {
+      console.error("GitHub API error:", data);
+      frameSelect.innerHTML = '<option value="">フレーム読み込みエラー</option>';
+      return;
+    }
+
     frameSelect.innerHTML = '<option value="">選択してください</option>';
 
     data.forEach(item => {
       if (item.name.endsWith(".png")) {
         const option = document.createElement("option");
-
-        // GitHub の raw URL
         option.value = item.download_url;
-
-        // ★ 管理画面で入力した名前がそのまま表示される
         option.textContent = formatFrameName(item.name);
-
         frameSelect.appendChild(option);
       }
     });
   } catch (err) {
     console.error("フレーム一覧取得エラー:", err);
+    frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
   }
 }
 
-window.addEventListener("DOMContentLoaded", loadFrames);
+// ▼ 初期化
+window.addEventListener("DOMContentLoaded", () => {
+  loadFrames();
+  resizeCanvas();
+});
 
 let baseImage = null;
 let frameImage = null;
@@ -65,16 +76,18 @@ let lastY = 0;
 let lastDist = 0;
 let isDragging = false;
 
+// ▼ Canvasサイズ調整（安全版）
 function resizeCanvas() {
   const size = canvas.clientWidth;
+  if (size === 0) return; // レイアウト未確定対策
   canvas.width = size;
   canvas.height = size;
   redraw();
 }
 
-window.addEventListener("load", resizeCanvas);
 window.addEventListener("resize", resizeCanvas);
 
+// ▼ 画像読み込み
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -89,7 +102,6 @@ imageInput.addEventListener("change", (e) => {
       const ih = baseImage.height;
 
       const fitScale = Math.min(cw / iw, ch / ih);
-
       scale = fitScale;
       minScale = fitScale * 0.3;
 
@@ -103,6 +115,7 @@ imageInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
+// ▼ フレーム選択
 frameSelect.addEventListener("change", () => {
   const value = frameSelect.value;
   if (!value) {
@@ -116,12 +129,14 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
+// ▼ ピンチ距離
 function getDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+// ▼ ピンチ中心
 function getCenter(touches) {
   return {
     x: (touches[0].clientX + touches[1].clientX) / 2,
@@ -129,18 +144,19 @@ function getCenter(touches) {
   };
 }
 
+// ▼ タッチ開始
 canvas.addEventListener("touchstart", (e) => {
   if (e.touches.length === 1) {
     isDragging = true;
     lastX = e.touches[0].clientX;
     lastY = e.touches[0].clientY;
   }
-
   if (e.touches.length === 2) {
     lastDist = getDistance(e.touches);
   }
 });
 
+// ▼ タッチ移動
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
@@ -158,7 +174,6 @@ canvas.addEventListener("touchmove", (e) => {
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
     const zoomRatio = scale / oldScale;
-
     offsetX = cx - (cx - offsetX) * zoomRatio;
     offsetY = cy - (cy - offsetY) * zoomRatio;
 
@@ -185,13 +200,13 @@ canvas.addEventListener("touchend", () => {
   isDragging = false;
 });
 
+// ▼ 描画
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (baseImage) {
     const drawW = baseImage.width * scale;
     const drawH = baseImage.height * scale;
-
     ctx.drawImage(baseImage, offsetX, offsetY, drawW, drawH);
   }
 
@@ -201,16 +216,18 @@ function redraw() {
     const size = Math.min(cw, ch);
     const x = (cw - size) / 2;
     const y = (ch - size) / 2;
-
     ctx.drawImage(frameImage, x, y, size, size);
   }
 }
 
+// ▼ 保存処理（高解像度）
 function saveHighRes() {
-  if (!baseImage) return;
+  if (!baseImage) {
+    alert("画像が選択されていません。");
+    return;
+  }
 
   const scaleFactor = 3;
-
   const saveCanvas = document.createElement("canvas");
   saveCanvas.width = canvas.width * scaleFactor;
   saveCanvas.height = canvas.height * scaleFactor;
@@ -221,7 +238,6 @@ function saveHighRes() {
 
   const drawW = baseImage.width * scale * scaleFactor;
   const drawH = baseImage.height * scale * scaleFactor;
-
   const x = offsetX * scaleFactor;
   const y = offsetY * scaleFactor;
 
@@ -233,19 +249,11 @@ function saveHighRes() {
     const size = Math.min(cw, ch);
     const fx = (cw - size) / 2;
     const fy = (ch - size) / 2;
-
     sctx.drawImage(frameImage, fx, fy, size, size);
   }
 
   const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  const hh = String(now.getHours()).padStart(2, "0");
-  const mi = String(now.getMinutes()).padStart(2, "0");
-  const ss = String(now.getSeconds()).padStart(2, "0");
-
-  const filename = `${yyyy}${mm}${dd}_${hh}${mi}${ss}.png`;
+  const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
 
   const link = document.createElement("a");
   link.download = filename;
@@ -253,8 +261,8 @@ function saveHighRes() {
   link.click();
 }
 
+// ▼ ボタンイベント
 document.getElementById("saveBtn").addEventListener("click", saveHighRes);
-
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
   frameImage = null;
@@ -262,6 +270,3 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   offsetX = 0;
   offsetY = 0;
   imageInput.value = "";
-  frameSelect.value = "";
-  redraw();
-});
