@@ -24,6 +24,7 @@ body {
   margin-bottom: 1.2em;
   letter-spacing: 0.04em;
   font-size: 0.9em;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 /* カード全体 */
@@ -32,7 +33,7 @@ body {
   max-width: 420px;
   margin: 1.6em auto;
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 1.6em 1.2em;
   border: 1px solid #e5e5e5;
   box-shadow: 0 6px 20px rgba(0, 40, 80, 0.05);
@@ -46,14 +47,17 @@ header h1 {
   letter-spacing: 0.03em;
 }
 
+/* ▼ タイトル下線の位置調整 */
 header h1::after {
   content: "";
   display: block;
   width: 60px;
   height: 3px;
   background: #999;
-  margin: 10px auto 0;
+  margin: 6px auto 0;
   border-radius: 2px;
+  position: relative;
+  top: -2px;
 }
 
 /* ラベル */
@@ -165,7 +169,7 @@ input[type="file"]::-webkit-file-upload-button {
   width: 100%;
   padding: 0.9em;
   margin-top: 1.2em;
-  background: #0078d4;
+  background: #006bb3;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -176,7 +180,7 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 #uploadBtn:hover {
-  background: #005fa3;
+  background: #005a94;
   box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
 }
 
