@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 完全安定版（GitHub API 直接読み込み）
+// FrameLab 完全安定版（raw.githubusercontent.com 方式）
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -7,44 +7,30 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼ GitHub APIからフレーム一覧を取得
+// ▼ GitHub raw URLからフレーム一覧を取得
 async function loadFramesFromGitHub() {
   const repo = "framesynth/icon-maker";
-  const apiUrl = `https://api.github.com/repos/${repo}/contents/frames`;
+  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`; // キャッシュ無効化
 
   try {
-    const response = await fetch(apiUrl, { cache: "no-cache" });
+    const response = await fetch(framesUrl, { cache: "no-cache" });
     const data = await response.json();
-
-    if (!Array.isArray(data)) throw new Error("GitHub API response invalid");
 
     frameSelect.innerHTML = '<option value="">選択してください</option>';
 
     data.forEach(item => {
       if (item.name.endsWith(".png")) {
+        // raw URLを使用して常に最新を取得
+        const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
         const option = document.createElement("option");
-        option.value = item.download_url;
+        option.value = rawUrl;
         option.textContent = item.name.replace(".png", "");
         frameSelect.appendChild(option);
       }
     });
   } catch (err) {
-    console.warn("GitHub API 読み込みエラー:", err);
-    frameSelect.innerHTML = `
-      <option value="">読み込み失敗（ローカルフォールバック）</option>
-    `;
-    // フォールバック：ローカル frames フォルダを直接参照
-    const fallbackFrames = [
-      "frames/フレーム1.png",
-      "frames/テスト1.png"
-    ];
-    fallbackFrames.forEach(path => {
-      const name = path.split("/").pop().replace(".png", "");
-      const option = document.createElement("option");
-      option.value = path;
-      option.textContent = name;
-      frameSelect.appendChild(option);
-    });
+    console.error("GitHub API 読み込みエラー:", err);
+    frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
   }
 }
 
@@ -114,7 +100,12 @@ frameSelect.addEventListener("change", () => {
   }
 
   frameImage = new Image();
+  frameImage.crossOrigin = "anonymous"; // CORS対策
   frameImage.onload = redraw;
+  frameImage.onerror = () => {
+    console.error("フレーム画像の読み込みに失敗:", value);
+    alert("フレーム画像の読み込みに失敗しました。");
+  };
   frameImage.src = value;
 });
 
@@ -128,7 +119,7 @@ function redraw() {
     ctx.drawImage(baseImage, offsetX, offsetY, drawW, drawH);
   }
 
-  if (frameImage) {
+  if (frameImage && frameImage.complete) {
     ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
   }
 }
@@ -156,8 +147,11 @@ function saveHighRes() {
 
   sctx.drawImage(baseImage, x, y, drawW, drawH);
 
-  if (frameImage) {
+  if (frameImage && frameImage.complete) {
     sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
+  } else {
+    alert("フレーム画像がまだ読み込まれていません。");
+    return;
   }
 
   const link = document.createElement("a");
