@@ -21,7 +21,7 @@ function toBase64(file) {
   });
 }
 
-// ▼ サムネイル表示（ふわっと表示）
+// ▼ サムネイル表示
 frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
