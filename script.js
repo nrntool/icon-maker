@@ -240,6 +240,11 @@ function saveHighRes() {
 
   // ▼ iPhone / Android 完全対応：Blob 保存
   saveCanvas.toBlob((blob) => {
+    if (!blob) {
+      alert("画像の生成に失敗しました。もう一度お試しください。");
+      return;
+    }
+
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
