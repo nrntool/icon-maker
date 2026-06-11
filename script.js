@@ -124,7 +124,7 @@ function redraw() {
   }
 }
 
-// ▼ 保存処理
+// ▼ 保存処理（iPhone / Android 完全対応版）
 function saveHighRes() {
   if (!baseImage) {
     alert("画像が選択されていません。");
@@ -154,20 +154,26 @@ function saveHighRes() {
     return;
   }
 
-  const link = document.createElement("a");
-  link.download = "framelab.png";
-  link.href = saveCanvas.toDataURL("image/png");
-  link.click();
-}
+  const now = new Date();
+  const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
 
-document.getElementById("saveBtn").addEventListener("click", saveHighRes);
-document.getElementById("resetBtn").addEventListener("click", () => {
-  baseImage = null;
-  frameImage = null;
-  scale = 1;
-  offsetX = 0;
-  offsetY = 0;
-  imageInput.value = "";
-  frameSelect.value = "";
-  redraw();
-});
+  // ▼ dataURL → Blob 保存方式に変更（全スマホ対応）
+  saveCanvas.toBlob((blob) => {
+    if (!blob) {
+      alert("画像の生成に失敗しました。");
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  }, "image/png");
+}
