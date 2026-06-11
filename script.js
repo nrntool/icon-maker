@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 完全安定版（raw.githubusercontent.com 方式）
+// FrameLab 完全安定版（ピンチ操作＋保存対応）
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -10,7 +10,7 @@ const ctx = canvas.getContext("2d");
 // ▼ GitHub raw URLからフレーム一覧を取得
 async function loadFramesFromGitHub() {
   const repo = "framesynth/icon-maker";
-  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`; // キャッシュ無効化
+  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
 
   try {
     const response = await fetch(framesUrl, { cache: "no-cache" });
@@ -20,7 +20,6 @@ async function loadFramesFromGitHub() {
 
     data.forEach(item => {
       if (item.name.endsWith(".png")) {
-        // raw URLを使用して常に最新を取得
         const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
         const option = document.createElement("option");
         option.value = rawUrl;
@@ -100,13 +99,95 @@ frameSelect.addEventListener("change", () => {
   }
 
   frameImage = new Image();
-  frameImage.crossOrigin = "anonymous"; // CORS対策
+  frameImage.crossOrigin = "anonymous";
   frameImage.onload = redraw;
-  frameImage.onerror = () => {
-    console.error("フレーム画像の読み込みに失敗:", value);
-    alert("フレーム画像の読み込みに失敗しました。");
-  };
   frameImage.src = value;
+});
+
+// ▼ ピンチ距離
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// ▼ ピンチ中心
+function getCenter(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  };
+}
+
+let isDragging = false;
+let lastX = 0;
+let lastY = 0;
+let lastDist = 0;
+
+// ▼ タッチ開始
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    isDragging = true;
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  }
+  if (e.touches.length === 2) {
+    lastDist = getDistance(e.touches);
+  }
+});
+
+// ▼ タッチ移動（軽くて直感的なピンチ操作）
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+
+  // ▼ 2本指ピンチ
+  if (e.touches.length === 2) {
+    const dist = getDistance(e.touches);
+    const center = getCenter(e.touches);
+
+    const rect = canvas.getBoundingClientRect();
+    const cx = center.x - rect.left;
+    const cy = center.y - rect.top;
+
+    const oldScale = scale;
+
+    // 速度に応じて自然に変化するズーム量
+    const diff = dist - lastDist;
+    const speed = Math.abs(diff);
+
+    const delta = (diff * 0.004) * (1 + speed * 0.002);
+
+    scale = Math.max(minScale, Math.min(maxScale, scale + delta));
+
+    // 中心に吸い付くように追従
+    const zoomRatio = scale / oldScale;
+    const follow = 0.85;
+
+    offsetX = cx - (cx - offsetX) * zoomRatio * follow;
+    offsetY = cy - (cy - offsetY) * zoomRatio * follow;
+
+    lastDist = dist;
+    redraw();
+    return;
+  }
+
+  // ▼ 1本指ドラッグ
+  if (e.touches.length === 1 && isDragging) {
+    const x = e.touches[0].clientX;
+    const y = e.touches[0].clientY;
+
+    offsetX += (x - lastX);
+    offsetY += (y - lastY);
+
+    lastX = x;
+    lastY = y;
+
+    redraw();
+  }
+});
+
+canvas.addEventListener("touchend", () => {
+  isDragging = false;
 });
 
 // ▼ 描画
@@ -124,7 +205,7 @@ function redraw() {
   }
 }
 
-// ▼ 保存処理（iPhone / Android 完全対応版）
+// ▼ 保存処理（iPhone / Android 完全対応）
 function saveHighRes() {
   if (!baseImage) {
     alert("画像が選択されていません。");
@@ -149,21 +230,12 @@ function saveHighRes() {
 
   if (frameImage && frameImage.complete) {
     sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
-  } else {
-    alert("フレーム画像がまだ読み込まれていません。");
-    return;
   }
 
   const now = new Date();
   const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
 
-  // ▼ dataURL → Blob 保存方式に変更（全スマホ対応）
   saveCanvas.toBlob((blob) => {
-    if (!blob) {
-      alert("画像の生成に失敗しました。");
-      return;
-    }
-
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
@@ -177,3 +249,15 @@ function saveHighRes() {
     URL.revokeObjectURL(url);
   }, "image/png");
 }
+
+document.getElementById("saveBtn").addEventListener("click", saveHighRes);
+document.getElementById("resetBtn").addEventListener("click", () => {
+  baseImage = null;
+  frameImage = null;
+  scale = 1;
+  offsetX = 0;
+  offsetY = 0;
+  imageInput.value = "";
+  frameSelect.value = "";
+  redraw();
+});
