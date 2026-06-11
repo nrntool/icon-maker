@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 安全版 script.js（完全ファイル）
+// FrameLab 保存バグ完全対策版 script.js
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -7,7 +7,7 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼ 日本語ファイル名を整形
+// ▼ 日本語ファイル名整形
 function formatFrameName(name) {
   return name
     .replace(".png", "")
@@ -16,25 +16,18 @@ function formatFrameName(name) {
     .trim();
 }
 
-// ▼ GitHub APIからフレーム一覧を取得（安全版）
+// ▼ GitHub APIからフレーム一覧取得（安全版）
 async function loadFrames() {
   const repo = "framesynth/icon-maker";
   const apiUrl = `https://api.github.com/repos/${repo}/contents/frames`;
 
   try {
-    const response = await fetch(apiUrl, {
-      headers: {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "FrameLab-Client"
-      }
-    });
-
+    const response = await fetch(apiUrl);
     const data = await response.json();
 
-    // ▼ APIエラー時の安全処理
     if (!Array.isArray(data)) {
       console.error("GitHub API error:", data);
-      frameSelect.innerHTML = '<option value="">フレーム読み込みエラー</option>';
+      frameSelect.innerHTML = '<option value="">読み込みエラー</option>';
       return;
     }
 
@@ -54,10 +47,29 @@ async function loadFrames() {
   }
 }
 
-// ▼ 初期化
+// ▼ Canvas サイズを確実にセットする関数
+function forceCanvasSize() {
+  const size = canvas.clientWidth;
+
+  if (size === 0) {
+    console.warn("Canvas size is 0 → 再試行");
+    setTimeout(forceCanvasSize, 50);
+    return;
+  }
+
+  canvas.width = size;
+  canvas.height = size;
+  redraw();
+}
+
+// ▼ 初期化（レイアウト確定後に実行）
 window.addEventListener("DOMContentLoaded", () => {
   loadFrames();
-  resizeCanvas();
+  setTimeout(forceCanvasSize, 50);
+});
+
+window.addEventListener("resize", () => {
+  setTimeout(forceCanvasSize, 50);
 });
 
 let baseImage = null;
@@ -75,17 +87,6 @@ let lastY = 0;
 
 let lastDist = 0;
 let isDragging = false;
-
-// ▼ Canvasサイズ調整（安全版）
-function resizeCanvas() {
-  const size = canvas.clientWidth;
-  if (size === 0) return; // レイアウト未確定対策
-  canvas.width = size;
-  canvas.height = size;
-  redraw();
-}
-
-window.addEventListener("resize", resizeCanvas);
 
 // ▼ 画像読み込み
 imageInput.addEventListener("change", (e) => {
@@ -222,6 +223,14 @@ function redraw() {
 
 // ▼ 保存処理（高解像度）
 function saveHighRes() {
+  // ▼ 保存前に canvas サイズを再チェック
+  if (canvas.width === 0 || canvas.height === 0) {
+    console.warn("Canvas size 0 → 再計算して保存");
+    forceCanvasSize();
+    setTimeout(saveHighRes, 50);
+    return;
+  }
+
   if (!baseImage) {
     alert("画像が選択されていません。");
     return;
@@ -261,7 +270,7 @@ function saveHighRes() {
   link.click();
 }
 
-// ▼ ボタンイベント
+// ▼ ボタン
 document.getElementById("saveBtn").addEventListener("click", saveHighRes);
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
@@ -270,3 +279,6 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   offsetX = 0;
   offsetY = 0;
   imageInput.value = "";
+  frameSelect.value = "";
+  redraw();
+});
