@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 完全安定版（raw.githubusercontent.com 方式）
+// FrameLab 安全版 script.js（完全ファイル）
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -7,49 +7,57 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼ GitHub raw URLからフレーム一覧を取得
-async function loadFramesFromGitHub() {
+// ▼ 日本語ファイル名を整形
+function formatFrameName(name) {
+  return name
+    .replace(".png", "")
+    .replace(/[_\-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// ▼ GitHub APIからフレーム一覧を取得（安全版）
+async function loadFrames() {
   const repo = "framesynth/icon-maker";
-  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`; // キャッシュ無効化
+  const apiUrl = `https://api.github.com/repos/${repo}/contents/frames`;
 
   try {
-    const response = await fetch(framesUrl, { cache: "no-cache" });
+    const response = await fetch(apiUrl, {
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "FrameLab-Client"
+      }
+    });
+
     const data = await response.json();
+
+    // ▼ APIエラー時の安全処理
+    if (!Array.isArray(data)) {
+      console.error("GitHub API error:", data);
+      frameSelect.innerHTML = '<option value="">フレーム読み込みエラー</option>';
+      return;
+    }
 
     frameSelect.innerHTML = '<option value="">選択してください</option>';
 
     data.forEach(item => {
       if (item.name.endsWith(".png")) {
-        // raw URLを使用して常に最新を取得
-        const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
         const option = document.createElement("option");
-        option.value = rawUrl;
-        option.textContent = item.name.replace(".png", "");
+        option.value = item.download_url;
+        option.textContent = formatFrameName(item.name);
         frameSelect.appendChild(option);
       }
     });
   } catch (err) {
-    console.error("GitHub API 読み込みエラー:", err);
+    console.error("フレーム一覧取得エラー:", err);
     frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
   }
 }
 
-// ▼ Canvas サイズ調整
-function resizeCanvas() {
-  const size = canvas.clientWidth;
-  if (!size) return;
-  canvas.width = size;
-  canvas.height = size;
-  redraw();
-}
-
+// ▼ 初期化
 window.addEventListener("DOMContentLoaded", () => {
-  loadFramesFromGitHub();
-  setTimeout(resizeCanvas, 50);
-});
-
-window.addEventListener("resize", () => {
-  setTimeout(resizeCanvas, 50);
+  loadFrames();
+  resizeCanvas();
 });
 
 let baseImage = null;
@@ -61,6 +69,23 @@ let maxScale = 4;
 
 let offsetX = 0;
 let offsetY = 0;
+
+let lastX = 0;
+let lastY = 0;
+
+let lastDist = 0;
+let isDragging = false;
+
+// ▼ Canvasサイズ調整（安全版）
+function resizeCanvas() {
+  const size = canvas.clientWidth;
+  if (size === 0) return; // レイアウト未確定対策
+  canvas.width = size;
+  canvas.height = size;
+  redraw();
+}
+
+window.addEventListener("resize", resizeCanvas);
 
 // ▼ 画像読み込み
 imageInput.addEventListener("change", (e) => {
@@ -100,13 +125,79 @@ frameSelect.addEventListener("change", () => {
   }
 
   frameImage = new Image();
-  frameImage.crossOrigin = "anonymous"; // CORS対策
   frameImage.onload = redraw;
-  frameImage.onerror = () => {
-    console.error("フレーム画像の読み込みに失敗:", value);
-    alert("フレーム画像の読み込みに失敗しました。");
-  };
   frameImage.src = value;
+});
+
+// ▼ ピンチ距離
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// ▼ ピンチ中心
+function getCenter(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  };
+}
+
+// ▼ タッチ開始
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    isDragging = true;
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  }
+  if (e.touches.length === 2) {
+    lastDist = getDistance(e.touches);
+  }
+});
+
+// ▼ タッチ移動
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+
+  if (e.touches.length === 2) {
+    const dist = getDistance(e.touches);
+    const center = getCenter(e.touches);
+
+    const rect = canvas.getBoundingClientRect();
+    const cx = center.x - rect.left;
+    const cy = center.y - rect.top;
+
+    const oldScale = scale;
+    const delta = (dist - lastDist) * 0.004;
+
+    scale = Math.max(minScale, Math.min(maxScale, scale + delta));
+
+    const zoomRatio = scale / oldScale;
+    offsetX = cx - (cx - offsetX) * zoomRatio;
+    offsetY = cy - (cy - offsetY) * zoomRatio;
+
+    lastDist = dist;
+    redraw();
+    return;
+  }
+
+  if (e.touches.length === 1 && isDragging) {
+    const x = e.touches[0].clientX;
+    const y = e.touches[0].clientY;
+
+    offsetX += (x - lastX);
+    offsetY += (y - lastY);
+
+    lastX = x;
+    lastY = y;
+
+    redraw();
+  }
+});
+
+canvas.addEventListener("touchend", () => {
+  isDragging = false;
 });
 
 // ▼ 描画
@@ -119,12 +210,17 @@ function redraw() {
     ctx.drawImage(baseImage, offsetX, offsetY, drawW, drawH);
   }
 
-  if (frameImage && frameImage.complete) {
-    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+  if (frameImage) {
+    const cw = canvas.width;
+    const ch = canvas.height;
+    const size = Math.min(cw, ch);
+    const x = (cw - size) / 2;
+    const y = (ch - size) / 2;
+    ctx.drawImage(frameImage, x, y, size, size);
   }
 }
 
-// ▼ 保存処理
+// ▼ 保存処理（高解像度）
 function saveHighRes() {
   if (!baseImage) {
     alert("画像が選択されていません。");
@@ -147,19 +243,25 @@ function saveHighRes() {
 
   sctx.drawImage(baseImage, x, y, drawW, drawH);
 
-  if (frameImage && frameImage.complete) {
-    sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
-  } else {
-    alert("フレーム画像がまだ読み込まれていません。");
-    return;
+  if (frameImage) {
+    const cw = saveCanvas.width;
+    const ch = saveCanvas.height;
+    const size = Math.min(cw, ch);
+    const fx = (cw - size) / 2;
+    const fy = (ch - size) / 2;
+    sctx.drawImage(frameImage, fx, fy, size, size);
   }
 
+  const now = new Date();
+  const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
+
   const link = document.createElement("a");
-  link.download = "framelab.png";
+  link.download = filename;
   link.href = saveCanvas.toDataURL("image/png");
   link.click();
 }
 
+// ▼ ボタンイベント
 document.getElementById("saveBtn").addEventListener("click", saveHighRes);
 document.getElementById("resetBtn").addEventListener("click", () => {
   baseImage = null;
@@ -168,6 +270,3 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   offsetX = 0;
   offsetY = 0;
   imageInput.value = "";
-  frameSelect.value = "";
-  redraw();
-});
