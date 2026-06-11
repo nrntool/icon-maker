@@ -10,7 +10,7 @@ const ctx = canvas.getContext("2d");
 // ▼ GitHub raw URLからフレーム一覧を取得
 async function loadFramesFromGitHub() {
   const repo = "framesynth/icon-maker";
-  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`; // キャッシュ無効化
+  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
 
   try {
     const response = await fetch(framesUrl, { cache: "no-cache" });
@@ -20,7 +20,6 @@ async function loadFramesFromGitHub() {
 
     data.forEach(item => {
       if (item.name.endsWith(".png")) {
-        // raw URLを使用して常に最新を取得
         const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
         const option = document.createElement("option");
         option.value = rawUrl;
@@ -34,22 +33,26 @@ async function loadFramesFromGitHub() {
   }
 }
 
-// ▼ Canvas サイズ調整
+// ▼ Canvas サイズ調整（安定版）
 function resizeCanvas() {
-  const size = canvas.clientWidth;
-  if (!size) return;
-  canvas.width = size;
-  canvas.height = size;
-  redraw();
+  const rect = canvas.getBoundingClientRect();
+  const size = rect.width;
+
+  if (size > 0) {
+    canvas.width = size;
+    canvas.height = size;
+    redraw();
+  }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+// ▼ ページ完全読み込み後に実行（最重要）
+window.addEventListener("load", () => {
   loadFramesFromGitHub();
-  setTimeout(resizeCanvas, 50);
+  resizeCanvas();
 });
 
 window.addEventListener("resize", () => {
-  setTimeout(resizeCanvas, 50);
+  resizeCanvas();
 });
 
 let baseImage = null;
@@ -119,6 +122,11 @@ function getCenter(touches) {
   };
 }
 
+let isDragging = false;
+let lastX = 0;
+let lastY = 0;
+let lastDist = 0;
+
 // ▼ タッチ開始
 canvas.addEventListener("touchstart", (e) => {
   if (e.touches.length === 1) {
@@ -175,7 +183,6 @@ canvas.addEventListener("touchend", () => {
   isDragging = false;
 });
 
-
 // ▼ 描画
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -196,10 +203,10 @@ function redraw() {
   }
 }
 
-// ▼ 保存処理（高解像度）
+// ▼ 保存処理（安定版）
 function saveHighRes() {
-  if (!baseImage) {
-    alert("画像が選択されていません。");
+  if (!baseImage || !baseImage.complete) {
+    alert("画像の読み込み中です。少し待ってから保存してください。");
     return;
   }
 
@@ -246,3 +253,5 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   offsetX = 0;
   offsetY = 0;
   imageInput.value = "";
+  redraw();
+});
