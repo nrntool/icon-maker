@@ -103,6 +103,10 @@ uploadBtn.addEventListener("click", async () => {
 
         uploadBtn.classList.remove("upload-glow");
       }, 600);
+
+      // ▼ アップロード後に一覧を更新
+      loadFrameList();
+
     } else {
       resultBox.textContent = `❌ エラー: ${data.message || "アップロードに失敗しました。"}`;
     }
@@ -115,3 +119,75 @@ uploadBtn.addEventListener("click", async () => {
   uploadBtn.classList.remove("loading");
   uploadBtn.innerHTML = "アップロード";
 });
+
+// ▼ フレーム一覧読み込み
+async function loadFrameList() {
+  const repo = "framesynth/icon-maker";
+  const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
+
+  const listBox = document.getElementById("frameList");
+  listBox.innerHTML = "読み込み中…";
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    listBox.innerHTML = "";
+
+    data.forEach(item => {
+      if (!item.name.endsWith(".png")) return;
+
+      const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
+
+      const div = document.createElement("div");
+      div.className = "frame-item";
+
+      div.innerHTML = `
+        <img src="${rawUrl}" class="frame-thumb">
+        <div>${item.name}</div>
+        <button class="delete-btn" data-name="${item.name}">削除</button>
+      `;
+
+      listBox.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error(err);
+    listBox.innerHTML = "読み込みに失敗しました。";
+  }
+}
+
+// ▼ 削除処理
+document.addEventListener("click", async (e) => {
+  if (!e.target.classList.contains("delete-btn")) return;
+
+  const filename = e.target.dataset.name;
+
+  if (!confirm(`${filename} を削除しますか？`)) return;
+
+  e.target.textContent = "削除中…";
+  e.target.disabled = true;
+
+  try {
+    const res = await fetch(WORKER_ENDPOINT, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      e.target.parentElement.remove();
+    } else {
+      alert("削除に失敗しました: " + data.message);
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("通信エラーが発生しました");
+  }
+});
+
+// ▼ 初期ロード
+window.addEventListener("DOMContentLoaded", loadFrameList);
