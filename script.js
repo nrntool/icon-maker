@@ -136,7 +136,7 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
-// ▼ タッチ移動（元の自然なピンチ操作）
+// ▼ タッチ移動（ibisPaint風ピンチ）
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
@@ -151,15 +151,21 @@ canvas.addEventListener("touchmove", (e) => {
 
     const oldScale = scale;
 
-    // ▼ 元のピンチ感度（一定速度）
-    const delta = (dist - lastDist) * 0.004;
+    // ▼ ibisPaint風：速度依存の自然なズーム
+    const diff = dist - lastDist;
+    const speed = Math.abs(diff);
+
+    // 速度に応じて変化量を調整（自然な加速）
+    const delta = (diff * 0.004) * (1 + speed * 0.002);
 
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
-    // ▼ 中心補正（自然な強さ）
+    // ▼ ibisPaint風：中心吸い付き補正（少し強め）
     const zoomRatio = scale / oldScale;
-    offsetX = cx - (cx - offsetX) * zoomRatio;
-    offsetY = cy - (cy - offsetY) * zoomRatio;
+    const follow = 0.85; // ← 0.7〜0.9 が自然
+
+    offsetX = cx - (cx - offsetX) * zoomRatio * follow;
+    offsetY = cy - (cy - offsetY) * zoomRatio * follow;
 
     lastDist = dist;
     redraw();
@@ -179,10 +185,6 @@ canvas.addEventListener("touchmove", (e) => {
 
     redraw();
   }
-});
-
-canvas.addEventListener("touchend", () => {
-  isDragging = false;
 });
 
 // ▼ 描画
