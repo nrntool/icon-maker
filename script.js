@@ -104,39 +104,7 @@ frameSelect.addEventListener("change", () => {
   frameImage.src = value;
 });
 
-// ▼ ピンチ距離
-function getDistance(touches) {
-  const dx = touches[0].clientX - touches[1].clientX;
-  const dy = touches[0].clientY - touches[1].clientY;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-// ▼ ピンチ中心
-function getCenter(touches) {
-  return {
-    x: (touches[0].clientX + touches[1].clientX) / 2,
-    y: (touches[0].clientY + touches[1].clientY) / 2
-  };
-}
-
-let isDragging = false;
-let lastX = 0;
-let lastY = 0;
-let lastDist = 0;
-
-// ▼ タッチ開始
-canvas.addEventListener("touchstart", (e) => {
-  if (e.touches.length === 1) {
-    isDragging = true;
-    lastX = e.touches[0].clientX;
-    lastY = e.touches[0].clientY;
-  }
-  if (e.touches.length === 2) {
-    lastDist = getDistance(e.touches);
-  }
-});
-
-// ▼ タッチ移動（元のピンチ操作）
+// ▼ タッチ移動（軽くて直感的なピンチ操作）
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
@@ -151,15 +119,22 @@ canvas.addEventListener("touchmove", (e) => {
 
     const oldScale = scale;
 
-    // ▼ 元のピンチ感度（一定速度）
-    const delta = (dist - lastDist) * 0.004;
+    // ▼ 速度に応じて自然に変化するズーム量
+    const diff = dist - lastDist;
+    const speed = Math.abs(diff);
+
+    // ゆっくり → 細かく  
+    // 速く → 大きく  
+    const delta = (diff * 0.004) * (1 + speed * 0.002);
 
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
-    // ▼ 中心補正（元の自然な強さ）
+    // ▼ 中心に吸い付くように追従する補正
     const zoomRatio = scale / oldScale;
-    offsetX = cx - (cx - offsetX) * zoomRatio;
-    offsetY = cy - (cy - offsetY) * zoomRatio;
+    const follow = 0.85; // ← 0.7〜0.9 が自然
+
+    offsetX = cx - (cx - offsetX) * zoomRatio * follow;
+    offsetY = cy - (cy - offsetY) * zoomRatio * follow;
 
     lastDist = dist;
     redraw();
@@ -179,10 +154,6 @@ canvas.addEventListener("touchmove", (e) => {
 
     redraw();
   }
-});
-
-canvas.addEventListener("touchend", () => {
-  isDragging = false;
 });
 
 // ▼ 描画
