@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 安定版
+// FrameLab 完全安定版
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -203,7 +203,7 @@ function redraw() {
   }
 }
 
-// ▼ 保存処理（安定版）
+// ▼ 保存処理（iPhone / Android 完全対応版）
 function saveHighRes() {
   if (!baseImage || !baseImage.complete) {
     alert("画像の読み込み中です。少し待ってから保存してください。");
@@ -238,10 +238,20 @@ function saveHighRes() {
   const now = new Date();
   const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
 
-  const link = document.createElement("a");
-  link.download = filename;
-  link.href = saveCanvas.toDataURL("image/png");
-  link.click();
+  // ▼ iPhone / Android 完全対応：Blob 保存
+  saveCanvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  }, "image/png");
 }
 
 // ▼ ボタンイベント
