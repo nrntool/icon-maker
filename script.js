@@ -136,7 +136,7 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
-// ▼ タッチ移動（軽くて直感的なピンチ操作）
+// ▼ タッチ移動（元のピンチ操作）
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
@@ -151,20 +151,15 @@ canvas.addEventListener("touchmove", (e) => {
 
     const oldScale = scale;
 
-    // 速度に応じて自然に変化するズーム量
-    const diff = dist - lastDist;
-    const speed = Math.abs(diff);
-
-    const delta = (diff * 0.004) * (1 + speed * 0.002);
+    // ▼ 元のピンチ感度（一定速度）
+    const delta = (dist - lastDist) * 0.004;
 
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
-    // 中心に吸い付くように追従
+    // ▼ 中心補正（元の自然な強さ）
     const zoomRatio = scale / oldScale;
-    const follow = 0.85;
-
-    offsetX = cx - (cx - offsetX) * zoomRatio * follow;
-    offsetY = cy - (cy - offsetY) * zoomRatio * follow;
+    offsetX = cx - (cx - offsetX) * zoomRatio;
+    offsetY = cy - (cy - offsetY) * zoomRatio;
 
     lastDist = dist;
     redraw();
