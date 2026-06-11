@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 完全安定版（ピンチ対応）
+// FrameLab ドラッグ慣性つき完全版
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -124,22 +124,31 @@ let lastX = 0;
 let lastY = 0;
 let lastDist = 0;
 
+// ▼ 慣性用の速度
+let vx = 0;
+let vy = 0;
+let lastMoveTime = 0;
+
 // ▼ タッチ開始
 canvas.addEventListener("touchstart", (e) => {
   if (e.touches.length === 1) {
     isDragging = true;
     lastX = e.touches[0].clientX;
     lastY = e.touches[0].clientY;
+    vx = 0;
+    vy = 0;
+    lastMoveTime = performance.now();
   }
   if (e.touches.length === 2) {
     lastDist = getDistance(e.touches);
   }
 });
 
-// ▼ タッチ移動
+// ▼ タッチ移動（ピンチ＋ドラッグ慣性）
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
 
+  // ▼ 2本指ピンチ
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
     const center = getCenter(e.touches);
@@ -162,23 +171,59 @@ canvas.addEventListener("touchmove", (e) => {
     return;
   }
 
+  // ▼ 1本指ドラッグ（慣性つき）
   if (e.touches.length === 1 && isDragging) {
     const x = e.touches[0].clientX;
     const y = e.touches[0].clientY;
 
-    offsetX += (x - lastX);
-    offsetY += (y - lastY);
+    const now = performance.now();
+    const dt = now - lastMoveTime;
+
+    const dx = x - lastX;
+    const dy = y - lastY;
+
+    // 速度計算
+    vx = dx / dt;
+    vy = dy / dt;
+
+    offsetX += dx;
+    offsetY += dy;
 
     lastX = x;
     lastY = y;
+    lastMoveTime = now;
 
     redraw();
   }
 });
 
+// ▼ タッチ終了 → 慣性開始
 canvas.addEventListener("touchend", () => {
   isDragging = false;
+  startInertia();
 });
+
+// ▼ 慣性アニメーション
+function startInertia() {
+  const friction = 0.95; // 減速率
+  const minSpeed = 0.001;
+
+  function animate() {
+    offsetX += vx * 16;
+    offsetY += vy * 16;
+
+    vx *= friction;
+    vy *= friction;
+
+    redraw();
+
+    if (Math.abs(vx) > minSpeed || Math.abs(vy) > minSpeed) {
+      requestAnimationFrame(animate);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
 
 // ▼ 描画
 function redraw() {
