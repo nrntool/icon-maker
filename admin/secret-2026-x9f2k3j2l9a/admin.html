@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FrameLab Uploader</title>
+  <title>FrameLab 管理画面</title>
   <link rel="stylesheet" href="admin.css" />
 </head>
 
@@ -12,14 +12,22 @@
   <!-- ▼ 管理画面帯 -->
   <div class="admin-banner">管理画面</div>
 
-  <div class="app-card">
-    <header>
-      <h1>FrameLab Uploader</h1>
-    </header>
+  <!-- ▼ モード選択カード -->
+  <div id="modeSelect" class="app-card">
+    <h2 class="mode-title">操作を選択</h2>
+    <p class="subtext">フレームを追加するか、削除するか選んでください。</p>
 
-    <p class="subtext">
-      フレーム画像を GitHub にアップロードできます。
-    </p>
+    <div class="mode-buttons">
+      <button id="addModeBtn" class="mode-btn">フレームを追加</button>
+      <button id="deleteModeBtn" class="mode-btn">フレームを削除</button>
+    </div>
+  </div>
+
+  <!-- ▼ 追加モード（最初は非表示） -->
+  <div id="addModeCard" class="app-card" style="display:none;">
+
+    <h2 class="mode-title">フレーム追加モード</h2>
+    <p class="subtext">フレーム画像をアップロードして登録できます。</p>
 
     <!-- STEP 1：画像選択 -->
     <label>
@@ -28,7 +36,7 @@
     </label>
     <input type="file" id="frameInput" accept="image/*" />
 
-    <!-- サムネイル表示 -->
+    <!-- プレビュー -->
     <div id="previewBox">
       <img id="previewImage" src="" alt="プレビュー" />
     </div>
@@ -43,15 +51,17 @@
     <!-- STEP 3：アップロード -->
     <button id="uploadBtn">アップロード</button>
 
-    <!-- 結果表示 -->
+    <!-- STEP 4：結果表示 -->
     <div id="result"></div>
   </div>
 
-    <!-- ▼ フレーム一覧 -->
-    <div class="app-card" id="frameListCard">
-      <h2 class="list-title">アップロード済みフレーム一覧</h2>
-      <div id="frameList" class="frame-list"></div>
-    </div>
+  <!-- ▼ 削除モード（後で作るので空のまま） -->
+  <div id="deleteModeCard" class="app-card" style="display:none;">
+    <h2 class="mode-title">フレーム削除モード</h2>
+    <p class="subtext">アップロード済みのフレームを削除できます。</p>
+
+    <div id="frameList" class="frame-list"></div>
+  </div>
 
   <script src="admin.js"></script>
 </body>
