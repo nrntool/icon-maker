@@ -55,12 +55,14 @@
     <div id="result"></div>
   </div>
 
-  <!-- ▼ 削除モード（後で作るので空のまま） -->
+  <!-- ▼ 削除モード -->
   <div id="deleteModeCard" class="app-card" style="display:none;">
     <h2 class="mode-title">フレーム削除モード</h2>
-    <p class="subtext">アップロード済みのフレームを削除できます。</p>
+    <p class="subtext">アップロード済みのフレームを一覧から削除できます。</p>
 
-    <div id="frameList" class="frame-list"></div>
+    <div id="frameList" class="frame-list">
+      <!-- JS がここに一覧を生成 -->
+    </div>
   </div>
 
   <script src="admin.js"></script>
