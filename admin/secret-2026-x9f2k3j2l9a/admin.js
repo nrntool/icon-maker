@@ -1,9 +1,30 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（完全版）
+// FrameLab 管理パネル用 admin.js（最終完成版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
+// ▼ モード切り替え
+const addModeBtn = document.getElementById("addModeBtn");
+const deleteModeBtn = document.getElementById("deleteModeBtn");
+const addModeCard = document.getElementById("addModeCard");
+const deleteModeCard = document.getElementById("deleteModeCard");
+const modeSelect = document.getElementById("modeSelect");
+
+addModeBtn.addEventListener("click", () => {
+  modeSelect.style.display = "none";
+  addModeCard.style.display = "block";
+  deleteModeCard.style.display = "none";
+});
+
+deleteModeBtn.addEventListener("click", () => {
+  modeSelect.style.display = "none";
+  addModeCard.style.display = "none";
+  deleteModeCard.style.display = "block";
+  loadFrameList();
+});
+
+// ▼ 追加モード（アップロード処理）
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
 const frameNameInput = document.getElementById("frameName");
@@ -21,26 +42,20 @@ function toBase64(file) {
   });
 }
 
-// ▼ サムネイル表示
+// ▼ プレビュー表示
 frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
     previewBox.style.display = "none";
     previewImage.src = "";
-    previewImage.classList.remove("show");
     return;
   }
 
   const reader = new FileReader();
   reader.onload = () => {
     previewImage.src = reader.result;
-
     previewBox.style.display = "block";
-    previewImage.classList.remove("show");
-
-    setTimeout(() => {
-      previewImage.classList.add("show");
-    }, 10);
+    previewImage.classList.add("show");
   };
   reader.readAsDataURL(file);
 });
@@ -60,10 +75,7 @@ uploadBtn.addEventListener("click", async () => {
   }
 
   uploadBtn.disabled = true;
-  uploadBtn.classList.add("loading");
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
-
-  resultBox.textContent = "⏳ アップロード中...";
 
   try {
     const base64Data = await toBase64(file);
@@ -80,47 +92,68 @@ uploadBtn.addEventListener("click", async () => {
     const data = await response.json();
 
     if (response.ok) {
+      const rawUrl = data.url;
+      const userPageUrl = "https://framesynth.github.io/icon-maker/";
+
       resultBox.innerHTML = `
-        ✅ アップロード完了！<br>
-        <a href="${data.url}" target="_blank">${data.url}</a>
+        ✅ アップロード完了！<br><br>
+
+        📁 GitHub 反映URL：<br>
+        <a href="${rawUrl}" target="_blank">${rawUrl}</a><br><br>
+
+        👀 ユーザー画面で確認：<br>
+        <a href="${userPageUrl}" target="_blank">${userPageUrl}</a><br><br>
+
+        <button id="checkReflectBtn">反映チェック</button>
+        <div id="reflectStatus"></div>
       `;
 
-      uploadBtn.classList.add("upload-glow");
-
-      previewImage.classList.add("reset-anim");
-      frameNameInput.classList.add("reset-anim");
-      frameInput.classList.add("reset-anim");
-
-      setTimeout(() => {
-        frameNameInput.value = "";
-        frameInput.value = "";
-        previewImage.src = "";
-        previewBox.style.display = "none";
-
-        previewImage.classList.remove("reset-anim");
-        frameNameInput.classList.remove("reset-anim");
-        frameInput.classList.remove("reset-anim");
-
-        uploadBtn.classList.remove("upload-glow");
-      }, 600);
-
-      // ▼ アップロード後に一覧を更新
-      loadFrameList();
+      // 入力リセット
+      frameNameInput.value = "";
+      frameInput.value = "";
+      previewImage.src = "";
+      previewBox.style.display = "none";
 
     } else {
-      resultBox.textContent = `❌ エラー: ${data.message || "アップロードに失敗しました。"}`;
+      resultBox.textContent = `❌ エラー: ${data.message}`;
     }
   } catch (err) {
-    console.error(err);
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
   }
 
   uploadBtn.disabled = false;
-  uploadBtn.classList.remove("loading");
   uploadBtn.innerHTML = "アップロード";
 });
 
-// ▼ フレーム一覧読み込み
+// ▼ 反映チェック
+document.addEventListener("click", async (e) => {
+  if (e.target.id !== "checkReflectBtn") return;
+
+  const statusBox = document.getElementById("reflectStatus");
+  statusBox.textContent = "⏳ チェック中…";
+
+  const rawUrl = document.querySelector("#result a").href;
+
+  try {
+    const res = await fetch(rawUrl + "?t=" + Date.now(), {
+      method: "HEAD",
+      cache: "no-store"
+    });
+
+    if (res.status === 200) {
+      statusBox.innerHTML = `✅ 反映されています！`;
+      statusBox.style.color = "#0a8a0a";
+    } else {
+      statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
+      statusBox.style.color = "#b8860b";
+    }
+  } catch {
+    statusBox.innerHTML = `⚠ チェック中にエラーが発生しました`;
+    statusBox.style.color = "#c0392b";
+  }
+});
+
+// ▼ 削除モード（一覧読み込み）
 async function loadFrameList() {
   const repo = "framesynth/icon-maker";
   const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
@@ -151,8 +184,7 @@ async function loadFrameList() {
       listBox.appendChild(div);
     });
 
-  } catch (err) {
-    console.error(err);
+  } catch {
     listBox.innerHTML = "読み込みに失敗しました。";
   }
 }
@@ -175,19 +207,12 @@ document.addEventListener("click", async (e) => {
       body: JSON.stringify({ filename })
     });
 
-    const data = await res.json();
-
     if (res.ok) {
       e.target.parentElement.remove();
     } else {
-      alert("削除に失敗しました: " + data.message);
+      alert("削除に失敗しました");
     }
-
-  } catch (err) {
-    console.error(err);
+  } catch {
     alert("通信エラーが発生しました");
   }
 });
-
-// ▼ 初期ロード
-window.addEventListener("DOMContentLoaded", loadFrameList);
