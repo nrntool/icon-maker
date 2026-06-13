@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（最終完成版）
+// FrameLab 管理パネル用 admin.js（完全統合版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -28,7 +28,6 @@ deleteModeBtn.addEventListener("click", () => {
   loadFrameList();
 });
 
-// ▼ 戻る処理
 backToSelectFromAdd.addEventListener("click", () => {
   addModeCard.style.display = "none";
   deleteModeCard.style.display = "none";
@@ -41,13 +40,18 @@ backToSelectFromDelete.addEventListener("click", () => {
   modeSelect.style.display = "block";
 });
 
-// ▼ 追加モード（アップロード処理）
+// ▼ 追加モード
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
 const frameNameInput = document.getElementById("frameName");
 const resultBox = document.getElementById("result");
 const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
+
+// ▼ 上書き警告ダイアログ
+const overwriteDialog = document.getElementById("overwriteDialog");
+const overwriteYes = document.getElementById("overwriteYes");
+const overwriteNo = document.getElementById("overwriteNo");
 
 // Base64 変換
 function toBase64(file) {
@@ -77,7 +81,15 @@ frameInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-// ▼ アップロード処理
+// ▼ GitHub に同名ファイルが存在するかチェック
+async function checkFileExists(filename) {
+  const repo = "framesynth/icon-maker";
+  const url = `https://api.github.com/repos/${repo}/contents/frames/${filename}`;
+  const res = await fetch(url);
+  return res.ok;
+}
+
+// ▼ アップロードボタン押下
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
@@ -91,6 +103,32 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
+  const filename = `${frameName}.png`;
+
+  // ▼ 上書きチェック
+  const exists = await checkFileExists(filename);
+
+  if (exists) {
+    overwriteDialog.style.display = "block";
+
+    overwriteYes.onclick = () => {
+      overwriteDialog.style.display = "none";
+      uploadFrame(file, frameName); // 上書き実行
+    };
+
+    overwriteNo.onclick = () => {
+      overwriteDialog.style.display = "none";
+    };
+
+    return;
+  }
+
+  // ▼ 新規アップロード
+  uploadFrame(file, frameName);
+});
+
+// ▼ 実際のアップロード処理
+async function uploadFrame(file, frameName) {
   uploadBtn.disabled = true;
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
 
@@ -108,12 +146,12 @@ uploadBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    if (response.ok) {
-      const rawUrl = data.url;
+    if (data.success) {
+      const rawUrl = data.data.url;
       const userPageUrl = "https://framesynth.github.io/icon-maker/";
 
       resultBox.innerHTML = `
-        ✅ アップロード完了！<br><br>
+        ${data.data.overwrite ? "🔄 上書き完了！" : "✅ アップロード完了！"}<br><br>
 
         📁 GitHub 反映URL：<br>
         <a href="${rawUrl}" target="_blank">${rawUrl}</a><br><br>
@@ -124,15 +162,8 @@ uploadBtn.addEventListener("click", async () => {
         <button id="checkReflectBtn">反映チェック</button>
         <div id="reflectStatus"></div>
       `;
-
-      // 入力リセット
-      frameNameInput.value = "";
-      frameInput.value = "";
-      previewImage.src = "";
-      previewBox.style.display = "none";
-
     } else {
-      resultBox.textContent = `❌ エラー: ${data.message}`;
+      resultBox.textContent = `❌ エラー: ${data.error.message}`;
     }
   } catch (err) {
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
@@ -140,7 +171,7 @@ uploadBtn.addEventListener("click", async () => {
 
   uploadBtn.disabled = false;
   uploadBtn.innerHTML = "アップロード";
-});
+}
 
 // ▼ 反映チェック
 document.addEventListener("click", async (e) => {
