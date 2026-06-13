@@ -1,255 +1,235 @@
 // ================================
-// FrameLab 管理画面 admin.js（完全版）
+// FrameLab 管理パネル用 admin.js（最終完成版）
 // ================================
 
-// ★ 必ずあなたの Worker URL に変更
-const WORKER_ENDPOINT = "https://YOUR-WORKER.workers.dev";
+const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
-// DOM取得
-const modeSelect = document.getElementById("modeSelect");
-const addModeCard = document.getElementById("addModeCard");
-const deleteModeCard = document.getElementById("deleteModeCard");
-
+// ▼ モード切り替え
 const addModeBtn = document.getElementById("addModeBtn");
 const deleteModeBtn = document.getElementById("deleteModeBtn");
+const addModeCard = document.getElementById("addModeCard");
+const deleteModeCard = document.getElementById("deleteModeCard");
+const modeSelect = document.getElementById("modeSelect");
 
+// ▼ 戻るボタン
 const backToSelectFromAdd = document.getElementById("backToSelectFromAdd");
 const backToSelectFromDelete = document.getElementById("backToSelectFromDelete");
 
+addModeBtn.addEventListener("click", () => {
+  modeSelect.style.display = "none";
+  addModeCard.style.display = "block";
+  deleteModeCard.style.display = "none";
+});
+
+deleteModeBtn.addEventListener("click", () => {
+  modeSelect.style.display = "none";
+  addModeCard.style.display = "none";
+  deleteModeCard.style.display = "block";
+  loadFrameList();
+});
+
+// ▼ 戻る処理
+backToSelectFromAdd.addEventListener("click", () => {
+  addModeCard.style.display = "none";
+  deleteModeCard.style.display = "none";
+  modeSelect.style.display = "block";
+});
+
+backToSelectFromDelete.addEventListener("click", () => {
+  addModeCard.style.display = "none";
+  deleteModeCard.style.display = "none";
+  modeSelect.style.display = "block";
+});
+
+// ▼ 追加モード（アップロード処理）
+const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
+const frameNameInput = document.getElementById("frameName");
+const resultBox = document.getElementById("result");
 const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
 
-const frameName = document.getElementById("frameName");
-const uploadBtn = document.getElementById("uploadBtn");
-const resultBox = document.getElementById("result");
-
-const overwriteDialog = document.getElementById("overwriteDialog");
-const overwriteYes = document.getElementById("overwriteYes");
-const overwriteNo = document.getElementById("overwriteNo");
-
-const frameList = document.getElementById("frameList");
-
-let selectedFile = null;
-let pendingUploadData = null;
-
-// ================================
-// モード切り替え（フェードアニメ統一）
-// ================================
-function showCard(card) {
-  modeSelect.style.display = "none";
-  addModeCard.style.display = "none";
-  deleteModeCard.style.display = "none";
-
-  card.style.display = "block";
-  card.classList.add("fade");
-
-  setTimeout(() => {
-    card.classList.add("show");
-  }, 10);
+// Base64 変換
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
-addModeBtn.onclick = () => showCard(addModeCard);
-deleteModeBtn.onclick = () => {
-  loadFrameList();
-  showCard(deleteModeCard);
-};
-
-backToSelectFromAdd.onclick = () => location.reload();
-backToSelectFromDelete.onclick = () => location.reload();
-
-// ================================
-// プレビュー表示
-// ================================
-frameInput.addEventListener("change", () => {
-  selectedFile = frameInput.files[0];
-  if (!selectedFile) return;
+// ▼ プレビュー表示
+frameInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) {
+    previewBox.style.display = "none";
+    previewImage.src = "";
+    return;
+  }
 
   const reader = new FileReader();
-  reader.onload = (e) => {
-    previewImage.src = e.target.result;
+  reader.onload = () => {
+    previewImage.src = reader.result;
     previewBox.style.display = "block";
-
-    setTimeout(() => previewImage.classList.add("show"), 10);
+    previewImage.classList.add("show");
   };
-  reader.readAsDataURL(selectedFile);
+  reader.readAsDataURL(file);
 });
 
-// ================================
-// 成功・エラー表示（高級UI）
-// ================================
-function showError(message) {
-  resultBox.innerHTML = `
-    <div class="error-box">
-      <div class="error-icon">!</div>
-      <div>${message}</div>
-    </div>
-  `;
-}
-
-function showSuccess(message) {
-  resultBox.innerHTML = `
-    <div class="success-box">
-      <div class="success-icon">✓</div>
-      <div>${message}</div>
-    </div>
-  `;
-}
-
-// ================================
-// アップロード（JSON送信 完全版）
-// ================================
+// ▼ アップロード処理
 uploadBtn.addEventListener("click", async () => {
-  if (!selectedFile) {
-    showError("画像が選択されていません。");
+  const file = frameInput.files[0];
+  const frameName = frameNameInput.value.trim();
+
+  if (!file) {
+    resultBox.textContent = "⚠ ファイルが選択されていません。";
     return;
   }
-  if (!frameName.value.trim()) {
-    showError("フレーム名を入力してください。");
+  if (!frameName) {
+    resultBox.textContent = "⚠ フレーム名を入力してください。";
     return;
   }
 
-  uploadBtn.classList.add("loading");
-  uploadBtn.innerHTML = `<span class="loading-spinner"></span> アップロード中...`;
+  uploadBtn.disabled = true;
+  uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
 
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64 = e.target.result;
+  try {
+    const base64Data = await toBase64(file);
 
-    const payload = {
-      filename: frameName.value.trim(),
-      content: base64
-    };
+    const response = await fetch(WORKER_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: `${frameName}.png`,
+        content: base64Data
+      })
+    });
 
-    try {
-      const res = await fetch(`${WORKER_ENDPOINT}/upload`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+    const data = await response.json();
 
-      const data = await res.json();
+    if (response.ok) {
+      const rawUrl = data.url;
+      const userPageUrl = "https://framesynth.github.io/icon-maker/";
 
-      uploadBtn.classList.remove("loading");
-      uploadBtn.textContent = "アップロード";
+      resultBox.innerHTML = `
+        ✅ アップロード完了！<br><br>
 
-      if (!data.success) {
-        if (data.error.message.includes("exists")) {
-          pendingUploadData = payload;
-          showOverwriteDialog();
-        } else {
-          showError(`エラー: ${data.error.message}`);
-        }
-        return;
-      }
+        📁 GitHub 反映URL：<br>
+        <a href="${rawUrl}" target="_blank">${rawUrl}</a><br><br>
 
-      showSuccess(
-        data.data.overwrite
-          ? "既存のフレームを上書きしました。"
-          : "アップロードが完了しました。"
-      );
+        👀 ユーザー画面で確認：<br>
+        <a href="${userPageUrl}" target="_blank">${userPageUrl}</a><br><br>
 
-    } catch (err) {
-      uploadBtn.classList.remove("loading");
-      uploadBtn.textContent = "アップロード";
-      showError("通信エラーが発生しました。");
+        <button id="checkReflectBtn">反映チェック</button>
+        <div id="reflectStatus"></div>
+      `;
+
+      // 入力リセット
+      frameNameInput.value = "";
+      frameInput.value = "";
+      previewImage.src = "";
+      previewBox.style.display = "none";
+
+    } else {
+      resultBox.textContent = `❌ エラー: ${data.message}`;
     }
-  };
+  } catch (err) {
+    resultBox.textContent = "⚠ 通信エラーが発生しました。";
+  }
 
-  reader.readAsDataURL(selectedFile);
+  uploadBtn.disabled = false;
+  uploadBtn.innerHTML = "アップロード";
 });
 
-// ================================
-// 上書き確認ダイアログ（JSON送信）
-// ================================
-function showOverwriteDialog() {
-  overwriteDialog.style.display = "flex";
-}
+// ▼ 反映チェック
+document.addEventListener("click", async (e) => {
+  if (e.target.id !== "checkReflectBtn") return;
 
-overwriteNo.onclick = () => {
-  overwriteDialog.style.display = "none";
-  pendingUploadData = null;
-};
+  const statusBox = document.getElementById("reflectStatus");
+  statusBox.textContent = "⏳ チェック中…";
 
-overwriteYes.onclick = async () => {
-  if (!pendingUploadData) return;
+  const rawUrl = document.querySelector("#result a").href;
 
-  overwriteDialog.style.display = "none";
+  try {
+    const res = await fetch(rawUrl + "?t=" + Date.now(), {
+      method: "HEAD",
+      cache: "no-store"
+    });
 
-  uploadBtn.classList.add("loading");
-  uploadBtn.innerHTML = `<span class="loading-spinner"></span> 上書き中...`;
-
-  const res = await fetch(`${WORKER_ENDPOINT}/upload`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(pendingUploadData)
-  });
-
-  const data = await res.json();
-
-  uploadBtn.classList.remove("loading");
-  uploadBtn.textContent = "アップロード";
-
-  if (!data.success) {
-    showError(`エラー: ${data.error.message}`);
-    return;
+    if (res.status === 200) {
+      statusBox.innerHTML = `✅ 反映されています！`;
+      statusBox.style.color = "#0a8a0a";
+    } else {
+      statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
+      statusBox.style.color = "#b8860b";
+    }
+  } catch {
+    statusBox.innerHTML = `⚠ チェック中にエラーが発生しました`;
+    statusBox.style.color = "#c0392b";
   }
+});
 
-  showSuccess("既存のフレームを上書きしました。");
-  pendingUploadData = null;
-};
-
-// ================================
-// 削除モード：一覧取得
-// ================================
+// ▼ 削除モード（一覧読み込み）
 async function loadFrameList() {
-  frameList.innerHTML = "読み込み中...";
+  const repo = "framesynth/icon-maker";
+  const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
 
-  const res = await fetch(`${WORKER_ENDPOINT}/list`);
-  const data = await res.json();
+  const listBox = document.getElementById("frameList");
+  listBox.innerHTML = "読み込み中…";
 
-  if (!data.success) {
-    frameList.innerHTML = "読み込みに失敗しました。";
-    return;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    listBox.innerHTML = "";
+
+    data.forEach(item => {
+      if (!item.name.endsWith(".png")) return;
+
+      const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
+
+      const div = document.createElement("div");
+      div.className = "frame-item";
+
+      div.innerHTML = `
+        <img src="${rawUrl}" class="frame-thumb">
+        <div>${item.name}</div>
+        <button class="delete-btn" data-name="${item.name}">削除</button>
+      `;
+
+      listBox.appendChild(div);
+    });
+
+  } catch {
+    listBox.innerHTML = "読み込みに失敗しました。";
   }
-
-  frameList.innerHTML = "";
-
-  data.files.forEach((file) => {
-    const item = document.createElement("div");
-    item.className = "frame-item";
-
-    item.innerHTML = `
-      <img src="${file.url}" class="frame-thumb" />
-      <p>${file.name}</p>
-      <button class="delete-btn" data-name="${file.name}">削除</button>
-    `;
-
-    frameList.appendChild(item);
-  });
-
-  document.querySelectorAll(".delete-btn").forEach((btn) => {
-    btn.onclick = () => deleteFrame(btn.dataset.name);
-  });
 }
 
-// ================================
-// 削除処理（JSON送信 完全版）
-// ================================
-async function deleteFrame(name) {
-  const res = await fetch(`${WORKER_ENDPOINT}/delete`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ filename: name })
-  });
+// ▼ 削除処理
+document.addEventListener("click", async (e) => {
+  if (!e.target.classList.contains("delete-btn")) return;
 
-  const data = await res.json();
+  const filename = e.target.dataset.name;
 
-  if (!data.success) {
-    showError("削除に失敗しました。");
-    return;
+  if (!confirm(`${filename} を削除しますか？`)) return;
+
+  e.target.textContent = "削除中…";
+  e.target.disabled = true;
+
+  try {
+    const res = await fetch(WORKER_ENDPOINT, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename })
+    });
+
+    if (res.ok) {
+      e.target.parentElement.remove();
+    } else {
+      alert("削除に失敗しました");
+    }
+  } catch {
+    alert("通信エラーが発生しました");
   }
-
-  showSuccess("削除が完了しました。");
-  loadFrameList();
-}
+});
