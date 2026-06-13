@@ -13,7 +13,7 @@
   <div class="admin-banner">管理画面</div>
 
   <!-- ▼ モード選択カード -->
-  <div id="modeSelect" class="app-card fade show">
+  <div id="modeSelect" class="app-card">
     <h2 class="mode-title">操作を選択</h2>
     <p class="subtext">フレームを追加するか、削除するか選んでください。</p>
 
@@ -24,56 +24,34 @@
   </div>
 
   <!-- ▼ 追加モード -->
-  <div id="addModeCard" class="app-card fade" style="display:none;">
-    <h2 class="mode-title">フレーム追加モード</h2>
-    <p class="subtext">フレーム画像をアップロードして登録できます。</p>
+<div id="addModeCard" class="app-card" style="display:none;">
+  <h2 class="mode-title">フレーム追加モード</h2>
+  <p class="subtext">フレーム画像をアップロードして登録できます。</p>
 
-    <!-- STEP 1：画像選択 -->
-    <label><span class="step-badge">1</span>画像を選択</label>
-    <input type="file" id="frameInput" accept="image/*" />
+  <!-- 既存のフォーム部分 -->
+  <label><span class="step-badge">1</span>画像を選択</label>
+  <input type="file" id="frameInput" accept="image/*" />
+  <div id="previewBox"><img id="previewImage" src="" alt="プレビュー" /></div>
 
-    <!-- プレビューエリア -->
-    <div id="previewBox">
-      <img id="previewImage" src="" alt="プレビュー" />
-    </div>
+  <label><span class="step-badge">2</span>フレーム名を入力</label>
+  <input type="text" id="frameName" placeholder="例：予約バトル" />
+  <button id="uploadBtn">アップロード</button>
+  <div id="result"></div>
 
-    <!-- STEP 2：フレーム名 -->
-    <label><span class="step-badge">2</span>フレーム名を入力</label>
-    <input type="text" id="frameName" placeholder="例：予約バトル" />
+  <!-- ▼ 戻るボタン -->
+  <button id="backToSelectFromAdd" class="back-btn">← 戻る</button>
+</div>
 
-    <!-- アップロード -->
-    <button id="uploadBtn">アップロード</button>
+<!-- ▼ 削除モード -->
+<div id="deleteModeCard" class="app-card" style="display:none;">
+  <h2 class="mode-title">フレーム削除モード</h2>
+  <p class="subtext">アップロード済みのフレームを一覧から削除できます。</p>
 
-    <!-- 結果表示（成功・エラー共通） -->
-    <div id="result"></div>
+  <div id="frameList" class="frame-list"></div>
 
-    <!-- ▼ 上書き確認ダイアログ（高級版） -->
-    <div id="overwriteDialog" class="overwrite-dialog" style="display:none;">
-      <div class="overwrite-icon">!</div>
-      <div>
-        <div>同じ名前のフレームがすでに登録されています。上書きしますか？</div>
-
-        <div class="overwrite-actions">
-          <button id="overwriteYes" class="dialog-btn-yes">上書きする</button>
-          <button id="overwriteNo" class="dialog-btn-no">キャンセル</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ▼ 戻るボタン -->
-    <button id="backToSelectFromAdd" class="back-btn">← 戻る</button>
-  </div>
-
-  <!-- ▼ 削除モード -->
-  <div id="deleteModeCard" class="app-card fade" style="display:none;">
-    <h2 class="mode-title">フレーム削除モード</h2>
-    <p class="subtext">アップロード済みのフレームを一覧から削除できます。</p>
-
-    <div id="frameList" class="frame-list"></div>
-
-    <!-- ▼ 戻るボタン -->
-    <button id="backToSelectFromDelete" class="back-btn">← 戻る</button>
-  </div>
+  <!-- ▼ 戻るボタン -->
+  <button id="backToSelectFromDelete" class="back-btn">← 戻る</button>
+</div>
 
   <script src="admin.js"></script>
 </body>
