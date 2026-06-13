@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（最終完成版）
+// FrameLab 管理パネル用 admin.js（完全統合版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -15,39 +15,53 @@ const modeSelect = document.getElementById("modeSelect");
 const backToSelectFromAdd = document.getElementById("backToSelectFromAdd");
 const backToSelectFromDelete = document.getElementById("backToSelectFromDelete");
 
+// ▼ フェード表示関数
+function showCard(card) {
+  card.style.display = "block";
+  requestAnimationFrame(() => card.classList.add("show"));
+}
+
+function hideCard(card) {
+  card.classList.remove("show");
+  setTimeout(() => (card.style.display = "none"), 300);
+}
+
+// ▼ モード切り替えイベント
 addModeBtn.addEventListener("click", () => {
-  modeSelect.style.display = "none";
-  addModeCard.style.display = "block";
-  deleteModeCard.style.display = "none";
+  hideCard(modeSelect);
+  hideCard(deleteModeCard);
+  showCard(addModeCard);
 });
 
 deleteModeBtn.addEventListener("click", () => {
-  modeSelect.style.display = "none";
-  addModeCard.style.display = "none";
-  deleteModeCard.style.display = "block";
+  hideCard(modeSelect);
+  hideCard(addModeCard);
+  showCard(deleteModeCard);
   loadFrameList();
 });
 
-// ▼ 戻る処理
 backToSelectFromAdd.addEventListener("click", () => {
-  addModeCard.style.display = "none";
-  deleteModeCard.style.display = "none";
-  modeSelect.style.display = "block";
+  hideCard(addModeCard);
+  showCard(modeSelect);
 });
 
 backToSelectFromDelete.addEventListener("click", () => {
-  addModeCard.style.display = "none";
-  deleteModeCard.style.display = "none";
-  modeSelect.style.display = "block";
+  hideCard(deleteModeCard);
+  showCard(modeSelect);
 });
 
-// ▼ 追加モード（アップロード処理）
+// ▼ 追加モード
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
 const frameNameInput = document.getElementById("frameName");
 const resultBox = document.getElementById("result");
 const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
+
+// ▼ 上書き警告ダイアログ
+const overwriteDialog = document.getElementById("overwriteDialog");
+const overwriteYes = document.getElementById("overwriteYes");
+const overwriteNo = document.getElementById("overwriteNo");
 
 // Base64 変換
 function toBase64(file) {
@@ -77,7 +91,15 @@ frameInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-// ▼ アップロード処理
+// ▼ GitHub に同名ファイルが存在するかチェック
+async function checkFileExists(filename) {
+  const repo = "framesynth/icon-maker";
+  const url = `https://api.github.com/repos/${repo}/contents/frames/${filename}`;
+  const res = await fetch(url);
+  return res.ok;
+}
+
+// ▼ アップロードボタン押下
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
@@ -91,6 +113,31 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
+  const filename = `${frameName}.png`;
+
+  // ▼ 上書きチェック
+  const exists = await checkFileExists(filename);
+
+  if (exists) {
+    overwriteDialog.style.display = "block";
+
+    overwriteYes.onclick = () => {
+      overwriteDialog.style.display = "none";
+      uploadFrame(file, frameName);
+    };
+
+    overwriteNo.onclick = () => {
+      overwriteDialog.style.display = "none";
+    };
+
+    return;
+  }
+
+  uploadFrame(file, frameName);
+});
+
+// ▼ 実際のアップロード処理
+async function uploadFrame(file, frameName) {
   uploadBtn.disabled = true;
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
 
@@ -108,12 +155,12 @@ uploadBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    if (response.ok) {
-      const rawUrl = data.url;
+    if (data.success) {
+      const rawUrl = data.data.url;
       const userPageUrl = "https://framesynth.github.io/icon-maker/";
 
       resultBox.innerHTML = `
-        ✅ アップロード完了！<br><br>
+        ${data.data.overwrite ? "🔄 上書き完了！" : "✅ アップロード完了！"}<br><br>
 
         📁 GitHub 反映URL：<br>
         <a href="${rawUrl}" target="_blank">${rawUrl}</a><br><br>
@@ -124,15 +171,8 @@ uploadBtn.addEventListener("click", async () => {
         <button id="checkReflectBtn">反映チェック</button>
         <div id="reflectStatus"></div>
       `;
-
-      // 入力リセット
-      frameNameInput.value = "";
-      frameInput.value = "";
-      previewImage.src = "";
-      previewBox.style.display = "none";
-
     } else {
-      resultBox.textContent = `❌ エラー: ${data.message}`;
+      resultBox.textContent = `❌ エラー: ${data.error.message}`;
     }
   } catch (err) {
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
@@ -140,7 +180,7 @@ uploadBtn.addEventListener("click", async () => {
 
   uploadBtn.disabled = false;
   uploadBtn.innerHTML = "アップロード";
-});
+}
 
 // ▼ 反映チェック
 document.addEventListener("click", async (e) => {
@@ -158,7 +198,7 @@ document.addEventListener("click", async (e) => {
     });
 
     if (res.status === 200) {
-      statusBox.innerHTML = `✅ 反映されています！`;
+      statusBox.innerHTML = `✅ 反映されています。`;
       statusBox.style.color = "#0a8a0a";
     } else {
       statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
@@ -184,6 +224,12 @@ async function loadFrameList() {
 
     listBox.innerHTML = "";
 
+    // ▼ フレームが存在しない場合（落ち着いたトーン）
+    if (!Array.isArray(data) || data.length === 0) {
+      listBox.innerHTML = "現在、削除できるフレームはありません。";
+      return;
+    }
+
     data.forEach(item => {
       if (!item.name.endsWith(".png")) return;
 
@@ -202,7 +248,7 @@ async function loadFrameList() {
     });
 
   } catch {
-    listBox.innerHTML = "読み込みに失敗しました。";
+    listBox.innerHTML = "現在、削除できるフレームはありません。";
   }
 }
 
@@ -224,10 +270,12 @@ document.addEventListener("click", async (e) => {
       body: JSON.stringify({ filename })
     });
 
-    if (res.ok) {
+    const data = await res.json();
+
+    if (data.success) {
       e.target.parentElement.remove();
     } else {
-      alert("削除に失敗しました");
+      alert(`削除に失敗しました：${data.error.message}`);
     }
   } catch {
     alert("通信エラーが発生しました");
