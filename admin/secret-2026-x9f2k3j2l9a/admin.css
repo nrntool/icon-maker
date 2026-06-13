@@ -235,6 +235,38 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 /* ================================
+   上書き警告ダイアログ
+================================ */
+
+.dialog {
+  margin-top: 1em;
+  padding: 1em;
+  background: #fff3cd;
+  border: 1px solid #ffecb5;
+  border-radius: 10px;
+  color: #664d03;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.dialog-btn {
+  margin: 0.5em;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dialog-btn.yes {
+  background: #d9534f;
+  color: #fff;
+}
+
+.dialog-btn.no {
+  background: #ccc;
+  color: #333;
+}
+
+/* ================================
    戻るボタン
 ================================ */
 
@@ -290,4 +322,52 @@ input[type="file"]::-webkit-file-upload-button {
   cursor: pointer;
 }
 
-.delete-btn:hover
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+/* ================================
+   アニメーション
+================================ */
+
+.reset-anim {
+  animation: fadeOutUp 0.6s ease forwards;
+}
+
+@keyframes fadeOutUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.upload-glow {
+  animation: glowFlash 0.8s ease-out;
+}
+
+@keyframes glowFlash {
+  0% { box-shadow: 0 0 0 rgba(0,120,212,0); transform: scale(1); }
+  40% { box-shadow: 0 0 18px rgba(0,120,212,0.55); transform: scale(1.03); }
+  100% { box-shadow: 0 0 0 rgba(0,120,212,0); transform: scale(1); }
+}
+
+/* ローディングスピナー */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading {
+  background: #0064b8 !important;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
