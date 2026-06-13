@@ -216,3 +216,4 @@ document.addEventListener("click", async (e) => {
     alert("通信エラーが発生しました");
   }
 });
+
