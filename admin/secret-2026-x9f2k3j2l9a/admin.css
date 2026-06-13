@@ -54,7 +54,7 @@ body {
     0 22px 50px rgba(0,0,0,0.06);
 }
 
-/* タイトル（フォントを軽くして高級感UP） */
+/* タイトル */
 .mode-title {
   font-size: 1.35em;
   font-weight: 500;
@@ -95,7 +95,6 @@ body {
   border-radius: 11px;
   cursor: pointer;
   font-size: 1em;
-  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
   font-weight: 500;
   letter-spacing: 0.01em;
   box-shadow:
@@ -170,7 +169,6 @@ input[type="text"] {
   max-width: 400px;
   padding: 0.75em 1em;
   font-size: 0.92em;
-  font-family: "Noto Sans JP", "Segoe UI", sans-serif;
   font-weight: 400;
   letter-spacing: 0.01em;
   color: #333;
@@ -183,42 +181,37 @@ input[type="text"] {
 }
 
 /* ================================
-   プレビュー・アップロード・結果表示
+   プレビューエリア（高級＋スマホ最適化）
 ================================ */
 
 #previewBox {
+  margin: 1.2em 0;
+  padding: 1.2em;
   background: rgba(250, 250, 250, 0.9);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  display: none;
 }
 
-#uploadBtn {
-  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+#previewImage {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  display: block;
+  margin: 0 auto;
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-#result {
-  font-family: "Noto Sans JP", "Segoe UI", sans-serif;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-}
-
-/* ================================
-   削除モード
-================================ */
-
-.frame-item {
-  font-family: "Noto Sans JP", "Segoe UI", sans-serif;
-  font-weight: 400;
-}
-
-.delete-btn {
-  font-family: "Segoe UI", "Noto Sans JP", sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+#previewImage.show {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* ================================
-   高級エラーメッセージ
+   成功・エラー通知（高級版）
 ================================ */
 
 .error-box {
@@ -228,15 +221,11 @@ input[type="text"] {
   border: 0.5px solid rgba(200, 80, 60, 0.25);
   border-radius: 12px;
   color: #8a3c32;
-  font-size: 0.92em;
-  line-height: 1.6;
-  text-align: left;
+  display: flex;
+  gap: 0.6em;
   box-shadow:
     0 2px 6px rgba(0,0,0,0.04),
     0 6px 18px rgba(0,0,0,0.03);
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6em;
 }
 
 .error-icon {
@@ -245,16 +234,10 @@ input[type="text"] {
   border-radius: 50%;
   background: #d46a5a;
   color: white;
-  font-size: 0.75em;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
-
-/* ================================
-   高級成功メッセージ
-================================ */
 
 .success-box {
   margin-top: 1.2em;
@@ -263,15 +246,11 @@ input[type="text"] {
   border: 0.5px solid rgba(60, 150, 90, 0.25);
   border-radius: 12px;
   color: #2f6b45;
-  font-size: 0.92em;
-  line-height: 1.6;
-  text-align: left;
+  display: flex;
+  gap: 0.6em;
   box-shadow:
     0 2px 6px rgba(0,0,0,0.04),
     0 6px 18px rgba(0,0,0,0.03);
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6em;
 }
 
 .success-icon {
@@ -280,15 +259,13 @@ input[type="text"] {
   border-radius: 50%;
   background: #4fae6f;
   color: white;
-  font-size: 0.75em;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 /* ================================
-   高級 上書き確認ダイアログ
+   上書き確認ダイアログ（高級版）
 ================================ */
 
 .overwrite-dialog {
@@ -298,14 +275,11 @@ input[type="text"] {
   border: 0.5px solid rgba(0,0,0,0.08);
   border-radius: 14px;
   color: #444;
-  font-size: 0.95em;
-  line-height: 1.6;
+  display: flex;
+  gap: 0.8em;
   box-shadow:
     0 3px 10px rgba(0,0,0,0.04),
     0 10px 28px rgba(0,0,0,0.03);
-  display: flex;
-  align-items: flex-start;
-  gap: 0.8em;
 }
 
 .overwrite-icon {
@@ -314,11 +288,9 @@ input[type="text"] {
   border-radius: 50%;
   background: #d0a85c;
   color: white;
-  font-size: 0.75em;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .overwrite-actions {
@@ -331,29 +303,68 @@ input[type="text"] {
   padding: 0.6em 1.2em;
   background: #5a7da8;
   color: #fff;
-  border: none;
   border-radius: 8px;
-  font-size: 0.9em;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.dialog-btn-yes:hover {
-  background: #4a6b92;
-  transform: translateY(-1px);
 }
 
 .dialog-btn-no {
   padding: 0.6em 1.2em;
   background: #e6e6e6;
   color: #333;
-  border: none;
   border-radius: 8px;
-  font-size: 0.9em;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-.dialog-btn-no:hover {
-  background: #d4d4d4;
+/* ================================
+   スマホ最適化（カード・余白）
+================================ */
+
+@media (max-width: 600px) {
+
+  .app-card {
+    width: 94%;
+    padding: 1.6em 1.3em;
+    margin: 1.4em auto 2em;
+    border-radius: 16px;
+  }
+
+  .mode-title {
+    margin-bottom: 0.4em;
+    font-size: 1.32em;
+  }
+
+  .subtext {
+    margin-bottom: 1.2em;
+    font-size: 0.95em;
+  }
+
+  #previewBox {
+    margin: 1.4em 0;
+    padding: 1.2em;
+  }
+
+  #previewImage {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  label {
+    margin-top: 1.4em;
+    margin-bottom: 0.5em;
+  }
+
+  input[type="file"],
+  input[type="text"] {
+    padding: 0.9em 1em;
+    font-size: 1em;
+  }
+
+  button {
+    padding: 1em;
+    font-size: 1.05em;
+  }
+
+  .back-btn {
+    margin-top: 1.8em;
+  }
 }
