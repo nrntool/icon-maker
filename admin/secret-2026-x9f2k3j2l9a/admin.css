@@ -1,15 +1,13 @@
 /* ================================
-   管理画面テーマ（完全版）
+   管理画面テーマ
 ================================ */
 
-/* ベースフォント（日本語＋英字） */
+/* 背景 */
 body {
-  background: radial-gradient(circle at top, #f9fafc 0%, #f2f3f5 45%, #eceff3 100%);
+  background: #f2f3f5;
   margin: 0;
   padding: 0;
-  font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
-  font-weight: 400;
-  letter-spacing: 0.02em;
+  font-family: "Noto Sans JP", sans-serif;
   color: #222;
   text-align: center;
   line-height: 1.6;
@@ -17,57 +15,43 @@ body {
 
 /* 管理画面帯 */
 .admin-banner {
-  background: linear-gradient(180deg, #ffffff 0%, #f3f4f7 100%);
-  color: #444;
-  padding: 0.6em;
-  font-weight: 500;
-  border-radius: 0 0 16px 16px;
-  margin-bottom: 1.6em;
-  letter-spacing: 0.03em;
-  font-size: 0.95em;
-  box-shadow:
-    0 2px 6px rgba(0,0,0,0.05),
-    0 10px 30px rgba(0,0,0,0.04);
+  background: #dcdfe3;
+  color: #333;
+  padding: 0.55em;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 1.2em;
+  letter-spacing: 0.04em;
+  font-size: 0.9em;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* カード（ガラス感＋2段階シャドウ＋ヘアライン） */
+/* カード */
 .app-card {
   width: 92%;
-  max-width: 440px;
-  margin: 1.8em auto;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 18px;
-  padding: 1.9em 1.5em;
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
-  box-shadow:
-    0 4px 14px rgba(0,0,0,0.06),
-    0 18px 40px rgba(0,0,0,0.05);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.app-card:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 6px 18px rgba(0,0,0,0.07),
-    0 22px 50px rgba(0,0,0,0.06);
+  max-width: 420px;
+  margin: 1.6em auto;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.6em 1.2em;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 6px 20px rgba(0, 40, 80, 0.05);
 }
 
 /* タイトル */
 .mode-title {
-  font-size: 1.35em;
-  font-weight: 500;
-  color: #2b2b2b;
-  letter-spacing: 0.01em;
+  font-size: 1.3em;
+  font-weight: 600;
+  margin-bottom: 0.4em;
 }
 
 /* 説明文 */
 .subtext {
-  font-size: 0.92em;
-  font-weight: 400;
-  color: #555;
-  letter-spacing: 0.02em;
+  font-size: 0.9em;
+  color: #444;
+  margin-top: 0.8em;
+  margin-bottom: 1.4em;
 }
 
 /* ================================
@@ -80,61 +64,21 @@ body {
   margin-top: 1em;
 }
 
-:root {
-  --accent: #5a7da8;
-  --accent-hover: #4a6b92;
-  --accent-soft: rgba(90, 125, 168, 0.12);
-}
-
 .mode-btn {
   flex: 1;
-  padding: 0.85em;
-  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
+  padding: 0.8em;
+  background: #006bb3;
   color: #fff;
   border: none;
-  border-radius: 11px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1em;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  box-shadow:
-    0 3px 10px rgba(90,125,168,0.25),
-    0 10px 26px rgba(90,125,168,0.25);
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* 光の流れ */
-.mode-btn::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -40%;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    rgba(255,255,255,0.55) 50%,
-    transparent 100%
-  );
-  transform: skewX(-20deg);
-  opacity: 0;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.mode-btn:hover::after {
-  opacity: 1;
-  transform: translateX(220%) skewX(-20deg);
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .mode-btn:hover {
-  background: linear-gradient(135deg, #4a6b92 0%, #5f7fa6 100%);
+  background: #005a94;
   transform: translateY(-2px);
-  box-shadow:
-    0 5px 14px rgba(90,125,168,0.3),
-    0 16px 32px rgba(90,125,168,0.35);
 }
 
 /* ================================
@@ -144,60 +88,87 @@ body {
 label {
   display: flex;
   align-items: center;
-  font-weight: 500;
-  margin: 1.2em 0 0.4em;
-  font-size: 0.92em;
-  color: #444;
-  letter-spacing: 0.01em;
+  font-weight: 600;
+  margin: 1em 0 0.3em;
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
 }
 
+/* 番号バッジ */
 .step-badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   width: 1.6em;
   height: 1.6em;
-  margin-right: 0.6em;
+  margin-right: 0.5em;
   font-size: 0.85em;
-  font-weight: 500;
-  color: #555;
+  font-weight: 600;
+  color: #333;
   border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.18);
-  background: linear-gradient(180deg, #f9f9f9 0%, #f1f1f1 100%);
+  border: 1.5px solid #999;
+  background: #f5f5f5;
 }
 
+/* 入力欄 */
 input[type="file"],
 input[type="text"] {
   width: 100%;
   max-width: 400px;
-  padding: 0.75em 1em;
-  font-size: 0.92em;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  box-sizing: border-box;
+  padding: 0.7em 0.9em;
+  font-size: 0.9em;
   color: #333;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid rgba(0,0,0,0.12);
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  background: #ffffff;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   margin-bottom: 1em;
   transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
+input[type="file"]:hover,
+input[type="text"]:hover {
+  background: #fafafa;
+  border-color: #bbb;
+}
+
+input[type="file"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #999;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* ファイル選択ボタン */
+input[type="file"]::-webkit-file-upload-button {
+  margin-right: 0.6em;
+  padding: 0.6em 1em;
+  background: #f2f2f2;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  color: #333;
+  cursor: pointer;
+}
+
 /* ================================
-   プレビューエリア（高級＋スマホ最適化）
+   プレビュー
 ================================ */
 
 #previewBox {
-  margin: 1.2em 0;
-  padding: 1.2em;
-  background: rgba(250, 250, 250, 0.9);
-  border-radius: 14px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  margin-top: 1em;
+  padding: 1em;
+  background: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 40, 80, 0.06);
   display: none;
 }
 
 #previewImage {
   width: 100%;
-  max-width: 380px;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  max-width: 360px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   display: block;
   margin: 0 auto;
   opacity: 0;
@@ -211,160 +182,112 @@ input[type="text"] {
 }
 
 /* ================================
-   成功・エラー通知（高級版）
+   アップロードボタン
 ================================ */
 
-.error-box {
+#uploadBtn {
+  width: 100%;
+  padding: 0.9em;
   margin-top: 1.2em;
-  padding: 1em 1.2em;
-  background: #fff4f2;
-  border: 0.5px solid rgba(200, 80, 60, 0.25);
-  border-radius: 12px;
-  color: #8a3c32;
-  display: flex;
-  gap: 0.6em;
-  box-shadow:
-    0 2px 6px rgba(0,0,0,0.04),
-    0 6px 18px rgba(0,0,0,0.03);
-}
-
-.error-icon {
-  width: 1.1em;
-  height: 1.1em;
-  border-radius: 50%;
-  background: #d46a5a;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.success-box {
-  margin-top: 1.2em;
-  padding: 1em 1.2em;
-  background: #f4fbf6;
-  border: 0.5px solid rgba(60, 150, 90, 0.25);
-  border-radius: 12px;
-  color: #2f6b45;
-  display: flex;
-  gap: 0.6em;
-  box-shadow:
-    0 2px 6px rgba(0,0,0,0.04),
-    0 6px 18px rgba(0,0,0,0.03);
-}
-
-.success-icon {
-  width: 1.1em;
-  height: 1.1em;
-  border-radius: 50%;
-  background: #4fae6f;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ================================
-   上書き確認ダイアログ（高級版）
-================================ */
-
-.overwrite-dialog {
-  margin-top: 1.2em;
-  padding: 1.2em 1.4em;
-  background: #fafafa;
-  border: 0.5px solid rgba(0,0,0,0.08);
-  border-radius: 14px;
-  color: #444;
-  display: flex;
-  gap: 0.8em;
-  box-shadow:
-    0 3px 10px rgba(0,0,0,0.04),
-    0 10px 28px rgba(0,0,0,0.03);
-}
-
-.overwrite-icon {
-  width: 1.2em;
-  height: 1.2em;
-  border-radius: 50%;
-  background: #d0a85c;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.overwrite-actions {
-  margin-top: 1em;
-  display: flex;
-  gap: 0.8em;
-}
-
-.dialog-btn-yes {
-  padding: 0.6em 1.2em;
-  background: #5a7da8;
+  background: #006bb3;
   color: #fff;
+  border: none;
   border-radius: 8px;
+  font-size: 0.95em;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.15);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.dialog-btn-no {
-  padding: 0.6em 1.2em;
-  background: #e6e6e6;
-  color: #333;
-  border-radius: 8px;
-  cursor: pointer;
+#uploadBtn:hover {
+  background: #005a94;
+  box-shadow: 0 4px 12px rgba(0, 40, 80, 0.25);
 }
 
 /* ================================
-   スマホ最適化（カード・余白）
+   結果表示
 ================================ */
 
-@media (max-width: 600px) {
-
-  .app-card {
-    width: 94%;
-    padding: 1.6em 1.3em;
-    margin: 1.4em auto 2em;
-    border-radius: 16px;
-  }
-
-  .mode-title {
-    margin-bottom: 0.4em;
-    font-size: 1.32em;
-  }
-
-  .subtext {
-    margin-bottom: 1.2em;
-    font-size: 0.95em;
-  }
-
-  #previewBox {
-    margin: 1.4em 0;
-    padding: 1.2em;
-  }
-
-  #previewImage {
-    max-width: 100%;
-    width: 100%;
-  }
-
-  label {
-    margin-top: 1.4em;
-    margin-bottom: 0.5em;
-  }
-
-  input[type="file"],
-  input[type="text"] {
-    padding: 0.9em 1em;
-    font-size: 1em;
-  }
-
-  button {
-    padding: 1em;
-    font-size: 1.05em;
-  }
-
-  .back-btn {
-    margin-top: 1.8em;
-  }
+#result {
+  margin-top: 1.4em;
+  padding: 1em 1.2em;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 40, 80, 0.06);
+  font-size: 0.9em;
+  text-align: left;
+  word-break: break-all;
 }
+
+/* 反映チェックボタン */
+#checkReflectBtn {
+  margin-top: 10px;
+  padding: 0.6em 1em;
+  background: #006bb3;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#checkReflectBtn:hover {
+  background: #005a94;
+}
+
+/* ================================
+   戻るボタン
+================================ */
+
+.back-btn {
+  margin-top: 1.4em;
+  padding: 0.7em 1.2em;
+  background: #ddd;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #ccc;
+}
+
+/* ================================
+   削除モード（一覧）
+================================ */
+
+.frame-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1em;
+  margin-top: 1em;
+}
+
+.frame-item {
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.8em;
+  box-shadow: 0 2px 8px rgba(0, 40, 80, 0.06);
+  text-align: center;
+}
+
+.frame-thumb {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.delete-btn {
+  margin-top: 0.6em;
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 0.45em 0.9em;
+  border-radius: 6px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.delete-btn:hover
