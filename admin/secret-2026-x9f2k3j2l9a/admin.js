@@ -2,6 +2,9 @@
 // FrameLab 管理画面 admin.js（完全版）
 // ================================
 
+// ★ 必ずあなたの Worker URL に変更
+const WORKER_ENDPOINT = "https://YOUR-WORKER.workers.dev";
+
 // DOM取得
 const modeSelect = document.getElementById("modeSelect");
 const addModeCard = document.getElementById("addModeCard");
@@ -31,16 +34,15 @@ let selectedFile = null;
 let pendingUploadData = null;
 
 // ================================
-// モード切り替え
+// モード切り替え（フェードアニメ統一）
 // ================================
-
 function showCard(card) {
   modeSelect.style.display = "none";
   addModeCard.style.display = "none";
   deleteModeCard.style.display = "none";
 
-  card.classList.add("fade");
   card.style.display = "block";
+  card.classList.add("fade");
 
   setTimeout(() => {
     card.classList.add("show");
@@ -59,7 +61,6 @@ backToSelectFromDelete.onclick = () => location.reload();
 // ================================
 // プレビュー表示
 // ================================
-
 frameInput.addEventListener("change", () => {
   selectedFile = frameInput.files[0];
   if (!selectedFile) return;
@@ -69,100 +70,14 @@ frameInput.addEventListener("change", () => {
     previewImage.src = e.target.result;
     previewBox.style.display = "block";
 
-    setTimeout(() => {
-      previewImage.classList.add("show");
-    }, 10);
+    setTimeout(() => previewImage.classList.add("show"), 10);
   };
   reader.readAsDataURL(selectedFile);
 });
 
 // ================================
-// アップロード処理
+// 成功・エラー表示（高級UI）
 // ================================
-
-uploadBtn.addEventListener("click", async () => {
-  if (!selectedFile) {
-    showError("画像が選択されていません。");
-    return;
-  }
-  if (!frameName.value.trim()) {
-    showError("フレーム名を入力してください。");
-    return;
-  }
-
-  uploadBtn.classList.add("loading");
-  uploadBtn.innerHTML = `<span class="loading-spinner"></span> アップロード中...`;
-
-  const formData = new FormData();
-  formData.append("file", selectedFile);
-  formData.append("name", frameName.value.trim());
-
-  const res = await fetch("/upload", { method: "POST", body: formData });
-  const data = await res.json();
-
-  uploadBtn.classList.remove("loading");
-  uploadBtn.textContent = "アップロード";
-
-  if (!data.success) {
-    if (data.error.message.includes("sha")) {
-      pendingUploadData = formData;
-      showOverwriteDialog();
-    } else {
-      showError(`エラー: ${data.error.message}`);
-    }
-    return;
-  }
-
-  if (data.data.overwrite) {
-    showSuccess("既存のフレームを上書きしました。<br>ユーザー画面で反映をご確認いただけます。");
-  } else {
-    showSuccess("アップロードが完了しました。<br>ユーザー画面で反映をご確認いただけます。");
-  }
-});
-
-// ================================
-// 上書き確認ダイアログ
-// ================================
-
-function showOverwriteDialog() {
-  overwriteDialog.style.display = "flex";
-}
-
-overwriteNo.onclick = () => {
-  overwriteDialog.style.display = "none";
-  pendingUploadData = null;
-};
-
-overwriteYes.onclick = async () => {
-  if (!pendingUploadData) return;
-
-  overwriteDialog.style.display = "none";
-
-  uploadBtn.classList.add("loading");
-  uploadBtn.innerHTML = `<span class="loading-spinner"></span> 上書き中...`;
-
-  const res = await fetch("/upload?overwrite=true", {
-    method: "POST",
-    body: pendingUploadData
-  });
-  const data = await res.json();
-
-  uploadBtn.classList.remove("loading");
-  uploadBtn.textContent = "アップロード";
-
-  if (!data.success) {
-    showError(`エラー: ${data.error.message}`);
-    return;
-  }
-
-  showSuccess("既存のフレームを上書きしました。<br>ユーザー画面で反映をご確認いただけます。");
-  pendingUploadData = null;
-};
-
-// ================================
-// 成功・エラー表示（高級版）
-// ================================
-
 function showError(message) {
   resultBox.innerHTML = `
     <div class="error-box">
@@ -182,13 +97,115 @@ function showSuccess(message) {
 }
 
 // ================================
+// アップロード（JSON送信 完全版）
+// ================================
+uploadBtn.addEventListener("click", async () => {
+  if (!selectedFile) {
+    showError("画像が選択されていません。");
+    return;
+  }
+  if (!frameName.value.trim()) {
+    showError("フレーム名を入力してください。");
+    return;
+  }
+
+  uploadBtn.classList.add("loading");
+  uploadBtn.innerHTML = `<span class="loading-spinner"></span> アップロード中...`;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result;
+
+    const payload = {
+      filename: frameName.value.trim(),
+      content: base64
+    };
+
+    try {
+      const res = await fetch(`${WORKER_ENDPOINT}/upload`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      uploadBtn.classList.remove("loading");
+      uploadBtn.textContent = "アップロード";
+
+      if (!data.success) {
+        if (data.error.message.includes("exists")) {
+          pendingUploadData = payload;
+          showOverwriteDialog();
+        } else {
+          showError(`エラー: ${data.error.message}`);
+        }
+        return;
+      }
+
+      showSuccess(
+        data.data.overwrite
+          ? "既存のフレームを上書きしました。"
+          : "アップロードが完了しました。"
+      );
+
+    } catch (err) {
+      uploadBtn.classList.remove("loading");
+      uploadBtn.textContent = "アップロード";
+      showError("通信エラーが発生しました。");
+    }
+  };
+
+  reader.readAsDataURL(selectedFile);
+});
+
+// ================================
+// 上書き確認ダイアログ（JSON送信）
+// ================================
+function showOverwriteDialog() {
+  overwriteDialog.style.display = "flex";
+}
+
+overwriteNo.onclick = () => {
+  overwriteDialog.style.display = "none";
+  pendingUploadData = null;
+};
+
+overwriteYes.onclick = async () => {
+  if (!pendingUploadData) return;
+
+  overwriteDialog.style.display = "none";
+
+  uploadBtn.classList.add("loading");
+  uploadBtn.innerHTML = `<span class="loading-spinner"></span> 上書き中...`;
+
+  const res = await fetch(`${WORKER_ENDPOINT}/upload`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(pendingUploadData)
+  });
+
+  const data = await res.json();
+
+  uploadBtn.classList.remove("loading");
+  uploadBtn.textContent = "アップロード";
+
+  if (!data.success) {
+    showError(`エラー: ${data.error.message}`);
+    return;
+  }
+
+  showSuccess("既存のフレームを上書きしました。");
+  pendingUploadData = null;
+};
+
+// ================================
 // 削除モード：一覧取得
 // ================================
-
 async function loadFrameList() {
   frameList.innerHTML = "読み込み中...";
 
-  const res = await fetch("/list");
+  const res = await fetch(`${WORKER_ENDPOINT}/list`);
   const data = await res.json();
 
   if (!data.success) {
@@ -217,19 +234,22 @@ async function loadFrameList() {
 }
 
 // ================================
-// 削除処理
+// 削除処理（JSON送信 完全版）
 // ================================
-
 async function deleteFrame(name) {
-  const res = await fetch(`/delete?name=${encodeURIComponent(name)}`, {
-    method: "DELETE"
+  const res = await fetch(`${WORKER_ENDPOINT}/delete`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: name })
   });
+
   const data = await res.json();
 
   if (!data.success) {
-    alert("削除に失敗しました。");
+    showError("削除に失敗しました。");
     return;
   }
 
+  showSuccess("削除が完了しました。");
   loadFrameList();
 }
