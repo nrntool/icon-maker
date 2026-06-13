@@ -15,29 +15,39 @@ const modeSelect = document.getElementById("modeSelect");
 const backToSelectFromAdd = document.getElementById("backToSelectFromAdd");
 const backToSelectFromDelete = document.getElementById("backToSelectFromDelete");
 
+// ▼ フェード表示関数
+function showCard(card) {
+  card.style.display = "block";
+  requestAnimationFrame(() => card.classList.add("show"));
+}
+
+function hideCard(card) {
+  card.classList.remove("show");
+  setTimeout(() => (card.style.display = "none"), 300);
+}
+
+// ▼ モード切り替えイベント
 addModeBtn.addEventListener("click", () => {
-  modeSelect.style.display = "none";
-  addModeCard.style.display = "block";
-  deleteModeCard.style.display = "none";
+  hideCard(modeSelect);
+  hideCard(deleteModeCard);
+  showCard(addModeCard);
 });
 
 deleteModeBtn.addEventListener("click", () => {
-  modeSelect.style.display = "none";
-  addModeCard.style.display = "none";
-  deleteModeCard.style.display = "block";
+  hideCard(modeSelect);
+  hideCard(addModeCard);
+  showCard(deleteModeCard);
   loadFrameList();
 });
 
 backToSelectFromAdd.addEventListener("click", () => {
-  addModeCard.style.display = "none";
-  deleteModeCard.style.display = "none";
-  modeSelect.style.display = "block";
+  hideCard(addModeCard);
+  showCard(modeSelect);
 });
 
 backToSelectFromDelete.addEventListener("click", () => {
-  addModeCard.style.display = "none";
-  deleteModeCard.style.display = "none";
-  modeSelect.style.display = "block";
+  hideCard(deleteModeCard);
+  showCard(modeSelect);
 });
 
 // ▼ 追加モード
@@ -113,7 +123,7 @@ uploadBtn.addEventListener("click", async () => {
 
     overwriteYes.onclick = () => {
       overwriteDialog.style.display = "none";
-      uploadFrame(file, frameName); // 上書き実行
+      uploadFrame(file, frameName);
     };
 
     overwriteNo.onclick = () => {
@@ -123,7 +133,6 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
-  // ▼ 新規アップロード
   uploadFrame(file, frameName);
 });
 
@@ -189,7 +198,7 @@ document.addEventListener("click", async (e) => {
     });
 
     if (res.status === 200) {
-      statusBox.innerHTML = `✅ 反映されています！`;
+      statusBox.innerHTML = `✅ 反映されています。`;
       statusBox.style.color = "#0a8a0a";
     } else {
       statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
@@ -215,6 +224,12 @@ async function loadFrameList() {
 
     listBox.innerHTML = "";
 
+    // ▼ フレームが存在しない場合（落ち着いたトーン）
+    if (!Array.isArray(data) || data.length === 0) {
+      listBox.innerHTML = "現在、削除できるフレームはありません。";
+      return;
+    }
+
     data.forEach(item => {
       if (!item.name.endsWith(".png")) return;
 
@@ -233,7 +248,7 @@ async function loadFrameList() {
     });
 
   } catch {
-    listBox.innerHTML = "読み込みに失敗しました。";
+    listBox.innerHTML = "現在、削除できるフレームはありません。";
   }
 }
 
@@ -255,10 +270,12 @@ document.addEventListener("click", async (e) => {
       body: JSON.stringify({ filename })
     });
 
-    if (res.ok) {
+    const data = await res.json();
+
+    if (data.success) {
       e.target.parentElement.remove();
     } else {
-      alert("削除に失敗しました");
+      alert(`削除に失敗しました：${data.error.message}`);
     }
   } catch {
     alert("通信エラーが発生しました");
