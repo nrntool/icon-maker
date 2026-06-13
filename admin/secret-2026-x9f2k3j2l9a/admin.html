@@ -23,47 +23,35 @@
     </div>
   </div>
 
-  <!-- ▼ 追加モード（最初は非表示） -->
-  <div id="addModeCard" class="app-card" style="display:none;">
+  <!-- ▼ 追加モード -->
+<div id="addModeCard" class="app-card" style="display:none;">
+  <h2 class="mode-title">フレーム追加モード</h2>
+  <p class="subtext">フレーム画像をアップロードして登録できます。</p>
 
-    <h2 class="mode-title">フレーム追加モード</h2>
-    <p class="subtext">フレーム画像をアップロードして登録できます。</p>
+  <!-- 既存のフォーム部分 -->
+  <label><span class="step-badge">1</span>画像を選択</label>
+  <input type="file" id="frameInput" accept="image/*" />
+  <div id="previewBox"><img id="previewImage" src="" alt="プレビュー" /></div>
 
-    <!-- STEP 1：画像選択 -->
-    <label>
-      <span class="step-badge">1</span>
-      アップロードする画像を選択
-    </label>
-    <input type="file" id="frameInput" accept="image/*" />
+  <label><span class="step-badge">2</span>フレーム名を入力</label>
+  <input type="text" id="frameName" placeholder="例：予約バトル" />
+  <button id="uploadBtn">アップロード</button>
+  <div id="result"></div>
 
-    <!-- プレビュー -->
-    <div id="previewBox">
-      <img id="previewImage" src="" alt="プレビュー" />
-    </div>
+  <!-- ▼ 戻るボタン -->
+  <button id="backToSelectFromAdd" class="back-btn">← 戻る</button>
+</div>
 
-    <!-- STEP 2：フレーム名入力 -->
-    <label>
-      <span class="step-badge">2</span>
-      フレーム名を入力
-    </label>
-    <input type="text" id="frameName" placeholder="例：予約バトル" />
+<!-- ▼ 削除モード -->
+<div id="deleteModeCard" class="app-card" style="display:none;">
+  <h2 class="mode-title">フレーム削除モード</h2>
+  <p class="subtext">アップロード済みのフレームを一覧から削除できます。</p>
 
-    <!-- STEP 3：アップロード -->
-    <button id="uploadBtn">アップロード</button>
+  <div id="frameList" class="frame-list"></div>
 
-    <!-- STEP 4：結果表示 -->
-    <div id="result"></div>
-  </div>
-
-  <!-- ▼ 削除モード -->
-  <div id="deleteModeCard" class="app-card" style="display:none;">
-    <h2 class="mode-title">フレーム削除モード</h2>
-    <p class="subtext">アップロード済みのフレームを一覧から削除できます。</p>
-
-    <div id="frameList" class="frame-list">
-      <!-- JS がここに一覧を生成 -->
-    </div>
-  </div>
+  <!-- ▼ 戻るボタン -->
+  <button id="backToSelectFromDelete" class="back-btn">← 戻る</button>
+</div>
 
   <script src="admin.js"></script>
 </body>
