@@ -11,6 +11,10 @@ const addModeCard = document.getElementById("addModeCard");
 const deleteModeCard = document.getElementById("deleteModeCard");
 const modeSelect = document.getElementById("modeSelect");
 
+// ▼ 戻るボタン
+const backToSelectFromAdd = document.getElementById("backToSelectFromAdd");
+const backToSelectFromDelete = document.getElementById("backToSelectFromDelete");
+
 addModeBtn.addEventListener("click", () => {
   modeSelect.style.display = "none";
   addModeCard.style.display = "block";
@@ -22,6 +26,19 @@ deleteModeBtn.addEventListener("click", () => {
   addModeCard.style.display = "none";
   deleteModeCard.style.display = "block";
   loadFrameList();
+});
+
+// ▼ 戻る処理
+backToSelectFromAdd.addEventListener("click", () => {
+  addModeCard.style.display = "none";
+  deleteModeCard.style.display = "none";
+  modeSelect.style.display = "block";
+});
+
+backToSelectFromDelete.addEventListener("click", () => {
+  addModeCard.style.display = "none";
+  deleteModeCard.style.display = "none";
+  modeSelect.style.display = "block";
 });
 
 // ▼ 追加モード（アップロード処理）
@@ -216,4 +233,3 @@ document.addEventListener("click", async (e) => {
     alert("通信エラーが発生しました");
   }
 });
-
