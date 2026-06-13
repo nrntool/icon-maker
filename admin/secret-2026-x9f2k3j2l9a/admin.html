@@ -42,14 +42,20 @@
     <!-- アップロード -->
     <button id="uploadBtn">アップロード</button>
 
-    <!-- 結果表示 -->
+    <!-- 結果表示（成功・エラー共通） -->
     <div id="result"></div>
 
-    <!-- ▼ 上書き警告ダイアログ -->
-    <div id="overwriteDialog" class="dialog" style="display:none;">
-      <p>⚠ 同じ名前のフレームが既に存在します。<br>上書きしてもよろしいですか？</p>
-      <button id="overwriteYes" class="dialog-btn yes">はい</button>
-      <button id="overwriteNo" class="dialog-btn no">キャンセル</button>
+    <!-- ▼ 上書き確認ダイアログ（高級版） -->
+    <div id="overwriteDialog" class="overwrite-dialog" style="display:none;">
+      <div class="overwrite-icon">!</div>
+      <div>
+        <div>同じ名前のフレームがすでに登録されています。上書きしますか？</div>
+
+        <div class="overwrite-actions">
+          <button id="overwriteYes" class="dialog-btn-yes">上書きする</button>
+          <button id="overwriteNo" class="dialog-btn-no">キャンセル</button>
+        </div>
+      </div>
     </div>
 
     <!-- ▼ 戻るボタン -->
