@@ -325,7 +325,7 @@ input[type="text"] {
   font-weight: 600;
   letter-spacing: 0.03em;
   border: none;
-  border-radius: 12px; /* ← 角丸を完全統一 */
+  border-radius: 12px;
   padding: 0.9em 1.6em;
   cursor: pointer;
   position: relative;
@@ -336,7 +336,6 @@ input[type="text"] {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 光の反射ライン */
 #uploadBtn::before {
   content: "";
   position: absolute;
@@ -352,7 +351,6 @@ input[type="text"] {
   transform: skewX(-25deg);
 }
 
-/* ホバー時 */
 #uploadBtn:hover {
   transform: translateY(-2px);
   box-shadow:
@@ -365,10 +363,10 @@ input[type="text"] {
   transition: left 0.8s ease;
 }
 
-/* クリック時 */
 #uploadBtn:active {
   transform: scale(0.97);
   box-shadow:
     0 3px 10px rgba(90,125,168,0.3),
     inset 0 0 20px rgba(255,255,255,0.25);
 }
+
