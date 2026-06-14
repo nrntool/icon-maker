@@ -301,3 +301,10 @@ document.addEventListener("click", async (e) => {
     alert("通信エラーが発生しました");
   }
 });
+
+// ページ読み込み時にモード選択カードを表示
+window.addEventListener("DOMContentLoaded", () => {
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.style.display = "block";
+  modeSelect.classList.add("show");
+});
