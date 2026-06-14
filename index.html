@@ -43,6 +43,11 @@
 
   </div>
 
-  <script src="script.js"></script>
+  <script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const card = document.querySelector(".app-card");
+    if (card) card.classList.add("show");
+  });
+</script>
 </body>
 </html>
