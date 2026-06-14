@@ -1,5 +1,5 @@
 /* ================================
-   管理画面 CSS
+   管理画面 CSS（FrameLab 完全版）
 ================================ */
 
 /* ベースフォント（日本語＋英字） */
@@ -54,7 +54,7 @@ body {
     0 22px 50px rgba(0,0,0,0.06);
 }
 
-/* タイトル（フォントを軽くして高級感UP） */
+/* タイトル */
 .mode-title {
   font-size: 1.35em;
   font-weight: 500;
@@ -89,7 +89,7 @@ body {
 .mode-btn {
   flex: 1;
   padding: 0.85em;
-  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #6f8fbc 100%);
   color: #fff;
   border: none;
   border-radius: 11px;
@@ -131,7 +131,7 @@ body {
 }
 
 .mode-btn:hover {
-  background: linear-gradient(135deg, #4a6b92 0%, #5f7fa6 100%);
+  background: linear-gradient(135deg, var(--accent-hover) 0%, #5f7fa6 100%);
   transform: translateY(-2px);
   box-shadow:
     0 5px 14px rgba(90,125,168,0.3),
@@ -183,12 +183,38 @@ input[type="text"] {
 }
 
 /* ================================
-   プレビュー・アップロード・結果表示
+   プレビュー（完全修正版）
 ================================ */
 
 #previewBox {
+  margin: 1.2em 0;
+  padding: 1.2em;
   background: rgba(250, 250, 250, 0.9);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  display: none;
 }
+
+#previewImage {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  display: block;
+  margin: 0 auto;
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#previewImage.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ================================
+   結果表示
+================================ */
 
 #uploadBtn {
   font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
@@ -215,4 +241,82 @@ input[type="text"] {
   font-family: "Segoe UI", "Noto Sans JP", sans-serif;
   font-weight: 500;
   letter-spacing: 0.01em;
+}
+
+/* ================================
+   スマホ最適化＋アニメーション最適化
+================================ */
+
+@media (max-width: 600px) {
+
+  .app-card {
+    width: 94%;
+    padding: 1.6em 1.3em;
+    margin: 1.4em auto 2em;
+    border-radius: 16px;
+  }
+
+  .mode-title {
+    font-size: 1.32em;
+  }
+
+  .subtext {
+    font-size: 0.95em;
+  }
+
+  label {
+    font-size: 0.95em;
+    margin-top: 1.4em;
+  }
+
+  input[type="file"],
+  input[type="text"] {
+    padding: 0.9em 1em;
+    font-size: 1em;
+  }
+
+  #previewBox {
+    padding: 1.2em;
+    border-radius: 14px;
+  }
+
+  #previewImage {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .mode-buttons {
+    flex-direction: column;
+    gap: 0.8em;
+  }
+
+  .mode-btn {
+    width: 100%;
+  }
+
+  /* スマホ用アニメーション軽量化 */
+  .fade {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+
+  .fade.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #previewImage {
+    transform: scale(0.985);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  #previewImage.show {
+    transform: scale(1);
+  }
+
+  button:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
 }
