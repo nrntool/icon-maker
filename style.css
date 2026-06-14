@@ -82,33 +82,30 @@ header .description {
 }
 
 /* ================================
-   ご利用にあたって（行間・余白調整）
+   ご利用にあたって（前のレイアウトに戻す）
 ================================ */
 
 .notice {
   background: rgba(255,255,255,0.55);
   border-radius: 14px;
-  padding: 1.6em 1.4em;
+  padding: 1.6em 1.4em; /* ← 前の広め余白 */
   box-shadow:
     0 3px 12px rgba(0,0,0,0.06),
     inset 0 0 20px rgba(255,255,255,0.15);
-  margin-bottom: 2.4em;
+  margin-bottom: 2.4em; /* ← 下の余白も広め */
 }
 
 .notice h2 {
   font-size: 1.1em;
   font-weight: 500;
   color: #333;
-  margin-bottom: 0.8em;
-  border-bottom: 1px solid rgba(0,0,0,0.15);
-  display: inline-block;
-  padding-bottom: 0.2em;
+  margin-bottom: 0.8em; /* ← タイトル下の余白を広めに */
 }
 
 .notice p {
   font-size: 0.95em;
   color: #555;
-  line-height: 1.9;
+  line-height: 1.9; /* ← 行間を前の自然な広さに */
   letter-spacing: 0.02em;
 }
 
@@ -128,7 +125,7 @@ label {
   display: flex;
   align-items: center;
   font-weight: 500;
-  margin: 1.6em 0 0.6em;
+  margin: 1.6em 0 0.6em; /* ← 前の自然な余白 */
   font-size: 0.95em;
   color: #444;
   letter-spacing: 0.01em;
@@ -150,7 +147,7 @@ input[type="file"],
 select {
   width: 100%;
   max-width: 400px;
-  padding: 1em 1.1em;
+  padding: 1em 1.1em; /* ← 前の余白感 */
   font-size: 0.95em;
   font-family: "Noto Sans JP", "Segoe UI", sans-serif;
   font-weight: 400;
@@ -162,7 +159,7 @@ select {
   box-shadow:
     0 2px 6px rgba(0,0,0,0.04),
     inset 0 0 8px rgba(255,255,255,0.4);
-  margin-bottom: 1.4em;
+  margin-bottom: 1.4em; /* ← 下の余白も前の広さ */
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
@@ -239,7 +236,70 @@ canvas {
 }
 
 /* ================================
-   スマホ最適化（最終ブラッシュアップ）
+   スマホ最適化（完全版）
 ================================ */
 
-@media (max-width: 600px
+@media (max-width: 600px) {
+
+  .app-card {
+    width: 94%;
+    padding: 2em 1.4em;
+    margin: 1.6em auto 2.4em;
+    border-radius: 18px;
+  }
+
+  header h1 {
+    font-size: 1.45em;
+  }
+
+  .description {
+    font-size: 0.95em;
+  }
+
+  .notice {
+    padding: 1.4em 1.2em;
+    margin-bottom: 2em;
+  }
+
+  .notice p {
+    line-height: 1.85;
+  }
+
+  label {
+    margin-top: 1.6em;
+    margin-bottom: 0.8em;
+  }
+
+  input[type="file"],
+  select {
+    padding: 1em;
+    margin-bottom: 1.6em;
+  }
+
+  main {
+    gap: 1.2em;
+  }
+
+  canvas {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+  }
+
+  .button-row {
+    flex-direction: column;
+    gap: 0.9em;
+  }
+
+  .btn-save,
+  .btn-reset {
+    width: 100%;
+    font-size: 1.05em;
+    padding: 1em;
+  }
+
+  button:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+     }
