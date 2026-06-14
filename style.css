@@ -238,3 +238,58 @@ canvas {
   left: 120%;
   transition: left 0.8s ease;
 }
+
+/* ================================
+   Reset ボタン（ガラス感＋青紫トーン）
+================================ */
+
+#resetBtn {
+  background: linear-gradient(135deg, #ffffff 0%, #f3f6ff 100%);
+  color: #4a4a4a;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 12px;
+  padding: 0.9em 1.6em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 12px rgba(120,140,180,0.18),
+    inset 0 0 18px rgba(255,255,255,0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+/* 光の反射ライン（保存ボタンと同じ動き） */
+#resetBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 60%);
+  transform: skewX(-25deg);
+}
+
+/* ホバー時のアニメーション */
+#resetBtn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #fdfdff 0%, #eef2ff 100%);
+  box-shadow:
+    0 6px 18px rgba(120,140,180,0.25),
+    inset 0 0 26px rgba(255,255,255,0.35);
+}
+
+#resetBtn:hover::before {
+  left: 120%;
+  transition: left 0.8s ease;
+}
+
+/* クリック時 */
+#resetBtn:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 3px 10px rgba(120,140,180,0.25),
+    inset 0 0 20px rgba(255,255,255,0.4);
+}
