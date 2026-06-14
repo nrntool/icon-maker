@@ -12,7 +12,7 @@ body {
   letter-spacing: 0.02em;
   color: #222;
   text-align: center;
-  line-height: 1.6;
+  line-height: 1.55; /* 全体の行間を少し詰める */
 }
 
 /* ================================
@@ -23,7 +23,7 @@ body {
   width: 92%;
   max-width: 440px;
   margin: 2em auto;
-  padding: 2.4em 1.8em;
+  padding: 2.2em 1.6em;
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
@@ -62,51 +62,52 @@ body {
 ================================ */
 
 header {
-  margin-bottom: 1.6em;
+  margin-bottom: 1.4em;
 }
 
 header h1 {
-  font-size: 1.6em;
+  font-size: 1.55em;
   font-weight: 600;
   color: #2b2b2b;
   letter-spacing: 0.02em;
   text-shadow: 0 1px 2px rgba(255,255,255,0.6);
-  margin-bottom: 0.3em;
+  margin-bottom: 0.25em;
 }
 
 header .description {
-  font-size: 0.95em;
+  font-size: 0.9em;
   color: #666;
   letter-spacing: 0.03em;
-  margin-bottom: 1.4em;
+  margin-bottom: 1.2em;
+  line-height: 1.5;
 }
 
 /* ================================
-   ご利用にあたって（前のレイアウト再現）
+   ご利用にあたって（行間コンパクト）
 ================================ */
 
 .notice {
   background: rgba(255,255,255,0.55);
   border-radius: 14px;
-  padding: 1.6em 1.4em;
+  padding: 1.2em 1.2em;
   box-shadow:
     0 3px 12px rgba(0,0,0,0.06),
     inset 0 0 20px rgba(255,255,255,0.15);
-  margin-bottom: 2.4em;
+  margin-bottom: 1.8em;
 }
 
 .notice h2 {
-  font-size: 1.1em;
+  font-size: 1.05em;
   font-weight: 500;
   color: #333;
-  margin-bottom: 0.8em;
+  margin-bottom: 0.5em;
 }
 
 .notice p {
-  font-size: 0.95em;
+  font-size: 0.9em;
   color: #555;
-  line-height: 1.9; /* ← 前の行間 */
-  letter-spacing: 0.02em;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
 /* ================================
@@ -116,7 +117,7 @@ header .description {
 main {
   display: flex;
   flex-direction: column;
-  gap: 1.4em;
+  gap: 1.2em;
   width: 100%;
   max-width: 400px;
 }
@@ -125,8 +126,8 @@ label {
   display: flex;
   align-items: center;
   font-weight: 500;
-  margin: 1.6em 0 0.6em; /* ← 前の余白感 */
-  font-size: 0.95em;
+  margin: 1.2em 0 0.4em;
+  font-size: 0.9em;
   color: #444;
   letter-spacing: 0.01em;
 }
@@ -147,8 +148,8 @@ input[type="file"],
 select {
   width: 100%;
   max-width: 400px;
-  padding: 1em 1.1em; /* ← 前の余白に戻す */
-  font-size: 0.95em;
+  padding: 0.8em 1em;
+  font-size: 0.9em;
   font-family: "Noto Sans JP", "Segoe UI", sans-serif;
   font-weight: 400;
   letter-spacing: 0.01em;
@@ -159,7 +160,7 @@ select {
   box-shadow:
     0 2px 6px rgba(0,0,0,0.04),
     inset 0 0 8px rgba(255,255,255,0.4);
-  margin-bottom: 1.4em; /* ← 前の余白 */
+  margin-bottom: 1em;
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
@@ -180,7 +181,7 @@ canvas {
   max-width: 380px;
   border-radius: 14px;
   box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-  margin: 1.2em auto;
+  margin: 1em auto;
   display: block;
 }
 
@@ -191,15 +192,15 @@ canvas {
 .button-row {
   display: flex;
   justify-content: center;
-  gap: 1em;
-  margin-top: 1.8em;
+  gap: 0.8em;
+  margin-top: 1.4em;
 }
 
 .btn-save,
 .btn-reset {
   flex: 1;
-  padding: 0.9em 1.4em;
-  font-size: 1em;
+  padding: 0.85em 1.3em;
+  font-size: 0.95em;
   font-weight: 500;
   letter-spacing: 0.02em;
   border-radius: 12px;
@@ -236,15 +237,15 @@ canvas {
 }
 
 /* ================================
-   スマホ最適化（最終ブラッシュアップ）
+   スマホ最適化（行間コンパクト）
 ================================ */
 
 @media (max-width: 600px) {
 
   .app-card {
     width: 94%;
-    padding: 2em 1.4em;
-    margin: 1.6em auto 2.4em;
+    padding: 1.8em 1.2em;
+    margin: 1.6em auto 2.2em;
     border-radius: 18px;
     box-shadow:
       0 6px 18px rgba(0,0,0,0.08),
@@ -252,23 +253,23 @@ canvas {
   }
 
   .notice {
-    padding: 1.4em 1.2em;
-    margin-bottom: 2em;
+    padding: 1.1em 1em;
+    margin-bottom: 1.6em;
   }
 
   .notice p {
-    line-height: 1.85;
+    line-height: 1.55;
   }
 
   label {
-    margin-top: 1.6em;
-    margin-bottom: 0.8em;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
   }
 
   input[type="file"],
   select {
-    padding: 1em;
-    margin-bottom: 1.6em;
+    padding: 0.8em;
+    margin-bottom: 1.2em;
   }
 
   canvas {
@@ -279,7 +280,7 @@ canvas {
 
   .button-row {
     flex-direction: column;
-    gap: 0.9em;
+    gap: 0.7em;
   }
 
   .btn-save,
