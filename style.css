@@ -235,62 +235,16 @@ canvas {
 }
 
 /* ================================
-   スマホ最適化（完全版）
+   スマホ最適化（最終ブラッシュアップ）
 ================================ */
 
 @media (max-width: 600px) {
 
   .app-card {
     width: 94%;
-    padding: 1.8em 1.3em;
-    margin: 1.4em auto 2em;
-    border-radius: 16px;
-    min-height: auto;
-  }
-
-  header h1 {
-    font-size: 1.4em;
-  }
-
-  .description {
-    font-size: 0.95em;
-  }
-
-  label {
-    font-size: 0.95em;
-    margin-top: 1.4em;
-  }
-
-  input[type="file"],
-  select {
-    padding: 1em;
-    font-size: 1em;
-  }
-
-  main {
-    gap: 1.2em;
-  }
-
-  canvas {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 12px;
-  }
-
-  .button-row {
-    flex-direction: column;
-    gap: 0.8em;
-  }
-
-  .btn-save,
-  .btn-reset {
-    width: 100%;
-    font-size: 1.05em;
-    padding: 1em;
-  }
-
-  button:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  }
-}
+    padding: 2em 1.4em;
+    margin: 1.6em auto 2.4em;
+    border-radius: 18px;
+    box-shadow:
+      0 6px 18px rgba(0,0,0,0.08),
+      inset 0 0 40px
