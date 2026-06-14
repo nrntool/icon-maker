@@ -1,5 +1,5 @@
 /* ================================
-   FrameLab ユーザー画面 CSS（ブランドUI完全版）
+   FrameLab ユーザー画面 CSS（行間コンパクト最終版）
 ================================ */
 
 /* ベースフォント・背景 */
@@ -12,18 +12,18 @@ body {
   letter-spacing: 0.02em;
   color: #222;
   text-align: center;
-  line-height: 1.55; /* 全体の行間を少し詰める */
+  line-height: 1.45; /* ← 全体の行間をさらに詰める */
 }
 
 /* ================================
-   カード（ガラス感＋高級アニメ）
+   カード
 ================================ */
 
 .app-card {
   width: 92%;
   max-width: 440px;
-  margin: 2em auto;
-  padding: 2.2em 1.6em;
+  margin: 1.6em auto;
+  padding: 2em 1.4em;
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
@@ -34,14 +34,10 @@ body {
     inset 0 0 40px rgba(255,255,255,0.15);
   opacity: 0;
   transform: translateY(10px) scale(0.985);
-  transition:
-    opacity 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
-    transform 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
-    box-shadow 0.25s ease;
+  transition: opacity .32s, transform .32s;
   min-height: 92vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
 }
 
@@ -50,64 +46,48 @@ body {
   transform: translateY(0) scale(1);
 }
 
-.app-card:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    0 12px 28px rgba(0,0,0,0.1),
-    inset 0 0 60px rgba(255,255,255,0.25);
-}
-
 /* ================================
    ヘッダー
 ================================ */
 
 header {
-  margin-bottom: 1.4em;
+  margin-bottom: 1.2em;
 }
 
 header h1 {
-  font-size: 1.55em;
+  font-size: 1.5em;
   font-weight: 600;
-  color: #2b2b2b;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.6);
-  margin-bottom: 0.25em;
+  margin-bottom: 0.2em;
 }
 
 header .description {
   font-size: 0.9em;
   color: #666;
-  letter-spacing: 0.03em;
-  margin-bottom: 1.2em;
-  line-height: 1.5;
+  margin-bottom: 1em;
+  line-height: 1.45;
 }
 
 /* ================================
-   ご利用にあたって（行間コンパクト）
+   ご利用にあたって（行間しっかり詰め）
 ================================ */
 
 .notice {
   background: rgba(255,255,255,0.55);
   border-radius: 14px;
-  padding: 1.2em 1.2em;
-  box-shadow:
-    0 3px 12px rgba(0,0,0,0.06),
-    inset 0 0 20px rgba(255,255,255,0.15);
-  margin-bottom: 1.8em;
+  padding: 1.1em 1.1em;
+  margin-bottom: 1.6em;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
 }
 
 .notice h2 {
   font-size: 1.05em;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.4em;
 }
 
 .notice p {
   font-size: 0.9em;
   color: #555;
-  line-height: 1.6;
-  letter-spacing: 0.01em;
+  line-height: 1.38; /* ← ここが一番効く（しっかり詰まる） */
 }
 
 /* ================================
@@ -117,7 +97,7 @@ header .description {
 main {
   display: flex;
   flex-direction: column;
-  gap: 1.2em;
+  gap: 0.8em; /* ← 全体の項目間を詰める */
   width: 100%;
   max-width: 400px;
 }
@@ -125,51 +105,26 @@ main {
 label {
   display: flex;
   align-items: center;
-  font-weight: 500;
-  margin: 1.2em 0 0.4em;
   font-size: 0.9em;
-  color: #444;
-  letter-spacing: 0.01em;
+  margin: 0.8em 0 0.3em; /* ← かなり詰めた */
 }
 
 .step-badge {
-  width: 1.6em;
-  height: 1.6em;
-  margin-right: 0.6em;
-  font-size: 0.85em;
-  font-weight: 500;
-  color: #555;
-  border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.18);
-  background: linear-gradient(180deg, #f9f9f9 0%, #f1f1f1 100%);
+  width: 1.4em;
+  height: 1.4em;
+  margin-right: 0.5em;
+  font-size: 0.8em;
 }
 
 input[type="file"],
 select {
   width: 100%;
-  max-width: 400px;
-  padding: 0.8em 1em;
+  padding: 0.7em 0.9em; /* ← 内側も詰める */
   font-size: 0.9em;
-  font-family: "Noto Sans JP", "Segoe UI", sans-serif;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  color: #333;
+  margin-bottom: 0.8em; /* ← 下の余白も詰める */
   background: rgba(255,255,255,0.85);
+  border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 12px;
-  box-shadow:
-    0 2px 6px rgba(0,0,0,0.04),
-    inset 0 0 8px rgba(255,255,255,0.4);
-  margin-bottom: 1em;
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-input[type="file"]:focus,
-select:focus {
-  border-color: rgba(90,125,168,0.4);
-  box-shadow:
-    0 4px 12px rgba(90,125,168,0.15),
-    inset 0 0 10px rgba(255,255,255,0.5);
 }
 
 /* ================================
@@ -178,11 +133,10 @@ select:focus {
 
 canvas {
   width: 100%;
-  max-width: 380px;
-  border-radius: 14px;
+  max-width: 360px;
+  border-radius: 12px;
+  margin: 0.8em auto;
   box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-  margin: 1em auto;
-  display: block;
 }
 
 /* ================================
@@ -192,106 +146,58 @@ canvas {
 .button-row {
   display: flex;
   justify-content: center;
-  gap: 0.8em;
-  margin-top: 1.4em;
+  gap: 0.7em; /* ← ボタン間も詰める */
+  margin-top: 1.2em;
 }
 
 .btn-save,
 .btn-reset {
   flex: 1;
-  padding: 0.85em 1.3em;
+  padding: 0.75em 1.2em; /* ← ボタンの高さも少し低く */
   font-size: 0.95em;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
-}
-
-.btn-save {
-  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
-  color: #fff;
-  box-shadow:
-    0 4px 12px rgba(90,125,168,0.25),
-    inset 0 0 20px rgba(255,255,255,0.15);
-}
-
-.btn-save:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 6px 18px rgba(90,125,168,0.3),
-    inset 0 0 30px rgba(255,255,255,0.25);
-}
-
-.btn-reset {
-  background: rgba(255,255,255,0.85);
-  color: #444;
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-}
-
-.btn-reset:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 10px;
 }
 
 /* ================================
-   スマホ最適化（行間コンパクト）
+   スマホ最適化
 ================================ */
 
 @media (max-width: 600px) {
 
   .app-card {
     width: 94%;
-    padding: 1.8em 1.2em;
-    margin: 1.6em auto 2.2em;
-    border-radius: 18px;
-    box-shadow:
-      0 6px 18px rgba(0,0,0,0.08),
-      inset 0 0 40px rgba(255,255,255,0.15);
+    padding: 1.6em 1.1em;
+    margin: 1.4em auto 2em;
   }
 
   .notice {
-    padding: 1.1em 1em;
-    margin-bottom: 1.6em;
+    padding: 1em;
+    margin-bottom: 1.4em;
   }
 
   .notice p {
-    line-height: 1.55;
+    line-height: 1.35; /* ← スマホはさらに詰める */
   }
 
   label {
-    margin-top: 1.2em;
-    margin-bottom: 0.6em;
+    margin-top: 0.9em;
+    margin-bottom: 0.4em;
   }
 
   input[type="file"],
   select {
-    padding: 0.8em;
-    margin-bottom: 1.2em;
-  }
-
-  canvas {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 14px;
+    padding: 0.75em;
+    margin-bottom: 1em;
   }
 
   .button-row {
     flex-direction: column;
-    gap: 0.7em;
+    gap: 0.6em;
   }
 
   .btn-save,
   .btn-reset {
     width: 100%;
-    font-size: 1.05em;
-    padding: 1em;
-  }
-
-  button:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    padding: 0.85em;
   }
 }
