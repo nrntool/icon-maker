@@ -315,6 +315,107 @@ input[type="text"] {
     transform: scale(1);
   }
 
+/* ================================
+   管理画面ボタン（ガラス感＋青紫トーン）
+================================ */
+
+/* アップロードボタン */
+#uploadBtn {
+  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9em 1.6em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 12px rgba(90,125,168,0.25),
+    inset 0 0 20px rgba(255,255,255,0.15);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#uploadBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+  transform: skewX(-25deg);
+}
+
+#uploadBtn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 18px rgba(90,125,168,0.3),
+    inset 0 0 30px rgba(255,255,255,0.25);
+}
+
+#uploadBtn:hover::before {
+  left: 120%;
+  transition: left 0.8s ease;
+}
+
+#uploadBtn:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 3px 10px rgba(90,125,168,0.3),
+    inset 0 0 20px rgba(255,255,255,0.25);
+}
+
+/* 戻るボタン */
+#backBtn {
+  background: linear-gradient(135deg, #ffffff 0%, #f3f6ff 100%);
+  color: #4a4a4a;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 12px;
+  padding: 0.9em 1.6em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 12px rgba(120,140,180,0.18),
+    inset 0 0 18px rgba(255,255,255,0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+#backBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 60%);
+  transform: skewX(-25deg);
+}
+
+#backBtn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #fdfdff 0%, #eef2ff 100%);
+  box-shadow:
+    0 6px 18px rgba(120,140,180,0.25),
+    inset 0 0 26px rgba(255,255,255,0.35);
+}
+
+#backBtn:hover::before {
+  left: 120%;
+  transition: left 0.8s ease;
+}
+
+#backBtn:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 3px 10px rgba(120,140,180,0.25),
+    inset 0 0 20px rgba(255,255,255,0.4);
+}
+
   button:active {
     transform: scale(0.97);
     box-shadow: 0 2px 8px rgba(0,0,0,0.12);
