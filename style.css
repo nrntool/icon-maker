@@ -23,6 +23,7 @@ body {
   width: 92%;
   max-width: 440px;
   margin: 2em auto;
+  padding: 2.4em 1.8em;
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
@@ -37,6 +38,11 @@ body {
     opacity 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
     transform 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
     box-shadow 0.25s ease;
+  min-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .app-card.show {
@@ -54,6 +60,10 @@ body {
 /* ================================
    ヘッダー
 ================================ */
+
+header {
+  margin-bottom: 1.6em;
+}
 
 header h1 {
   font-size: 1.6em;
@@ -82,7 +92,7 @@ header .description {
   box-shadow:
     0 3px 12px rgba(0,0,0,0.06),
     inset 0 0 20px rgba(255,255,255,0.15);
-  margin-bottom: 1.6em;
+  margin-bottom: 2.2em;
 }
 
 .notice h2 {
@@ -101,6 +111,14 @@ header .description {
 /* ================================
    入力・選択・キャンバス
 ================================ */
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4em;
+  width: 100%;
+  max-width: 400px;
+}
 
 label {
   display: flex;
@@ -173,7 +191,7 @@ canvas {
   display: flex;
   justify-content: center;
   gap: 1em;
-  margin-top: 1.4em;
+  margin-top: 1.8em;
 }
 
 .btn-save,
@@ -217,15 +235,17 @@ canvas {
 }
 
 /* ================================
-   スマホ最適化
+   スマホ最適化（完全版）
 ================================ */
 
 @media (max-width: 600px) {
+
   .app-card {
     width: 94%;
-    padding: 1.6em 1.3em;
+    padding: 1.8em 1.3em;
     margin: 1.4em auto 2em;
     border-radius: 16px;
+    min-height: auto;
   }
 
   header h1 {
@@ -247,63 +267,30 @@ canvas {
     font-size: 1em;
   }
 
-  .button-row {
-    flex-direction: column;
-    gap: 
-
-/* ================================
-   ユーザー画面レイアウト調整
-================================ */
-
-/* カード全体の高さと余白を調整 */
-.app-card {
-  padding: 2.4em 1.8em;
-  min-height: 92vh; /* 画面全体に近い高さ */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-/* ヘッダーと注意セクションの間隔 */
-header {
-  margin-bottom: 1.6em;
-}
-
-.notice {
-  margin-bottom: 2.2em;
-}
-
-/* メイン要素の縦間隔を広げる */
-main {
-  display: flex;
-  flex-direction: column;
-  gap: 1.4em;
-  width: 100%;
-  max-width: 400px;
-}
-
-/* ボタン行の余白と配置 */
-.button-row {
-  display: flex;
-  justify-content: center;
-  gap: 1em;
-  margin-top: 1.8em;
-}
-
-/* スマホ最適化 */
-@media (max-width: 600px) {
-  .app-card {
-    padding: 1.8em 1.3em;
-    min-height: auto;
-  }
-
   main {
     gap: 1.2em;
+  }
+
+  canvas {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
   }
 
   .button-row {
     flex-direction: column;
     gap: 0.8em;
+  }
+
+  .btn-save,
+  .btn-reset {
+    width: 100%;
+    font-size: 1.05em;
+    padding: 1em;
+  }
+
+  button:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   }
 }
