@@ -134,7 +134,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
   border-color: #bbb;
 }
 
-/* キャンバス（スマホ安定版） */
+/* キャンバス */
 canvas {
   width: 100%;
   max-width: 360px;
@@ -156,93 +156,42 @@ canvas {
   flex-wrap: wrap;
 }
 
-.button-row button {
-  flex: 1;
-  min-width: 120px;
-  padding: 0.9em;
-  font-size: 0.95em;
-  border-radius: 8px;
-  cursor: pointer;
-  background: #ffffff;
-  color: #333;
-  border: 1.5px solid #ccc;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
 /* ================================
-   保存ボタン（ガラス感＋青紫トーン＋角丸12px）
+   ▼ 全ボタン共通（光沢ライン＋影＋フォント統一）
 ================================ */
 
-#saveBtn {
-  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
-  color: #fff;
-  border: none;
+.button-row button,
+#saveBtn,
+#resetBtn {
+  width: 240px;
+  height: 54px;
+  padding: 0;
   border-radius: 12px;
-  padding: 0.9em 1.6em;
-  font-size: 0.95em;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
   font-weight: 600;
   letter-spacing: 0.03em;
+  font-size: 0.95em;
+
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
+
   box-shadow:
     0 4px 12px rgba(90,125,168,0.25),
     inset 0 0 20px rgba(255,255,255,0.15);
+
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-#saveBtn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -40%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
-  transform: skewX(-25deg);
-}
-
-#saveBtn:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 6px 18px rgba(90,125,168,0.3),
-    inset 0 0 30px rgba(255,255,255,0.25);
-}
-
-#saveBtn:hover::before {
-  left: 120%;
-  transition: left 0.8s ease;
-}
-
-#saveBtn:active {
-  transform: scale(0.97);
-  box-shadow:
-    0 3px 10px rgba(90,125,168,0.3),
-    inset 0 0 20px rgba(255,255,255,0.25);
-}
-
-/* ================================
-   Reset ボタン（ガラス感＋青紫トーン＋角丸12px）
-================================ */
-
-#resetBtn {
-  background: linear-gradient(135deg, #ffffff 0%, #f3f6ff 100%);
-  color: #4a4a4a;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  border: 1px solid rgba(255,255,255,0.6);
-  border-radius: 12px;
-  padding: 0.9em 1.6em;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    0 4px 12px rgba(120,140,180,0.18),
-    inset 0 0 18px rgba(255,255,255,0.25);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-}
-
+/* 光沢ライン（共通） */
+.button-row button::before,
+#saveBtn::before,
 #resetBtn::before {
   content: "";
   position: absolute;
@@ -250,26 +199,52 @@ canvas {
   left: -40%;
   width: 80%;
   height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 60%);
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0) 60%
+  );
   transform: skewX(-25deg);
-}
-
-#resetBtn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #fdfdff 0%, #eef2ff 100%);
-  box-shadow:
-    0 6px 18px rgba(120,140,180,0.25),
-    inset 0 0 26px rgba(255,255,255,0.35);
-}
-
-#resetBtn:hover::before {
-  left: 120%;
   transition: left 0.8s ease;
 }
 
+.button-row button:hover::before,
+#saveBtn:hover::before,
+#resetBtn:hover::before {
+  left: 120%;
+}
+
+/* ホバー時 */
+.button-row button:hover,
+#saveBtn:hover,
+#resetBtn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 18px rgba(90,125,168,0.3),
+    inset 0 0 30px rgba(255,255,255,0.25);
+}
+
+/* クリック時 */
+.button-row button:active,
+#saveBtn:active,
 #resetBtn:active {
   transform: scale(0.97);
   box-shadow:
-    0 3px 10px rgba(120,140,180,0.25),
-    inset 0 0 20px rgba(255,255,255,0.4);
+    0 3px 10px rgba(90,125,168,0.3),
+    inset 0 0 20px rgba(255,255,255,0.25);
+}
+
+/* ================================
+   ▼ 個別色（save / reset）
+================================ */
+
+#saveBtn {
+  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
+  color: #fff;
+}
+
+#resetBtn {
+  background: linear-gradient(135deg, #ffffff 0%, #f3f6ff 100%);
+  color: #4a4a4a;
+  border: 1px solid rgba(255,255,255,0.6);
 }
