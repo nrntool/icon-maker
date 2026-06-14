@@ -192,3 +192,49 @@ canvas {
   background: #004f8a;
   box-shadow: 0 2px 6px rgba(0, 40, 80, 0.3);
 }
+
+/* ================================
+   FrameLab ボタン（ガラス感＋青紫トーン）
+================================ */
+
+.btn-save {
+  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9em 1.6em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 12px rgba(90,125,168,0.25),
+    inset 0 0 20px rgba(255,255,255,0.15);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* 光の反射ライン（ガラス感） */
+.btn-save::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+  transform: skewX(-25deg);
+}
+
+/* ホバー時のアニメーション */
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 18px rgba(90,125,168,0.3),
+    inset 0 0 30px rgba(255,255,255,0.25);
+}
+
+.btn-save:hover::before {
+  left: 120%;
+  transition: left 0.8s ease;
+}
