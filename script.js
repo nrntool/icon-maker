@@ -1,5 +1,5 @@
 // ================================
-// FrameLab ドラッグ慣性つき完全版（ズレゼロ修正版）
+// FrameLab ドラッグ慣性なし完全版（ズレゼロ）
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -124,13 +124,8 @@ let lastX = null;
 let lastY = null;
 let lastDist = null;
 
-// ▼ 慣性用の速度
-let vx = 0;
-let vy = 0;
-let lastMoveTime = 0;
-
 // ================================
-// ▼ タッチ開始（ズレゼロ修正版）
+// ▼ タッチ開始（ズレゼロ）
 // ================================
 canvas.addEventListener("touchstart", (e) => {
   const rect = canvas.getBoundingClientRect();
@@ -140,10 +135,6 @@ canvas.addEventListener("touchstart", (e) => {
 
     lastX = e.touches[0].clientX - rect.left;
     lastY = e.touches[0].clientY - rect.top;
-
-    vx = 0;
-    vy = 0;
-    lastMoveTime = performance.now();
   }
 
   if (e.touches.length === 2) {
@@ -152,7 +143,7 @@ canvas.addEventListener("touchstart", (e) => {
 });
 
 // ================================
-// ▼ タッチ移動（ピンチ＋ドラッグ慣性）
+// ▼ タッチ移動（ピンチ＋ドラッグ）
 // ================================
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
@@ -180,63 +171,33 @@ canvas.addEventListener("touchmove", (e) => {
     return;
   }
 
-  // ▼ 1本指ドラッグ（慣性つき）
+  // ▼ 1本指ドラッグ
   if (e.touches.length === 1 && isDragging) {
     const x = e.touches[0].clientX - rect.left;
     const y = e.touches[0].clientY - rect.top;
 
-    const now = performance.now();
-    const dt = now - lastMoveTime;
-
     const dx = x - lastX;
     const dy = y - lastY;
-
-    vx = dx / dt;
-    vy = dy / dt;
 
     offsetX += dx;
     offsetY += dy;
 
     lastX = x;
     lastY = y;
-    lastMoveTime = now;
 
     redraw();
   }
 }, { passive: false });
 
 // ================================
-// ▼ タッチ終了 → 慣性開始
+// ▼ タッチ終了（慣性なし → ピタッと止まる）
 // ================================
 canvas.addEventListener("touchend", () => {
   isDragging = false;
   lastX = null;
   lastY = null;
   lastDist = null;
-  startInertia();
 });
-
-// ▼ 慣性アニメーション
-function startInertia() {
-  const friction = 0.95;
-  const minSpeed = 0.001;
-
-  function animate() {
-    offsetX += vx * 16;
-    offsetY += vy * 16;
-
-    vx *= friction;
-    vy *= friction;
-
-    redraw();
-
-    if (Math.abs(vx) > minSpeed || Math.abs(vy) > minSpeed) {
-      requestAnimationFrame(animate);
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
 
 // ▼ 描画
 function redraw() {
