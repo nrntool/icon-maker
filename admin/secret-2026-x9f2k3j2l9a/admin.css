@@ -223,130 +223,26 @@ input[type="text"] {
 }
 
 /* ================================
+   ボタン共通サイズ・配置
+================================ */
+
+#uploadBtn,
+.back-btn {
+  width: 220px;
+  height: 52px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.95em;
+  box-sizing: border-box;
+  margin: 0.6em auto;
+}
+
+/* ================================
    戻るボタン（ガラスUI）
 ================================ */
 
 .back-btn {
   background: linear-gradient(135deg, #ffffff 0%, #f3f6ff 100%);
   color: #4a4a4a;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  border: 1px solid rgba(255,255,255,0.6);
-  border-radius: 12px;
-  padding: 0.9em 1.6em;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    0 4px 12px rgba(120,140,180,0.18),
-    inset 0 0 18px rgba(255,255,255,0.25);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-}
-
-.back-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -40%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 60%);
-  transform: skewX(-25deg);
-}
-
-.back-btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #fdfdff 0%, #eef2ff 100%);
-  box-shadow:
-    0 6px 18px rgba(120,140,180,0.25),
-    inset 0 0 26px rgba(255,255,255,0.35);
-}
-
-.back-btn:hover::before {
-  left: 120%;
-  transition: left 0.8s ease;
-}
-
-.back-btn:active {
-  transform: scale(0.97);
-  box-shadow:
-    0 3px 10px rgba(120,140,180,0.25),
-    inset 0 0 20px rgba(255,255,255,0.4);
-}
-
-/* ================================
-   アップロードボタン（ガラスUI）
-================================ */
-
-#uploadBtn {
-  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
-  color: #fff;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  border: none;
-  border-radius: 12px;
-  padding: 0.9em 1.6em;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    0 4px 12px rgba(90,125,168,0.25),
-    inset 0 0 20px rgba(255,255,255,0.15);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-#uploadBtn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -40%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    rgba(255,255,255,0.4) 0%,
-    rgba(255,255,255,0) 60%
-  );
-  transform: skewX(-25deg);
-}
-
-#uploadBtn:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 6px 18px rgba(90,125,168,0.3),
-    inset 0 0 30px rgba(255,255,255,0.25);
-}
-
-#uploadBtn:hover::before {
-  left: 120%;
-  transition: left 0.8s ease;
-}
-
-#uploadBtn:active {
-  transform: scale(0.97);
-  box-shadow:
-    0 3px 10px rgba(90,125,168,0.3),
-    inset 0 0 20px rgba(255,255,255,0.25);
-}
-
-/* ================================
-   スマホ最適化
-================================ */
-
-@media (max-width: 600px) {
-  .app-card {
-    width: 94%;
-    padding: 1.6em 1.3em;
-    margin: 1.4em auto 2em;
-    border-radius: 16px;
-  }
-
-  .mode-buttons {
-    flex-direction: column;
-    gap: 0.8em;
-  }
-
-  .mode-btn {
-    width: 100%;
-  }
-}
