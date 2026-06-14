@@ -183,7 +183,7 @@ input[type="text"] {
 }
 
 /* ================================
-   プレビュー（完全修正版）
+   プレビュー
 ================================ */
 
 #previewBox {
@@ -216,12 +216,6 @@ input[type="text"] {
    結果表示
 ================================ */
 
-#uploadBtn {
-  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
 #result {
   font-family: "Noto Sans JP", "Segoe UI", sans-serif;
   font-weight: 400;
@@ -229,94 +223,59 @@ input[type="text"] {
 }
 
 /* ================================
-   削除モード
+   戻るボタン（ガラスUI）
 ================================ */
 
-.frame-item {
-  font-family: "Noto Sans JP", "Segoe UI", sans-serif;
-  font-weight: 400;
+.back-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #f3f6ff 100%);
+  color: #4a4a4a;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 12px;
+  padding: 0.9em 1.6em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 4px 12px rgba(120,140,180,0.18),
+    inset 0 0 18px rgba(255,255,255,0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
-.delete-btn {
-  font-family: "Segoe UI", "Noto Sans JP", sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+.back-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 60%);
+  transform: skewX(-25deg);
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #fdfdff 0%, #eef2ff 100%);
+  box-shadow:
+    0 6px 18px rgba(120,140,180,0.25),
+    inset 0 0 26px rgba(255,255,255,0.35);
+}
+
+.back-btn:hover::before {
+  left: 120%;
+  transition: left 0.8s ease;
+}
+
+.back-btn:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 3px 10px rgba(120,140,180,0.25),
+    inset 0 0 20px rgba(255,255,255,0.4);
 }
 
 /* ================================
-   スマホ最適化＋アニメーション最適化
-================================ */
-
-@media (max-width: 600px) {
-
-  .app-card {
-    width: 94%;
-    padding: 1.6em 1.3em;
-    margin: 1.4em auto 2em;
-    border-radius: 16px;
-  }
-
-  .mode-title {
-    font-size: 1.32em;
-  }
-
-  .subtext {
-    font-size: 0.95em;
-  }
-
-  label {
-    font-size: 0.95em;
-    margin-top: 1.4em;
-  }
-
-  input[type="file"],
-  input[type="text"] {
-    padding: 0.9em 1em;
-    font-size: 1em;
-  }
-
-  #previewBox {
-    padding: 1.2em;
-    border-radius: 14px;
-  }
-
-  #previewImage {
-    max-width: 100%;
-    border-radius: 12px;
-  }
-
-  .mode-buttons {
-    flex-direction: column;
-    gap: 0.8em;
-  }
-
-  .mode-btn {
-    width: 100%;
-  }
-
-  /* スマホ用アニメーション軽量化 */
-  .fade {
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
-  }
-
-  .fade.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  #previewImage {
-    transform: scale(0.985);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-
-  #previewImage.show {
-    transform: scale(1);
-  }
-
-/* ================================
-   アップロードボタン（ガラス感＋青紫トーン＋角丸12px）
+   アップロードボタン（ガラスUI）
 ================================ */
 
 #uploadBtn {
@@ -370,3 +329,24 @@ input[type="text"] {
     inset 0 0 20px rgba(255,255,255,0.25);
 }
 
+/* ================================
+   スマホ最適化
+================================ */
+
+@media (max-width: 600px) {
+  .app-card {
+    width: 94%;
+    padding: 1.6em 1.3em;
+    margin: 1.4em auto 2em;
+    border-radius: 16px;
+  }
+
+  .mode-buttons {
+    flex-direction: column;
+    gap: 0.8em;
+  }
+
+  .mode-btn {
+    width: 100%;
+  }
+}
