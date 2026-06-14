@@ -1,38 +1,21 @@
 // ================================
-// FrameLab 管理パネル admin.js（CSS同期版・完全統合）
+// FrameLab 管理パネル用 admin.js（完全統合版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
-// ▼ DOM
-const modeSelect = document.getElementById("modeSelect");
-const addModeCard = document.getElementById("addModeCard");
-const deleteModeCard = document.getElementById("deleteModeCard");
-
+// ▼ モード切り替え
 const addModeBtn = document.getElementById("addModeBtn");
 const deleteModeBtn = document.getElementById("deleteModeBtn");
+const addModeCard = document.getElementById("addModeCard");
+const deleteModeCard = document.getElementById("deleteModeCard");
+const modeSelect = document.getElementById("modeSelect");
 
+// ▼ 戻るボタン
 const backToSelectFromAdd = document.getElementById("backToSelectFromAdd");
 const backToSelectFromDelete = document.getElementById("backToSelectFromDelete");
 
-const frameInput = document.getElementById("frameInput");
-const frameNameInput = document.getElementById("frameName");
-const uploadBtn = document.getElementById("uploadBtn");
-
-const previewBox = document.getElementById("previewBox");
-const previewImage = document.getElementById("previewImage");
-
-const resultBox = document.getElementById("result");
-
-const overwriteDialog = document.getElementById("overwriteDialog");
-const overwriteYes = document.getElementById("overwriteYes");
-const overwriteNo = document.getElementById("overwriteNo");
-
-const frameList = document.getElementById("frameList");
-
-// ================================
-// カード切り替え（CSS の fade/show と同期）
-// ================================
+// ▼ フェード表示関数
 function showCard(card) {
   card.style.display = "block";
   requestAnimationFrame(() => card.classList.add("show"));
@@ -40,61 +23,47 @@ function showCard(card) {
 
 function hideCard(card) {
   card.classList.remove("show");
-  setTimeout(() => (card.style.display = "none"), 250);
+  setTimeout(() => (card.style.display = "none"), 300);
 }
 
-// ▼ モード切り替え
-addModeBtn.onclick = () => {
+// ▼ モード切り替えイベント
+addModeBtn.addEventListener("click", () => {
   hideCard(modeSelect);
   hideCard(deleteModeCard);
   showCard(addModeCard);
-};
+});
 
-deleteModeBtn.onclick = () => {
+deleteModeBtn.addEventListener("click", () => {
   hideCard(modeSelect);
   hideCard(addModeCard);
   showCard(deleteModeCard);
   loadFrameList();
-};
-
-backToSelectFromAdd.onclick = () => {
-  hideCard(addModeCard);
-  showCard(modeSelect);
-};
-
-backToSelectFromDelete.onclick = () => {
-  hideCard(deleteModeCard);
-  showCard(modeSelect);
-};
-
-// ================================
-// プレビュー（CSS と完全同期）
-// ================================
-frameInput.addEventListener("change", (e) => {
-  const file = e.target.files[0];
-
-  if (!file) {
-    previewBox.style.display = "none";
-    previewImage.src = "";
-    previewImage.classList.remove("show");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    previewImage.src = reader.result;
-    previewBox.style.display = "block";
-
-    // CSS の fade-in と同期
-    previewImage.classList.remove("show");
-    requestAnimationFrame(() => previewImage.classList.add("show"));
-  };
-  reader.readAsDataURL(file);
 });
 
-// ================================
+backToSelectFromAdd.addEventListener("click", () => {
+  hideCard(addModeCard);
+  showCard(modeSelect);
+});
+
+backToSelectFromDelete.addEventListener("click", () => {
+  hideCard(deleteModeCard);
+  showCard(modeSelect);
+});
+
+// ▼ 追加モード
+const uploadBtn = document.getElementById("uploadBtn");
+const frameInput = document.getElementById("frameInput");
+const frameNameInput = document.getElementById("frameName");
+const resultBox = document.getElementById("result");
+const previewBox = document.getElementById("previewBox");
+const previewImage = document.getElementById("previewImage");
+
+// ▼ 上書き警告ダイアログ
+const overwriteDialog = document.getElementById("overwriteDialog");
+const overwriteYes = document.getElementById("overwriteYes");
+const overwriteNo = document.getElementById("overwriteNo");
+
 // Base64 変換
-// ================================
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -104,9 +73,25 @@ function toBase64(file) {
   });
 }
 
-// ================================
-// GitHub に同名ファイルがあるか確認
-// ================================
+// ▼ プレビュー表示
+frameInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) {
+    previewBox.style.display = "none";
+    previewImage.src = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    previewImage.src = reader.result;
+    previewBox.style.display = "block";
+    previewImage.classList.add("show");
+  };
+  reader.readAsDataURL(file);
+});
+
+// ▼ GitHub に同名ファイルが存在するかチェック
 async function checkFileExists(filename) {
   const repo = "framesynth/icon-maker";
   const url = `https://api.github.com/repos/${repo}/contents/frames/${filename}`;
@@ -114,9 +99,7 @@ async function checkFileExists(filename) {
   return res.ok;
 }
 
-// ================================
-// アップロード処理
-// ================================
+// ▼ アップロードボタン押下
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
@@ -132,27 +115,28 @@ uploadBtn.addEventListener("click", async () => {
 
   const filename = `${frameName}.png`;
 
-  // 上書きチェック
+  // ▼ 上書きチェック
   const exists = await checkFileExists(filename);
 
   if (exists) {
-    overwriteDialog.style.display = "flex";
+    overwriteDialog.style.display = "block";
+
     overwriteYes.onclick = () => {
       overwriteDialog.style.display = "none";
       uploadFrame(file, frameName);
     };
+
     overwriteNo.onclick = () => {
       overwriteDialog.style.display = "none";
     };
+
     return;
   }
 
   uploadFrame(file, frameName);
 });
 
-// ================================
-// 実際のアップロード処理
-// ================================
+// ▼ 実際のアップロード処理
 async function uploadFrame(file, frameName) {
   uploadBtn.disabled = true;
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
@@ -190,7 +174,7 @@ async function uploadFrame(file, frameName) {
     } else {
       resultBox.textContent = `❌ エラー: ${data.error.message}`;
     }
-  } catch {
+  } catch (err) {
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
   }
 
@@ -198,9 +182,7 @@ async function uploadFrame(file, frameName) {
   uploadBtn.innerHTML = "アップロード";
 }
 
-// ================================
-// 反映チェック
-// ================================
+// ▼ 反映チェック
 document.addEventListener("click", async (e) => {
   if (e.target.id !== "checkReflectBtn") return;
 
@@ -228,23 +210,23 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-// ================================
-// 削除モード：一覧読み込み
-// ================================
+// ▼ 削除モード（一覧読み込み）
 async function loadFrameList() {
   const repo = "framesynth/icon-maker";
   const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
 
-  frameList.innerHTML = "読み込み中…";
+  const listBox = document.getElementById("frameList");
+  listBox.innerHTML = "読み込み中…";
 
   try {
     const res = await fetch(url);
     const data = await res.json();
 
-    frameList.innerHTML = "";
+    listBox.innerHTML = "";
 
+    // ▼ フレームが存在しない場合（落ち着いたトーン）
     if (!Array.isArray(data) || data.length === 0) {
-      frameList.innerHTML = "現在、削除できるフレームはありません。";
+      listBox.innerHTML = "現在、削除できるフレームはありません。";
       return;
     }
 
@@ -262,17 +244,15 @@ async function loadFrameList() {
         <button class="delete-btn" data-name="${item.name}">削除</button>
       `;
 
-      frameList.appendChild(div);
+      listBox.appendChild(div);
     });
 
   } catch {
-    frameList.innerHTML = "現在、削除できるフレームはありません。";
+    listBox.innerHTML = "現在、削除できるフレームはありません。";
   }
 }
 
-// ================================
-// 削除処理
-// ================================
+// ▼ 削除処理
 document.addEventListener("click", async (e) => {
   if (!e.target.classList.contains("delete-btn")) return;
 
@@ -300,11 +280,4 @@ document.addEventListener("click", async (e) => {
   } catch {
     alert("通信エラーが発生しました");
   }
-});
-
-// ページ読み込み時にモード選択カードを表示
-window.addEventListener("DOMContentLoaded", () => {
-  const modeSelect = document.getElementById("modeSelect");
-  modeSelect.style.display = "block";
-  modeSelect.classList.add("show");
 });
