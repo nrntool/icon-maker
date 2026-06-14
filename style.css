@@ -250,3 +250,54 @@ canvas {
   .button-row {
     flex-direction: column;
     gap: 
+
+     /* ================================
+   ユーザー画面レイアウト調整
+================================ */
+
+/* カードの高さと余白を調整 */
+.app-card {
+  padding: 2.2em 1.6em;
+  min-height: 90vh; /* 画面全体に近い高さ */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* ヘッダーと注意セクションの間隔 */
+header {
+  margin-bottom: 1.4em;
+}
+
+.notice {
+  margin-bottom: 2em;
+}
+
+/* メイン要素の縦間隔を広げる */
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+
+/* ボタン行の余白を調整 */
+.button-row {
+  margin-top: 1.6em;
+}
+
+/* スマホ時の余白最適化 */
+@media (max-width: 600px) {
+  .app-card {
+    padding: 1.8em 1.3em;
+    min-height: auto;
+  }
+
+  main {
+    gap: 1em;
+  }
+
+  .button-row {
+    flex-direction: column;
+    gap: 0.8em;
+  }
+}
