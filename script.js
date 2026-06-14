@@ -1,5 +1,5 @@
 // ================================
-// FrameLab ドラッグ慣性つき完全版
+// FrameLab ドラッグ慣性つき完全版（ズレゼロ修正版）
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -120,40 +120,49 @@ function getCenter(touches) {
 }
 
 let isDragging = false;
-let lastX = 0;
-let lastY = 0;
-let lastDist = 0;
+let lastX = null;
+let lastY = null;
+let lastDist = null;
 
 // ▼ 慣性用の速度
 let vx = 0;
 let vy = 0;
 let lastMoveTime = 0;
 
-// ▼ タッチ開始
+// ================================
+// ▼ タッチ開始（ズレゼロ修正版）
+// ================================
 canvas.addEventListener("touchstart", (e) => {
+  const rect = canvas.getBoundingClientRect();
+
   if (e.touches.length === 1) {
     isDragging = true;
-    lastX = e.touches[0].clientX;
-    lastY = e.touches[0].clientY;
+
+    lastX = e.touches[0].clientX - rect.left;
+    lastY = e.touches[0].clientY - rect.top;
+
     vx = 0;
     vy = 0;
     lastMoveTime = performance.now();
   }
+
   if (e.touches.length === 2) {
     lastDist = getDistance(e.touches);
   }
 });
 
+// ================================
 // ▼ タッチ移動（ピンチ＋ドラッグ慣性）
+// ================================
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
 
   // ▼ 2本指ピンチ
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
     const center = getCenter(e.touches);
 
-    const rect = canvas.getBoundingClientRect();
     const cx = center.x - rect.left;
     const cy = center.y - rect.top;
 
@@ -173,8 +182,8 @@ canvas.addEventListener("touchmove", (e) => {
 
   // ▼ 1本指ドラッグ（慣性つき）
   if (e.touches.length === 1 && isDragging) {
-    const x = e.touches[0].clientX;
-    const y = e.touches[0].clientY;
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
 
     const now = performance.now();
     const dt = now - lastMoveTime;
@@ -182,7 +191,6 @@ canvas.addEventListener("touchmove", (e) => {
     const dx = x - lastX;
     const dy = y - lastY;
 
-    // 速度計算
     vx = dx / dt;
     vy = dy / dt;
 
@@ -195,17 +203,22 @@ canvas.addEventListener("touchmove", (e) => {
 
     redraw();
   }
-});
+}, { passive: false });
 
+// ================================
 // ▼ タッチ終了 → 慣性開始
+// ================================
 canvas.addEventListener("touchend", () => {
   isDragging = false;
+  lastX = null;
+  lastY = null;
+  lastDist = null;
   startInertia();
 });
 
 // ▼ 慣性アニメーション
 function startInertia() {
-  const friction = 0.95; // 減速率
+  const friction = 0.95;
   const minSpeed = 0.001;
 
   function animate() {
@@ -240,7 +253,7 @@ function redraw() {
   }
 }
 
-// ▼ 保存処理（iPhone / Android 完全対応）
+// ▼ 保存処理
 function saveHighRes() {
   if (!baseImage) {
     alert("画像が選択されていません。");
