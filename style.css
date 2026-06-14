@@ -182,225 +182,9 @@ canvas {
   overflow: hidden;
   box-sizing: border-box;
 
-  /* 黒縁を出さない柔らかい影 */
   box-shadow:
-    0 4px 12px rgba(90,125,168,0.18),
-    inset 0 0 20px rgba(255,255,255,0.25);
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-/* 光沢ライン（共通） */
-.button-row button::before,
-#saveBtn::before,
-#resetBtn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -40%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    rgba(255,255,255了解だよ、Natsumi。  
-あなたが貼ってくれた CSS をベースに、**保存ボタンの黒縁を完全に消した“完全版”** を仕上げたよ。  
-FrameLab の UI トーン（青紫ガラス × 白ガラス）に合わせて、**影・光沢・境界のにじみ**をすべて最適化してある。
-
-以下は **そのままコピペで置き換えられる完全版**。
-
----
-
-# 💎 **FrameLab UI 完全版 CSS（保存ボタンの黒縁ゼロ）**
-
-```css
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: "Noto Sans JP", sans-serif;
-  background: #f3f5f8;
-  color: #222;
-  text-align: center;
-  line-height: 1.6;
-}
-
-/* カード全体 */
-.app-card {
-  width: 92%;
-  max-width: 420px;
-  margin: 1.6em auto;
-  background: #fff;
-  border-radius: 18px;
-  padding: 1.6em 1.2em;
-  box-shadow: 0 6px 20px rgba(0, 40, 80, 0.08);
-  overflow: visible;
-}
-
-/* 見出し */
-header h1 {
-  font-size: 1.8em;
-  font-weight: 600;
-  margin: 0;
-  letter-spacing: 0.03em;
-}
-
-header h1::after {
-  content: "";
-  display: block;
-  width: 70px;
-  height: 3px;
-  background: #999;
-  margin: 10px auto 0;
-  border-radius: 2px;
-}
-
-/* 注意事項 */
-.notice {
-  margin: 1.2em auto;
-  text-align: left;
-}
-
-.notice h2 {
-  font-size: 0.95em;
-  font-weight: 600;
-  border-bottom: 2px solid #bbb;
-  display: inline-block;
-  padding-bottom: 2px;
-  margin-bottom: 0.3em;
-}
-
-.notice p {
-  background: #f9f9f9;
-  padding: 0.9em;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 40, 80, 0.06);
-  font-size: 0.85em;
-  margin-top: 0;
-}
-
-/* ラベル */
-label {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  margin: 1em 0 0.3em;
-  font-size: 0.9em;
-  letter-spacing: 0.02em;
-}
-
-/* 番号バッジ */
-.step-badge {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 1.6em;
-  height: 1.6em;
-  margin-right: 0.5em;
-  font-size: 0.85em;
-  font-weight: 600;
-  color: #333;
-  border-radius: 6px;
-  border: 1.5px solid #999;
-  background: #f5f5f5;
-}
-
-/* 入力フォーム */
-input[type="file"],
-select {
-  width: 100%;
-  max-width: 400px;
-  box-sizing: border-box;
-  padding: 0.7em 0.9em;
-  font-size: 0.9em;
-  color: #333;
-  background: #ffffff;
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-}
-
-input[type="file"]:hover,
-select:hover {
-  background: #fafafa;
-  border-color: #bbb;
-}
-
-input[type="file"]:focus,
-select:focus {
-  outline: none;
-  border-color: #999;
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-}
-
-/* ファイル選択ボタン */
-input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
-  padding: 0.6em 1em;
-  background: #f2f2f2;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  color: #333;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-input[type="file"]::-webkit-file-upload-button:hover {
-  background: #eaeaea;
-  border-color: #bbb;
-}
-
-/* キャンバス */
-canvas {
-  width: 100%;
-  max-width: 360px;
-  height: 360px;
-  display: block;
-  margin: 1.2em auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 3px 12px rgba(0, 40, 80, 0.08);
-  touch-action: none;
-}
-
-/* ボタン行 */
-.button-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.8em;
-  margin-top: 1.4em;
-  flex-wrap: wrap;
-}
-
-/* ================================
-   ▼ 全ボタン共通（光沢ライン＋影＋フォント統一）
-================================ */
-
-.button-row button,
-#saveBtn,
-#resetBtn {
-  width: 240px;
-  height: 54px;
-  padding: 0;
-  border-radius: 12px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  font-size: 0.95em;
-
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-sizing: border-box;
-
-  /* 黒縁を出さない柔らかい影 */
-  box-shadow:
-    0 4px 12px rgba(90,125,168,0.18),
-    inset 0 0 20px rgba(255,255,255,0.25);
+    0 4px 12px rgba(90,125,168,0.25),
+    inset 0 0 20px rgba(255,255,255,0.15);
 
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -436,8 +220,8 @@ canvas {
 #resetBtn:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 6px 18px rgba(90,125,168,0.25),
-    inset 0 0 30px rgba(255,255,255,0.3);
+    0 6px 18px rgba(90,125,168,0.3),
+    inset 0 0 30px rgba(255,255,255,0.25);
 }
 
 /* クリック時 */
@@ -446,8 +230,8 @@ canvas {
 #resetBtn:active {
   transform: scale(0.97);
   box-shadow:
-    0 3px 10px rgba(90,125,168,0.25),
-    inset 0 0 20px rgba(255,255,255,0.3);
+    0 3px 10px rgba(90,125,168,0.3),
+    inset 0 0 20px rgba(255,255,255,0.25);
 }
 
 /* ================================
