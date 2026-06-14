@@ -30,7 +30,10 @@ body {
     0 10px 30px rgba(0,0,0,0.04);
 }
 
-/* カード（ガラス感＋2段階シャドウ＋ヘアライン） */
+/* ================================
+   カード（ガラス感＋高級アニメ）
+================================ */
+
 .app-card {
   width: 92%;
   max-width: 440px;
@@ -44,11 +47,23 @@ body {
   box-shadow:
     0 4px 14px rgba(0,0,0,0.06),
     0 18px 40px rgba(0,0,0,0.05);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  /* 高級アニメ */
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+  transition:
+    opacity 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
+    box-shadow 0.25s ease;
+}
+
+.app-card.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .app-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.01);
   box-shadow:
     0 6px 18px rgba(0,0,0,0.07),
     0 22px 50px rgba(0,0,0,0.06);
@@ -101,7 +116,10 @@ body {
   box-shadow:
     0 3px 10px rgba(90,125,168,0.25),
     0 10px 26px rgba(90,125,168,0.25);
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.25s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
   position: relative;
   overflow: hidden;
 }
@@ -183,7 +201,7 @@ input[type="text"] {
 }
 
 /* ================================
-   プレビュー（完全修正版）
+   プレビュー（光フェード）
 ================================ */
 
 #previewBox {
@@ -202,30 +220,39 @@ input[type="text"] {
   box-shadow: 0 4px 14px rgba(0,0,0,0.12);
   display: block;
   margin: 0 auto;
+
   opacity: 0;
-  transform: scale(0.97);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: scale(0.96);
+  filter: brightness(0.9) blur(1px);
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    filter 0.45s ease;
 }
 
 #previewImage.show {
   opacity: 1;
   transform: scale(1);
+  filter: brightness(1) blur(0);
 }
 
 /* ================================
-   結果表示
+   結果表示（上品フェード）
 ================================ */
 
-#uploadBtn {
-  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+.success-box,
+.error-box {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: fadeUpNotice 0.32s ease forwards;
 }
 
-#result {
-  font-family: "Noto Sans JP", "Segoe UI", sans-serif;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+@keyframes fadeUpNotice {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ================================
@@ -244,7 +271,24 @@ input[type="text"] {
 }
 
 /* ================================
-   スマホ最適化＋アニメーション最適化
+   上書きダイアログ（高級ポップアップ）
+================================ */
+
+#overwriteDialog {
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+#overwriteDialog.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ================================
+   スマホ最適化＋軽量アニメ
 ================================ */
 
 @media (max-width: 600px) {
@@ -254,6 +298,11 @@ input[type="text"] {
     padding: 1.6em 1.3em;
     margin: 1.4em auto 2em;
     border-radius: 16px;
+    transform: translateY(6px) scale(0.99);
+  }
+
+  .app-card.show {
+    transform: translateY(0) scale(1);
   }
 
   .mode-title {
@@ -275,14 +324,12 @@ input[type="text"] {
     font-size: 1em;
   }
 
-  #previewBox {
-    padding: 1.2em;
-    border-radius: 14px;
+  #previewImage {
+    transform: scale(0.985);
   }
 
-  #previewImage {
-    max-width: 100%;
-    border-radius: 12px;
+  #previewImage.show {
+    transform: scale(1);
   }
 
   .mode-buttons {
@@ -292,27 +339,6 @@ input[type="text"] {
 
   .mode-btn {
     width: 100%;
-  }
-
-  /* スマホ用アニメーション軽量化 */
-  .fade {
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
-  }
-
-  .fade.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  #previewImage {
-    transform: scale(0.985);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-
-  #previewImage.show {
-    transform: scale(1);
   }
 
   button:active {
