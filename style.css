@@ -12,38 +12,29 @@ body {
   letter-spacing: 0.02em;
   color: #222;
   text-align: center;
-  line-height: 1.45; /* ← 全体の行間をさらに詰める */
+  line-height: 1.4; /* 全体の行間をさらに詰める */
 }
 
 /* ================================
-   カード
+   カード（ガラス感＋高級アニメ）
 ================================ */
 
 .app-card {
   width: 92%;
   max-width: 440px;
-  margin: 1.6em auto;
-  padding: 2em 1.4em;
+  margin: 1.4em auto;
+  padding: 1.8em 1.4em; /* ← 内側余白を減らす */
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
-  border-radius: 20px;
+  border-radius: 18px;
   border: 0.5px solid rgba(255, 255, 255, 0.4);
   box-shadow:
-    0 8px 24px rgba(0,0,0,0.08),
-    inset 0 0 40px rgba(255,255,255,0.15);
-  opacity: 0;
-  transform: translateY(10px) scale(0.985);
-  transition: opacity .32s, transform .32s;
-  min-height: 92vh;
+    0 6px 18px rgba(0,0,0,0.08),
+    inset 0 0 30px rgba(255,255,255,0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.app-card.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
 }
 
 /* ================================
@@ -55,7 +46,7 @@ header {
 }
 
 header h1 {
-  font-size: 1.5em;
+  font-size: 1.45em;
   font-weight: 600;
   margin-bottom: 0.2em;
 }
@@ -64,7 +55,7 @@ header .description {
   font-size: 0.9em;
   color: #666;
   margin-bottom: 1em;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 /* ================================
@@ -73,21 +64,21 @@ header .description {
 
 .notice {
   background: rgba(255,255,255,0.55);
-  border-radius: 14px;
-  padding: 1.1em 1.1em;
-  margin-bottom: 1.6em;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  padding: 1em 1em;
+  margin-bottom: 1.4em;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
 }
 
 .notice h2 {
-  font-size: 1.05em;
-  margin-bottom: 0.4em;
+  font-size: 1em;
+  margin-bottom: 0.3em;
 }
 
 .notice p {
   font-size: 0.9em;
   color: #555;
-  line-height: 1.38; /* ← ここが一番効く（しっかり詰まる） */
+  line-height: 1.35; /* ← 行間をしっかり詰める */
 }
 
 /* ================================
@@ -97,7 +88,7 @@ header .description {
 main {
   display: flex;
   flex-direction: column;
-  gap: 0.8em; /* ← 全体の項目間を詰める */
+  gap: 0.6em; /* ← 全体の項目間を詰める */
   width: 100%;
   max-width: 400px;
 }
@@ -106,22 +97,22 @@ label {
   display: flex;
   align-items: center;
   font-size: 0.9em;
-  margin: 0.8em 0 0.3em; /* ← かなり詰めた */
+  margin: 0.6em 0 0.3em; /* ← 余白を詰める */
 }
 
 .step-badge {
   width: 1.4em;
   height: 1.4em;
-  margin-right: 0.5em;
+  margin-right: 0.4em;
   font-size: 0.8em;
 }
 
 input[type="file"],
 select {
   width: 100%;
-  padding: 0.7em 0.9em; /* ← 内側も詰める */
+  padding: 0.7em 0.9em;
   font-size: 0.9em;
-  margin-bottom: 0.8em; /* ← 下の余白も詰める */
+  margin-bottom: 0.8em;
   background: rgba(255,255,255,0.85);
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.08);
@@ -136,7 +127,7 @@ canvas {
   max-width: 360px;
   border-radius: 12px;
   margin: 0.8em auto;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 /* ================================
@@ -146,15 +137,15 @@ canvas {
 .button-row {
   display: flex;
   justify-content: center;
-  gap: 0.7em; /* ← ボタン間も詰める */
-  margin-top: 1.2em;
+  gap: 0.6em; /* ← ボタン間も詰める */
+  margin-top: 1em;
 }
 
 .btn-save,
 .btn-reset {
   flex: 1;
-  padding: 0.75em 1.2em; /* ← ボタンの高さも少し低く */
-  font-size: 0.95em;
+  padding: 0.7em 1.1em;
+  font-size: 0.9em;
   border-radius: 10px;
 }
 
@@ -163,41 +154,40 @@ canvas {
 ================================ */
 
 @media (max-width: 600px) {
-
   .app-card {
     width: 94%;
     padding: 1.6em 1.1em;
-    margin: 1.4em auto 2em;
+    margin: 1.2em auto 2em;
   }
 
   .notice {
-    padding: 1em;
-    margin-bottom: 1.4em;
+    padding: 0.9em;
+    margin-bottom: 1.2em;
   }
 
   .notice p {
-    line-height: 1.35; /* ← スマホはさらに詰める */
+    line-height: 1.3; /* ← スマホではさらに詰める */
   }
 
   label {
-    margin-top: 0.9em;
-    margin-bottom: 0.4em;
+    margin-top: 0.7em;
+    margin-bottom: 0.3em;
   }
 
   input[type="file"],
   select {
-    padding: 0.75em;
-    margin-bottom: 1em;
+    padding: 0.7em;
+    margin-bottom: 0.9em;
   }
 
   .button-row {
     flex-direction: column;
-    gap: 0.6em;
+    gap: 0.5em;
   }
 
   .btn-save,
   .btn-reset {
     width: 100%;
-    padding: 0.85em;
+    padding: 0.8em;
   }
 }
