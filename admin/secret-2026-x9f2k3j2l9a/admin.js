@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（完全統合版）
+// FrameLab 管理パネル admin.js（完全統合版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -23,7 +23,7 @@ function showCard(card) {
 
 function hideCard(card) {
   card.classList.remove("show");
-  setTimeout(() => (card.style.display = "none"), 300);
+  setTimeout(() => (card.style.display = "none"), 250);
 }
 
 // ▼ モード切り替えイベント
@@ -73,12 +73,14 @@ function toBase64(file) {
   });
 }
 
-// ▼ プレビュー表示
+// ▼ プレビュー表示（完全修正版）
 frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
+
   if (!file) {
     previewBox.style.display = "none";
     previewImage.src = "";
+    previewImage.classList.remove("show");
     return;
   }
 
@@ -86,7 +88,7 @@ frameInput.addEventListener("change", (e) => {
   reader.onload = () => {
     previewImage.src = reader.result;
     previewBox.style.display = "block";
-    previewImage.classList.add("show");
+    requestAnimationFrame(() => previewImage.classList.add("show"));
   };
   reader.readAsDataURL(file);
 });
@@ -119,7 +121,7 @@ uploadBtn.addEventListener("click", async () => {
   const exists = await checkFileExists(filename);
 
   if (exists) {
-    overwriteDialog.style.display = "block";
+    overwriteDialog.style.display = "flex";
 
     overwriteYes.onclick = () => {
       overwriteDialog.style.display = "none";
@@ -224,7 +226,6 @@ async function loadFrameList() {
 
     listBox.innerHTML = "";
 
-    // ▼ フレームが存在しない場合（落ち着いたトーン）
     if (!Array.isArray(data) || data.length === 0) {
       listBox.innerHTML = "現在、削除できるフレームはありません。";
       return;
