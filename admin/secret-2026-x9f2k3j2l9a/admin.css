@@ -1,20 +1,8 @@
 /* ================================
-   FrameLab 管理画面 — 最適化完全版
+   FrameLab 管理画面 — 完全統合版（仕切り線なし）
 ================================ */
 
-/* カラーパレット */
-:root {
-  --accent-blue: #6a8fc0;
-  --accent-light: #7fa0d0;
-  --text-main: #4a5f85;
-  --shadow-main: rgba(90,125,168,0.15);
-  --shadow-light: rgba(90,125,168,0.08);
-  --white-glass: rgba(255,255,255,0.72);
-}
-
-/* ================================
-   ベース
-================================ */
+/* ベース */
 body {
   background: radial-gradient(circle at top, #e8ecf5 0%, #f4f6fb 45%, #f2f3f8 100%);
   margin: 0;
@@ -31,15 +19,15 @@ body {
 ================================ */
 .admin-banner {
   background: linear-gradient(180deg, #ffffff 0%, #eef2fa 100%);
-  color: var(--text-main);
+  color: #4a5f85;
   padding: 0.6em;
   font-weight: 500;
   font-size: 0.95em;
   border-radius: 0 0 16px 16px;
   margin-bottom: 1.6em;
   box-shadow:
-    0 2px 6px var(--shadow-light),
-    0 10px 30px var(--shadow-light);
+    0 2px 6px rgba(90,125,168,0.08),
+    0 10px 30px rgba(90,125,168,0.06);
 }
 
 /* ================================
@@ -50,21 +38,21 @@ body {
   max-width: 440px;
   margin: 1.8em auto;
   padding: 1.9em 1.5em;
-  background: var(--white-glass);
+  background: rgba(255,255,255,0.72);
   backdrop-filter: blur(16px);
   border-radius: 18px;
   border: 1px solid rgba(90,125,168,0.25);
   box-shadow:
-    0 4px 14px var(--shadow-main),
-    0 18px 40px var(--shadow-light);
+    0 4px 14px rgba(90,125,168,0.12),
+    0 18px 40px rgba(90,125,168,0.08);
   transition: 0.25s ease;
 }
 
 .app-card:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 6px 18px var(--shadow-main),
-    0 22px 50px var(--shadow-light);
+    0 6px 18px rgba(90,125,168,0.15),
+    0 22px 50px rgba(90,125,168,0.12);
 }
 
 /* ================================
@@ -73,7 +61,7 @@ body {
 .mode-title {
   font-size: 1.35em;
   font-weight: 500;
-  color: var(--text-main);
+  color: #4a5f85;
 }
 
 .subtext {
@@ -82,7 +70,7 @@ body {
 }
 
 /* ================================
-   ボタン行（左右配置）
+   ▼ ボタン行（左右配置・仕切り線なし）
 ================================ */
 .mode-buttons {
   display: flex;
@@ -94,7 +82,7 @@ body {
 }
 
 /* ================================
-   ボタン共通（青紫ガラス）
+   ▼ ボタン共通（青紫ガラス・ふち黒解消）
 ================================ */
 .mode-btn,
 #uploadBtn,
@@ -102,22 +90,31 @@ body {
   width: 180px;
   height: 54px;
   border-radius: 12px;
+
   display: flex;
   justify-content: center;
   align-items: center;
+
+  font-family: inherit;
   font-weight: 600;
   font-size: 0.95em;
   letter-spacing: 0.03em;
+
   cursor: pointer;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+
+  /* 黒く見えない明るめグラデーション */
+  background: linear-gradient(135deg, #6a8fc0 0%, #7fa0d0 100%);
   color: #fff;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-light) 100%);
+
+  /* 黒縁を消すための淡い境界線＋影 */
   border: 1px solid rgba(255,255,255,0.4);
   box-shadow:
-    0 4px 10px var(--shadow-main),
+    0 4px 10px rgba(90,125,168,0.15),
     inset 0 0 18px rgba(255,255,255,0.25);
+
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -131,7 +128,11 @@ body {
   left: -40%;
   width: 80%;
   height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.45), rgba(255,255,255,0));
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.45),
+    rgba(255,255,255,0)
+  );
   transform: skewX(-25deg);
   transition: left 0.8s ease;
 }
@@ -142,16 +143,17 @@ body {
   left: 120%;
 }
 
-/* ホバー・クリック */
+/* ホバー */
 .mode-btn:hover,
 #uploadBtn:hover,
 .back-btn:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 6px 16px var(--shadow-main),
+    0 6px 16px rgba(90,125,168,0.22),
     inset 0 0 28px rgba(255,255,255,0.3);
 }
 
+/* クリック */
 .mode-btn:active,
 #uploadBtn:active,
 .back-btn:active {
@@ -159,24 +161,24 @@ body {
 }
 
 /* ================================
-   アップロードボタン強調
+   ▼ アップロードボタン強調
 ================================ */
 #uploadBtn {
   transform: scale(1.04);
   box-shadow:
-    0 6px 20px var(--shadow-main),
+    0 6px 20px rgba(90,125,168,0.25),
     inset 0 0 28px rgba(255,255,255,0.32);
 }
 
 #uploadBtn:hover {
   transform: scale(1.07);
   box-shadow:
-    0 8px 26px var(--shadow-main),
+    0 8px 26px rgba(90,125,168,0.32),
     inset 0 0 36px rgba(255,255,255,0.38);
 }
 
 /* ================================
-   戻るボタン（白ガラス）
+   ▼ 戻るボタン（白ガラス）
 ================================ */
 .back-btn {
   background: linear-gradient(135deg, #f6f8ff 0%, #e9efff 100%);
@@ -193,7 +195,7 @@ label {
   margin: 1.2em 0 0.4em;
   font-size: 0.92em;
   font-weight: 500;
-  color: var(--text-main);
+  color: #4a5f85;
 }
 
 .step-badge {
@@ -201,14 +203,13 @@ label {
   height: 1.6em;
   margin-right: 0.6em;
   font-size: 0.85em;
-  color: var(--text-main);
+  color: #4a5f85;
   border-radius: 6px;
   border: 1px solid rgba(90,125,168,0.35);
   background: rgba(255,255,255,0.55);
   backdrop-filter: blur(6px);
 }
 
-/* 入力欄（FrameLabと統一） */
 input[type="file"],
 input[type="text"] {
   width: 100%;
@@ -216,9 +217,9 @@ input[type="text"] {
   padding: 0.75em 1em;
   font-size: 0.92em;
   background: rgba(255,255,255,0.75);
-  border: 1px solid rgba(90,125,168,0.25);
+  border: 1px solid rgba(90,125,168,0.35);
   border-radius: 10px;
-  box-shadow: 0 2px 6px var(--shadow-main);
+  box-shadow: 0 2px 6px rgba(90,125,168,0.12);
   margin-bottom: 1em;
   transition: 0.25s ease;
 }
@@ -230,20 +231,58 @@ input[type="text"]:focus {
   box-shadow: 0 0 0 4px rgba(90,125,168,0.15);
 }
 
-/* ファイル選択ボタン */
-input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
-  padding: 0.6em 1em;
-  border: none;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #eef2ff 0%, #dfe6fa 100%);
-  color: var(--text-main);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease;
+/* ================================
+   プレビュー
+================================ */
+#previewBox {
+  margin: 1.2em 0;
+  padding: 1.2em;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(90,125,168,0.12);
+  display: none;
 }
 
-input[type="file"]::-webkit-file-upload-button:hover {
-  background: linear-gradient(135deg, #e3e8ff 0%, #d6defa 100%);
+#previewImage {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(90,125,168,0.18);
+  display: block;
+  margin: 0 auto;
+  opacity: 0;
+  transform: scale(0.97);
+  transition: 0.3s ease;
 }
 
+#previewImage.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ================================
+   ▼ スマホでも左右配置を維持
+================================ */
+@media (max-width: 600px) {
+
+  .mode-buttons {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.8em;
+  }
+
+  .mode-btn,
+  #uploadBtn,
+  .back-btn {
+    width: 46%;
+    min-width: 140px;
+  }
+
+  #uploadBtn {
+    transform: scale(1.05);
+  }
+  #uploadBtn:hover {
+    transform: scale(1.08);
+  }
+}
