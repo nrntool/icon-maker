@@ -1,51 +1,50 @@
 /* ================================
-   FrameLab 管理画面 — 完全統合版（仕切り線なし）
+   管理画面 CSS（FrameLab 青紫ガラス最適化版）
 ================================ */
 
-/* ベース */
+/* ベースフォント（日本語＋英字） */
 body {
   background: radial-gradient(circle at top, #e8ecf5 0%, #f4f6fb 45%, #f2f3f8 100%);
   margin: 0;
   padding: 0;
   font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: #222;
   text-align: center;
   line-height: 1.6;
-  letter-spacing: 0.02em;
 }
 
-/* ================================
-   管理画面帯
-================================ */
+/* 管理画面帯 */
 .admin-banner {
   background: linear-gradient(180deg, #ffffff 0%, #eef2fa 100%);
   color: #4a5f85;
   padding: 0.6em;
   font-weight: 500;
-  font-size: 0.95em;
   border-radius: 0 0 16px 16px;
   margin-bottom: 1.6em;
+  letter-spacing: 0.03em;
+  font-size: 0.95em;
   box-shadow:
     0 2px 6px rgba(90,125,168,0.08),
     0 10px 30px rgba(90,125,168,0.06);
 }
 
-/* ================================
-   カード（青紫ガラス）
-================================ */
+/* カード（青紫ガラス） */
 .app-card {
   width: 92%;
   max-width: 440px;
   margin: 1.8em auto;
-  padding: 1.9em 1.5em;
-  background: rgba(255,255,255,0.72);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 18px;
+  padding: 1.9em 1.5em;
   border: 1px solid rgba(90,125,168,0.25);
   box-shadow:
     0 4px 14px rgba(90,125,168,0.12),
     0 18px 40px rgba(90,125,168,0.08);
-  transition: 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .app-card:hover {
@@ -55,65 +54,69 @@ body {
     0 22px 50px rgba(90,125,168,0.12);
 }
 
-/* ================================
-   タイトル・説明
-================================ */
+/* タイトル */
 .mode-title {
   font-size: 1.35em;
   font-weight: 500;
   color: #4a5f85;
+  letter-spacing: 0.01em;
 }
 
+/* 説明文 */
 .subtext {
   font-size: 0.92em;
+  font-weight: 400;
   color: #5a6b8a;
+  letter-spacing: 0.02em;
 }
 
 /* ================================
-   ▼ ボタン行（左右配置・仕切り線なし）
+   モード選択
 ================================ */
+
 .mode-buttons {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.4em;
-  margin-top: 1.6em;
-  flex-wrap: wrap;
+  gap: 1em;
+  margin-top: 1em;
+}
+
+:root {
+  --accent: #5a7da8;
+  --accent-hover: #4a6b92;
 }
 
 /* ================================
-   ▼ ボタン共通（青紫ガラス・ふち黒解消）
+   ボタン共通（青紫ガラス統一）
 ================================ */
+
 .mode-btn,
 #uploadBtn,
 .back-btn {
-  width: 180px;
+  width: 240px;
   height: 54px;
+  padding: 0;
   border-radius: 12px;
-
   display: flex;
   justify-content: center;
   align-items: center;
 
-  font-family: inherit;
+  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
   font-weight: 600;
-  font-size: 0.95em;
   letter-spacing: 0.03em;
+  font-size: 0.95em;
 
   cursor: pointer;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
 
-  /* 黒く見えない明るめグラデーション */
-  background: linear-gradient(135deg, #6a8fc0 0%, #7fa0d0 100%);
+  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
   color: #fff;
+  border: none;
 
-  /* 黒縁を消すための淡い境界線＋影 */
-  border: 1px solid rgba(255,255,255,0.4);
   box-shadow:
-    0 4px 10px rgba(90,125,168,0.15),
-    inset 0 0 18px rgba(255,255,255,0.25);
+    0 4px 12px rgba(90,125,168,0.18),
+    inset 0 0 20px rgba(255,255,255,0.25);
 
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -130,8 +133,8 @@ body {
   height: 100%;
   background: linear-gradient(
     120deg,
-    rgba(255,255,255,0.45),
-    rgba(255,255,255,0)
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0) 60%
   );
   transform: skewX(-25deg);
   transition: left 0.8s ease;
@@ -143,45 +146,29 @@ body {
   left: 120%;
 }
 
-/* ホバー */
+/* ホバー時 */
 .mode-btn:hover,
 #uploadBtn:hover,
 .back-btn:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 6px 16px rgba(90,125,168,0.22),
-    inset 0 0 28px rgba(255,255,255,0.3);
+    0 6px 18px rgba(90,125,168,0.25),
+    inset 0 0 30px rgba(255,255,255,0.3);
 }
 
-/* クリック */
+/* クリック時 */
 .mode-btn:active,
 #uploadBtn:active,
 .back-btn:active {
   transform: scale(0.97);
-}
-
-/* ================================
-   ▼ アップロードボタン強調
-================================ */
-#uploadBtn {
-  transform: scale(1.04);
   box-shadow:
-    0 6px 20px rgba(90,125,168,0.25),
-    inset 0 0 28px rgba(255,255,255,0.32);
+    0 3px 10px rgba(90,125,168,0.25),
+    inset 0 0 20px rgba(255,255,255,0.3);
 }
 
-#uploadBtn:hover {
-  transform: scale(1.07);
-  box-shadow:
-    0 8px 26px rgba(90,125,168,0.32),
-    inset 0 0 36px rgba(255,255,255,0.38);
-}
-
-/* ================================
-   ▼ 戻るボタン（白ガラス）
-================================ */
+/* 戻るボタン（白ガラス調） */
 .back-btn {
-  background: linear-gradient(135deg, #f6f8ff 0%, #e9efff 100%);
+  background: linear-gradient(135deg, #eef2ff 0%, #dfe6fa 100%);
   color: #4a4a4a;
   border: 1px solid rgba(255,255,255,0.6);
 }
@@ -189,13 +176,15 @@ body {
 /* ================================
    ラベル・入力欄
 ================================ */
+
 label {
   display: flex;
   align-items: center;
+  font-weight: 500;
   margin: 1.2em 0 0.4em;
   font-size: 0.92em;
-  font-weight: 500;
   color: #4a5f85;
+  letter-spacing: 0.01em;
 }
 
 .step-badge {
@@ -203,6 +192,7 @@ label {
   height: 1.6em;
   margin-right: 0.6em;
   font-size: 0.85em;
+  font-weight: 500;
   color: #4a5f85;
   border-radius: 6px;
   border: 1px solid rgba(90,125,168,0.35);
@@ -210,6 +200,7 @@ label {
   backdrop-filter: blur(6px);
 }
 
+/* 入力欄 */
 input[type="file"],
 input[type="text"] {
   width: 100%;
@@ -234,6 +225,7 @@ input[type="text"]:focus {
 /* ================================
    プレビュー
 ================================ */
+
 #previewBox {
   margin: 1.2em 0;
   padding: 1.2em;
@@ -253,7 +245,7 @@ input[type="text"]:focus {
   margin: 0 auto;
   opacity: 0;
   transform: scale(0.97);
-  transition: 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 #previewImage.show {
@@ -262,27 +254,25 @@ input[type="text"]:focus {
 }
 
 /* ================================
-   ▼ スマホでも左右配置を維持
+   スマホ最適化
 ================================ */
+
 @media (max-width: 600px) {
+  .app-card {
+    width: 94%;
+    padding: 1.6em 1.3em;
+    margin: 1.4em auto 2em;
+    border-radius: 16px;
+  }
 
   .mode-buttons {
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
     gap: 0.8em;
   }
 
   .mode-btn,
   #uploadBtn,
   .back-btn {
-    width: 46%;
-    min-width: 140px;
-  }
-
-  #uploadBtn {
-    transform: scale(1.05);
-  }
-  #uploadBtn:hover {
-    transform: scale(1.08);
+    width: 100%;
   }
 }
