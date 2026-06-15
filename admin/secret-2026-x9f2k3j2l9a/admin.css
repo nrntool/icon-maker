@@ -1,5 +1,5 @@
 /* ================================
-   FrameLab 管理画面 — 最適化完成版
+   FrameLab 管理画面 — 完全最適化版
 ================================ */
 
 /* UIトークン */
@@ -94,7 +94,8 @@ body {
 .mode-buttons {
   display: flex;
   justify-content: center;
-  gap: 1.8em; /* ← 少し広げて自然な余白 */
+  align-items: center;
+  gap: 1.8em;
   margin-top: 1.8em;
   flex-wrap: wrap;
 }
@@ -121,7 +122,7 @@ body {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 青紫ガラス */
+/* 青紫ガラス（基本） */
 .mode-btn,
 #uploadBtn {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
@@ -134,9 +135,13 @@ body {
 
 /* 白ガラス（戻る） */
 .back-btn {
-  background: linear-gradient(135deg, #f6f8ff, #e9efff);
+  background: linear-gradient(135deg, #f9fbff, #eef2fa);
   color: #4a4a4a;
-  border: 1px solid rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow:
+    0 3px 10px rgba(90,125,168,0.12),
+    inset 0 0 18px rgba(255,255,255,0.25);
+  opacity: 0.95;
 }
 
 /* 光沢ライン */
@@ -184,14 +189,23 @@ body {
   box-shadow:
     0 6px 20px var(--shadow-main),
     inset 0 0 28px rgba(255,255,255,0.32),
-    0 8px 14px rgba(90,125,168,0.18); /* ← 下方向の柔らかい影 */
+    0 8px 14px rgba(90,125,168,0.18);
 }
 
 #uploadBtn:hover {
   transform: scale(1.07);
   box-shadow:
-    0 10px 22px rgba(90,125,168,0.22), /* ← hover時は少し強め */
+    0 10px 22px rgba(90,125,168,0.22),
     inset 0 0 36px rgba(255,255,255,0.38);
+}
+
+/* 戻るボタン（補助階層） */
+.back-btn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 14px rgba(90,125,168,0.18),
+    inset 0 0 24px rgba(255,255,255,0.3);
 }
 
 /* ================================
