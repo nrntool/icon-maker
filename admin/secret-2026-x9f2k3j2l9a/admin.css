@@ -89,14 +89,18 @@ body {
 }
 
 /* ================================
-   ボタン行
+   ボタン行（上下バランス最適化）
 ================================ */
 .mode-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1.8em;
-  margin-top: 1.8em;
+
+  /* ▼ 上下位置の最適化 */
+  margin-top: 2.2em;     /* タイトル → 説明 → ボタン行 の流れが自然に */
+  margin-bottom: 1.4em;  /* 入力欄との距離を詰めて安定感UP */
+
   flex-wrap: wrap;
 }
 
@@ -243,7 +247,7 @@ input[type="text"] {
   border: 1px solid rgba(90,125,168,0.25);
   border-radius: var(--radius-input);
   box-shadow: 0 2px 6px var(--shadow-main);
-  margin-bottom: 1em;
+  margin-bottom: 1.2em;
   transition: 0.25s ease;
 }
 
@@ -308,7 +312,8 @@ input[type="file"]::-webkit-file-upload-button:hover {
 
   .mode-buttons {
     gap: 1.2em;
-    margin-top: 1.6em;
+    margin-top: 2.6em;   /* スマホではさらに下げて視線誘導を最適化 */
+    margin-bottom: 1.2em;
   }
 
   /* アップロード（主役） */
