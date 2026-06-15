@@ -76,13 +76,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1.2em;
-  margin-top: 1.4em;
+  gap: 1.4em;
+  margin-top: 1.6em;
   flex-wrap: wrap;
 }
 
 /* ================================
-   ▼ ボタン共通（青紫ガラス）
+   ▼ ボタン共通（青紫ガラス・ふち黒解消）
 ================================ */
 .mode-btn,
 #uploadBtn,
@@ -105,12 +105,15 @@ body {
   overflow: hidden;
   box-sizing: border-box;
 
-  background: linear-gradient(135deg, #5a7da8 0%, #6f8fbc 100%);
+  /* 黒く見えない明るめグラデーション */
+  background: linear-gradient(135deg, #6a8fc0 0%, #7fa0d0 100%);
   color: #fff;
 
+  /* 黒縁を消すための淡い境界線＋影 */
+  border: 1px solid rgba(255,255,255,0.4);
   box-shadow:
-    0 4px 12px rgba(90,125,168,0.18),
-    inset 0 0 20px rgba(255,255,255,0.25);
+    0 4px 10px rgba(90,125,168,0.15),
+    inset 0 0 18px rgba(255,255,255,0.25);
 
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -146,8 +149,8 @@ body {
 .back-btn:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 6px 18px rgba(90,125,168,0.25),
-    inset 0 0 30px rgba(255,255,255,0.3);
+    0 6px 16px rgba(90,125,168,0.22),
+    inset 0 0 28px rgba(255,255,255,0.3);
 }
 
 /* クリック */
@@ -163,7 +166,7 @@ body {
 #uploadBtn {
   transform: scale(1.04);
   box-shadow:
-    0 6px 20px rgba(90,125,168,0.28),
+    0 6px 20px rgba(90,125,168,0.25),
     inset 0 0 28px rgba(255,255,255,0.32);
 }
 
@@ -178,7 +181,7 @@ body {
    ▼ 戻るボタン（白ガラス）
 ================================ */
 .back-btn {
-  background: linear-gradient(135deg, #eef2ff 0%, #dfe6fa 100%);
+  background: linear-gradient(135deg, #f6f8ff 0%, #e9efff 100%);
   color: #4a4a4a;
   border: 1px solid rgba(255,255,255,0.6);
 }
