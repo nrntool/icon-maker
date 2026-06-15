@@ -94,8 +94,8 @@ body {
 .mode-buttons {
   display: flex;
   justify-content: center;
-  gap: 1.4em;
-  margin-top: 1.6em;
+  gap: 1.8em; /* ← 少し広げて自然な余白 */
+  margin-top: 1.8em;
   flex-wrap: wrap;
 }
 
@@ -176,18 +176,21 @@ body {
   transform: scale(0.97);
 }
 
-/* アップロードボタン強調 */
+/* ================================
+   アップロードボタン（立体感強化）
+================================ */
 #uploadBtn {
   transform: scale(1.04);
   box-shadow:
     0 6px 20px var(--shadow-main),
-    inset 0 0 28px rgba(255,255,255,0.32);
+    inset 0 0 28px rgba(255,255,255,0.32),
+    0 8px 14px rgba(90,125,168,0.18); /* ← 下方向の柔らかい影 */
 }
 
 #uploadBtn:hover {
   transform: scale(1.07);
   box-shadow:
-    0 8px 26px var(--shadow-main),
+    0 10px 22px rgba(90,125,168,0.22), /* ← hover時は少し強め */
     inset 0 0 36px rgba(255,255,255,0.38);
 }
 
