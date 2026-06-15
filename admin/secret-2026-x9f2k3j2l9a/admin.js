@@ -1,10 +1,10 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（完全統合版）
+// FrameLab 管理パネル用 admin.js（最適化版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
 
-// ▼ モード切り替え
+// ▼ モード切り替え要素
 const addModeBtn = document.getElementById("addModeBtn");
 const deleteModeBtn = document.getElementById("deleteModeBtn");
 const addModeCard = document.getElementById("addModeCard");
@@ -15,7 +15,7 @@ const modeSelect = document.getElementById("modeSelect");
 const backToSelectFromAdd = document.getElementById("backToSelectFromAdd");
 const backToSelectFromDelete = document.getElementById("backToSelectFromDelete");
 
-// ▼ フェード表示関数
+// ▼ フェード表示
 function showCard(card) {
   card.style.display = "block";
   requestAnimationFrame(() => card.classList.add("show"));
@@ -26,7 +26,7 @@ function hideCard(card) {
   setTimeout(() => (card.style.display = "none"), 300);
 }
 
-// ▼ モード切り替えイベント
+// ▼ モード切り替え
 addModeBtn.addEventListener("click", () => {
   hideCard(modeSelect);
   hideCard(deleteModeCard);
@@ -50,7 +50,9 @@ backToSelectFromDelete.addEventListener("click", () => {
   showCard(modeSelect);
 });
 
+// ================================
 // ▼ 追加モード
+// ================================
 const uploadBtn = document.getElementById("uploadBtn");
 const frameInput = document.getElementById("frameInput");
 const frameNameInput = document.getElementById("frameName");
@@ -58,7 +60,7 @@ const resultBox = document.getElementById("result");
 const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
 
-// ▼ 上書き警告ダイアログ
+// ▼ 上書きダイアログ（存在しない場合の安全処理）
 const overwriteDialog = document.getElementById("overwriteDialog");
 const overwriteYes = document.getElementById("overwriteYes");
 const overwriteNo = document.getElementById("overwriteNo");
@@ -73,7 +75,7 @@ function toBase64(file) {
   });
 }
 
-// ▼ プレビュー表示
+// ▼ プレビュー
 frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
@@ -91,15 +93,14 @@ frameInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-// ▼ GitHub に同名ファイルが存在するかチェック
+// ▼ GitHub raw で存在チェック（rate limit 回避）
 async function checkFileExists(filename) {
-  const repo = "framesynth/icon-maker";
-  const url = `https://api.github.com/repos/${repo}/contents/frames/${filename}`;
-  const res = await fetch(url);
+  const rawUrl = `https://raw.githubusercontent.com/framesynth/icon-maker/main/frames/${filename}`;
+  const res = await fetch(rawUrl, { method: "HEAD" });
   return res.ok;
 }
 
-// ▼ アップロードボタン押下
+// ▼ アップロード処理
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
@@ -114,9 +115,13 @@ uploadBtn.addEventListener("click", async () => {
   }
 
   const filename = `${frameName}.png`;
-
-  // ▼ 上書きチェック
   const exists = await checkFileExists(filename);
+
+  // ▼ 上書きダイアログが存在しない場合は即アップロード
+  if (!overwriteDialog) {
+    uploadFrame(file, frameName);
+    return;
+  }
 
   if (exists) {
     overwriteDialog.style.display = "block";
@@ -136,7 +141,7 @@ uploadBtn.addEventListener("click", async () => {
   uploadFrame(file, frameName);
 });
 
-// ▼ 実際のアップロード処理
+// ▼ 実際のアップロード
 async function uploadFrame(file, frameName) {
   uploadBtn.disabled = true;
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
@@ -174,7 +179,7 @@ async function uploadFrame(file, frameName) {
     } else {
       resultBox.textContent = `❌ エラー: ${data.error.message}`;
     }
-  } catch (err) {
+  } catch {
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
   }
 
@@ -210,7 +215,9 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-// ▼ 削除モード（一覧読み込み）
+// ================================
+// ▼ 削除モード
+// ================================
 async function loadFrameList() {
   const repo = "framesynth/icon-maker";
   const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
@@ -224,7 +231,6 @@ async function loadFrameList() {
 
     listBox.innerHTML = "";
 
-    // ▼ フレームが存在しない場合（落ち着いたトーン）
     if (!Array.isArray(data) || data.length === 0) {
       listBox.innerHTML = "現在、削除できるフレームはありません。";
       return;
@@ -248,7 +254,7 @@ async function loadFrameList() {
     });
 
   } catch {
-    listBox.innerHTML = "現在、削除できるフレームはありません。";
+    listBox.innerHTML = "⚠ フレーム一覧の取得に失敗しました。通信状況を確認してください。";
   }
 }
 
