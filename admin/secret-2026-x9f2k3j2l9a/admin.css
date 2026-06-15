@@ -247,11 +247,3 @@ input[type="file"]::-webkit-file-upload-button:hover {
   background: linear-gradient(135deg, #e3e8ff 0%, #d6defa 100%);
 }
 
-/* ================================
-   プレビュー
-================================ */
-#previewBox {
-  margin: 1.2em 0;
-  padding: 1.2em;
-  background: rgba(255,255,255,0.65);
-  backdrop-filter: blur
