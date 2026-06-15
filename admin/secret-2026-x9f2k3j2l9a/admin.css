@@ -1,5 +1,5 @@
 /* ================================
-   FrameLab 管理画面 — 完全統合版
+   FrameLab 管理画面 — 完全統合版（仕切り線なし）
 ================================ */
 
 /* ベース */
@@ -70,9 +70,9 @@ body {
 }
 
 /* ================================
-   ▼ ボタン行（左右配置）
+   ▼ ボタン行（左右配置・仕切り線なし）
 ================================ */
-.button-row {
+.mode-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -84,28 +84,32 @@ body {
 /* ================================
    ▼ ボタン共通（青紫ガラス・ふち黒解消）
 ================================ */
-.button-row button,
+.mode-btn,
 #uploadBtn,
 .back-btn {
   width: 180px;
   height: 54px;
   border-radius: 12px;
+
   display: flex;
   justify-content: center;
   align-items: center;
 
-  font-family: "Segoe UI", "Helvetica Neue", "Noto Sans JP", sans-serif;
+  font-family: inherit;
   font-weight: 600;
   font-size: 0.95em;
   letter-spacing: 0.03em;
+
   cursor: pointer;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
 
+  /* 黒く見えない明るめグラデーション */
   background: linear-gradient(135deg, #6a8fc0 0%, #7fa0d0 100%);
   color: #fff;
 
+  /* 黒縁を消すための淡い境界線＋影 */
   border: 1px solid rgba(255,255,255,0.4);
   box-shadow:
     0 4px 10px rgba(90,125,168,0.15),
@@ -115,7 +119,7 @@ body {
 }
 
 /* 光沢ライン */
-.button-row button::before,
+.mode-btn::before,
 #uploadBtn::before,
 .back-btn::before {
   content: "";
@@ -133,14 +137,14 @@ body {
   transition: left 0.8s ease;
 }
 
-.button-row button:hover::before,
+.mode-btn:hover::before,
 #uploadBtn:hover::before,
 .back-btn:hover::before {
   left: 120%;
 }
 
 /* ホバー */
-.button-row button:hover,
+.mode-btn:hover,
 #uploadBtn:hover,
 .back-btn:hover {
   transform: translateY(-2px);
@@ -150,7 +154,7 @@ body {
 }
 
 /* クリック */
-.button-row button:active,
+.mode-btn:active,
 #uploadBtn:active,
 .back-btn:active {
   transform: scale(0.97);
@@ -258,3 +262,27 @@ input[type="text"]:focus {
 }
 
 /* ================================
+   ▼ スマホでも左右配置を維持
+================================ */
+@media (max-width: 600px) {
+
+  .mode-buttons {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.8em;
+  }
+
+  .mode-btn,
+  #uploadBtn,
+  .back-btn {
+    width: 46%;
+    min-width: 140px;
+  }
+
+  #uploadBtn {
+    transform: scale(1.05);
+  }
+  #uploadBtn:hover {
+    transform: scale(1.08);
+  }
+}
