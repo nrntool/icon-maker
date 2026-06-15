@@ -2,7 +2,7 @@
    FrameLab 管理画面 — 最適化完成版
 ================================ */
 
-/* カラーパレット（UIトークン） */
+/* UIトークン */
 :root {
   --accent-blue: #6a8fc0;
   --accent-light: #7fa0d0;
@@ -121,7 +121,7 @@ body {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 青紫ガラス（基本） */
+/* 青紫ガラス */
 .mode-btn,
 #uploadBtn {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
@@ -132,7 +132,7 @@ body {
     inset 0 0 18px rgba(255,255,255,0.25);
 }
 
-/* 戻るボタン（白ガラス） */
+/* 白ガラス（戻る） */
 .back-btn {
   background: linear-gradient(135deg, #f6f8ff, #e9efff);
   color: #4a4a4a;
@@ -237,7 +237,7 @@ input[type="text"]:focus {
   box-shadow: 0 0 0 4px rgba(90,125,168,0.15);
 }
 
-/* ファイル選択ボタン */
+/* ファイル選択ボタン（文字色統一） */
 input[type="file"]::-webkit-file-upload-button {
   margin-right: 0.6em;
   padding: 0.6em 1em;
