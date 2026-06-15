@@ -1,26 +1,32 @@
 /* ================================
-   FrameLab 管理画面 — 最適化完全版
+   FrameLab 管理画面 — 最適化完成版
 ================================ */
 
-/* カラーパレット */
+/* カラーパレット（UIトークン） */
 :root {
   --accent-blue: #6a8fc0;
   --accent-light: #7fa0d0;
   --text-main: #4a5f85;
+
+  --glass: rgba(255,255,255,0.72);
+  --glass-soft: rgba(255,255,255,0.65);
+
   --shadow-main: rgba(90,125,168,0.15);
   --shadow-light: rgba(90,125,168,0.08);
-  --white-glass: rgba(255,255,255,0.72);
-  --white-glass-soft: rgba(255,255,255,0.65);
+
+  --radius-card: 18px;
+  --radius-btn: 12px;
+  --radius-input: 10px;
 }
 
 /* ================================
    ベース
 ================================ */
 body {
-  background: radial-gradient(circle at top, #e8ecf5 0%, #f4f6fb 45%, #f2f3f8 100%);
   margin: 0;
   padding: 0;
   font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
+  background: radial-gradient(circle at top, #e8ecf5 0%, #f4f6fb 45%, #f2f3f8 100%);
   color: #222;
   text-align: center;
   line-height: 1.6;
@@ -31,11 +37,11 @@ body {
    管理画面帯
 ================================ */
 .admin-banner {
-  background: linear-gradient(180deg, #ffffff 0%, #eef2fa 100%);
+  background: linear-gradient(180deg, #ffffff, #eef2fa);
   color: var(--text-main);
   padding: 0.6em;
-  font-weight: 500;
   font-size: 0.95em;
+  font-weight: 500;
   border-radius: 0 0 16px 16px;
   margin-bottom: 1.6em;
   box-shadow:
@@ -51,9 +57,9 @@ body {
   max-width: 440px;
   margin: 1.8em auto;
   padding: 1.9em 1.5em;
-  background: var(--white-glass);
+  background: var(--glass);
   backdrop-filter: blur(16px);
-  border-radius: 18px;
+  border-radius: var(--radius-card);
   border: 1px solid rgba(90,125,168,0.25);
   box-shadow:
     0 4px 14px var(--shadow-main),
@@ -83,26 +89,25 @@ body {
 }
 
 /* ================================
-   ボタン行（左右配置）
+   ボタン行
 ================================ */
 .mode-buttons {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 1.4em;
   margin-top: 1.6em;
   flex-wrap: wrap;
 }
 
 /* ================================
-   ボタン共通（青紫ガラス）
+   ボタン共通
 ================================ */
 .mode-btn,
 #uploadBtn,
 .back-btn {
   width: 180px;
   height: 54px;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -119,7 +124,7 @@ body {
 /* 青紫ガラス（基本） */
 .mode-btn,
 #uploadBtn {
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-light) 100%);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
   color: #fff;
   border: 1px solid rgba(255,255,255,0.4);
   box-shadow:
@@ -129,7 +134,7 @@ body {
 
 /* 戻るボタン（白ガラス） */
 .back-btn {
-  background: linear-gradient(135deg, #f6f8ff 0%, #e9efff 100%);
+  background: linear-gradient(135deg, #f6f8ff, #e9efff);
   color: #4a4a4a;
   border: 1px solid rgba(255,255,255,0.6);
 }
@@ -144,7 +149,7 @@ body {
   left: -40%;
   width: 80%;
   height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.45), rgba(255,255,255,0));
+  background: linear-gradient(120deg, rgba(255,255,255,0.45), transparent);
   transform: skewX(-25deg);
   transition: left 0.8s ease;
 }
@@ -210,7 +215,7 @@ label {
   backdrop-filter: blur(6px);
 }
 
-/* 入力欄（FrameLabと統一） */
+/* 入力欄 */
 input[type="file"],
 input[type="text"] {
   width: 100%;
@@ -219,7 +224,7 @@ input[type="text"] {
   font-size: 0.92em;
   background: rgba(255,255,255,0.75);
   border: 1px solid rgba(90,125,168,0.25);
-  border-radius: 10px;
+  border-radius: var(--radius-input);
   box-shadow: 0 2px 6px var(--shadow-main);
   margin-bottom: 1em;
   transition: 0.25s ease;
@@ -238,7 +243,7 @@ input[type="file"]::-webkit-file-upload-button {
   padding: 0.6em 1em;
   border: none;
   border-radius: 6px;
-  background: linear-gradient(135deg, #eef2ff 0%, #dfe6fa 100%);
+  background: linear-gradient(135deg, #eef2ff, #dfe6fa);
   color: var(--text-main);
   font-weight: 500;
   cursor: pointer;
@@ -246,16 +251,16 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 input[type="file"]::-webkit-file-upload-button:hover {
-  background: linear-gradient(135deg, #e3e8ff 0%, #d6defa 100%);
+  background: linear-gradient(135deg, #e3e8ff, #d6defa);
 }
 
 /* ================================
-   プレビュー（壊れ防止）
+   プレビュー
 ================================ */
 #previewBox {
   margin: 1.2em 0;
   padding: 1.2em;
-  background: var(--white-glass-soft);
+  background: var(--glass-soft);
   backdrop-filter: blur(10px);
   border-radius: 14px;
   box-shadow: 0 3px 12px var(--shadow-main);
