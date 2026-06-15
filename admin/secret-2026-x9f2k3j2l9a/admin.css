@@ -1,5 +1,5 @@
 /* ================================
-   FrameLab 管理画面 — 完全統合版
+   FrameLab 管理画面 — 完全統合版（仕切り線なし）
 ================================ */
 
 /* ベース */
@@ -70,34 +70,15 @@ body {
 }
 
 /* ================================
-   ▼ ボタン行（左右配置）
+   ▼ ボタン行（左右配置・仕切り線なし）
 ================================ */
 .mode-buttons {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1.2em;
   margin-top: 1.4em;
   flex-wrap: wrap;
-}
-
-/* ▼ 中央の薄い仕切り線 */
-.mode-buttons::after {
-  content: "";
-  position: absolute;
-  width: 1px;
-  height: 42px;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgba(90,125,168,0) 0%,
-    rgba(90,125,168,0.35) 50%,
-    rgba(90,125,168,0) 100%
-  );
-  border-radius: 1px;
 }
 
 /* ================================
@@ -293,10 +274,6 @@ input[type="text"]:focus {
   .back-btn {
     width: 46%;
     min-width: 140px;
-  }
-
-  .mode-buttons::after {
-    height: 36px;
   }
 
   #uploadBtn {
