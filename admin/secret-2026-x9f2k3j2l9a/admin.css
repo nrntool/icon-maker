@@ -96,11 +96,8 @@ body {
   justify-content: center;
   align-items: center;
   gap: 1.8em;
-
-  /* ▼ 上下位置の最適化 */
-  margin-top: 2.2em;     /* タイトル → 説明 → ボタン行 の流れが自然に */
-  margin-bottom: 1.4em;  /* 入力欄との距離を詰めて安定感UP */
-
+  margin-top: 2.2em;
+  margin-bottom: 1.4em;
   flex-wrap: wrap;
 }
 
@@ -203,7 +200,7 @@ body {
     inset 0 0 36px rgba(255,255,255,0.38);
 }
 
-/* 戻るボタン（補助階層） */
+/* 戻るボタン */
 .back-btn:hover {
   opacity: 1;
   transform: translateY(-1px);
@@ -258,7 +255,7 @@ input[type="text"]:focus {
   box-shadow: 0 0 0 4px rgba(90,125,168,0.15);
 }
 
-/* ファイル選択ボタン（文字色統一） */
+/* ファイル選択ボタン */
 input[type="file"]::-webkit-file-upload-button {
   margin-right: 0.6em;
   padding: 0.6em 1em;
@@ -306,17 +303,47 @@ input[type="file"]::-webkit-file-upload-button:hover {
 }
 
 /* ================================
-   スマホ最適化（主役／補助の階層調整）
+   フレーム一覧（削除モード）
+================================ */
+.frame-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4em;
+  margin-top: 1.6em;
+}
+
+/* 各フレームカード */
+.frame-item {
+  padding: 1em;
+  background: var(--glass-soft);
+  border-radius: 14px;
+  box-shadow: 0 3px 10px var(--shadow-main);
+  text-align: center;
+}
+
+/* サムネイル画像（見切れ防止） */
+.frame-item img {
+  width: 100%;
+  max-width: 260px;
+  max-height: 150px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 0.6em;
+  background: #000;
+  border-radius: 10px;
+}
+
+/* ================================
+   スマホ最適化
 ================================ */
 @media (max-width: 600px) {
 
   .mode-buttons {
     gap: 1.2em;
-    margin-top: 2.6em;   /* スマホではさらに下げて視線誘導を最適化 */
+    margin-top: 2.6em;
     margin-bottom: 1.2em;
   }
 
-  /* アップロード（主役） */
   #uploadBtn {
     width: 54%;
     min-width: 150px;
@@ -327,7 +354,6 @@ input[type="file"]::-webkit-file-upload-button:hover {
     transform: scale(1.09);
   }
 
-  /* 戻る（補助） */
   .back-btn {
     width: 40%;
     min-width: 130px;
