@@ -60,7 +60,7 @@ const resultBox = document.getElementById("result");
 const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
 
-// ▼ 上書きダイアログ（存在しない場合の安全処理）
+// ▼ 上書きダイアログ
 const overwriteDialog = document.getElementById("overwriteDialog");
 const overwriteYes = document.getElementById("overwriteYes");
 const overwriteNo = document.getElementById("overwriteNo");
@@ -93,7 +93,7 @@ frameInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-// ▼ GitHub raw で存在チェック（rate limit 回避）
+// ▼ GitHub raw で存在チェック
 async function checkFileExists(filename) {
   const rawUrl = `https://raw.githubusercontent.com/framesynth/icon-maker/main/frames/${filename}`;
   const res = await fetch(rawUrl, { method: "HEAD" });
@@ -117,7 +117,6 @@ uploadBtn.addEventListener("click", async () => {
   const filename = `${frameName}.png`;
   const exists = await checkFileExists(filename);
 
-  // ▼ 上書きダイアログが存在しない場合は即アップロード
   if (!overwriteDialog) {
     uploadFrame(file, frameName);
     return;
@@ -164,20 +163,34 @@ async function uploadFrame(file, frameName) {
       const rawUrl = data.data.url;
       const userPageUrl = "https://framesynth.github.io/icon-maker/";
 
+      // ▼ 成功メッセージ（最適化版）
       resultBox.innerHTML = `
-        ${data.data.overwrite ? "🔄 上書き完了！" : "✅ アップロード完了！"}<br><br>
+        <div class="success-box">
+          <div class="success-icon">✓</div>
+          <div class="success-text">
+            ${data.data.overwrite ? "上書きが完了しました。" : "アップロードが完了しました。"}<br>
+            反映をご確認ください。
+          </div>
+        </div>
 
-        📁 GitHub 反映URL：<br>
-        <a href="${rawUrl}" target="_blank">${rawUrl}</a><br><br>
+        <div class="success-links">
+          <p>📁 GitHub 反映URL：</p>
+          <a href="${rawUrl}" target="_blank">${rawUrl}</a>
 
-        👀 ユーザー画面で確認：<br>
-        <a href="${userPageUrl}" target="_blank">${userPageUrl}</a><br><br>
+          <p>👀 ユーザー画面：</p>
+          <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
 
-        <button id="checkReflectBtn">反映チェック</button>
-        <div id="reflectStatus"></div>
+          <button id="checkReflectBtn" class="reflect-btn">反映チェック</button>
+          <div id="reflectStatus"></div>
+        </div>
       `;
     } else {
-      resultBox.textContent = `❌ エラー: ${data.error.message}`;
+      // ▼ 同名エラー最適化
+      if (data.error?.message?.includes("sha")) {
+        resultBox.innerHTML = `❌ 同じ名前のフレームがすでに登録されています。`;
+      } else {
+        resultBox.innerHTML = `❌ エラーが発生しました：${data.error?.message || "不明なエラー"}`;
+      }
     }
   } catch {
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
