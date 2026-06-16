@@ -5,10 +5,12 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: "Noto Sans JP", sans-serif;
+  font-weight: 400;
   background: linear-gradient(135deg, #e8ecf5 0%, #f4f6fb 100%);
   color: #222;
   text-align: center;
   line-height: 1.6;
+  letter-spacing: 0.02em;
 }
 
 /* ================================
@@ -83,14 +85,12 @@ header h1::after {
 label {
   display: flex;
   align-items: center;
-  font-weight: 600;
+  font-weight: 500;
   margin: 1em 0 0.3em;
   font-size: 0.9em;
-  letter-spacing: 0.02em;
   color: #4a5f85;
 }
 
-/* Step Badge */
 .step-badge {
   display: inline-flex;
   justify-content: center;
@@ -140,7 +140,7 @@ select:focus {
 }
 
 /* ================================
-   File Button — 1枚目・2枚目完全統一
+   File Button — 統一デザイン
 ================================ */
 input[type="file"]::-webkit-file-upload-button {
   margin-right: 0.6em;
@@ -199,7 +199,7 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.95em;
   letter-spacing: 0.03em;
   cursor: pointer;
