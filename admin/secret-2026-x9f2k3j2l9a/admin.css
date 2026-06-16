@@ -1,5 +1,5 @@
 /* ================================
-   FrameLab 管理画面 — 最終最適化版
+   FrameLab 管理画面 — 最終最適化版（圧縮・統一）
 ================================ */
 
 /* UIトークン */
@@ -17,7 +17,7 @@
 }
 
 /* ================================
-   ベース（フォント完全統一）
+   ベース
 ================================ */
 html, body, button, input, select, label, p, h1, h2, h3, div, span {
   font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
@@ -34,17 +34,15 @@ body {
 }
 
 /* ================================
-   フェードイン（成功メッセージ用）
+   フェードイン
 ================================ */
 .fade-in {
   opacity: 0;
   transform: translateY(6px);
   animation: fadeInUp 0.45s ease-out forwards;
 }
-
 @keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ================================
@@ -62,7 +60,7 @@ body {
 }
 
 /* ================================
-   カード（青紫ガラス）
+   カード
 ================================ */
 .app-card {
   width: 92%;
@@ -74,35 +72,21 @@ body {
   border-radius: var(--radius-card);
   border: 1px solid rgba(90,125,168,0.25);
   box-shadow: 0 4px 14px var(--shadow-main), 0 18px 40px var(--shadow-light);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: 0.25s ease;
 }
-
 .app-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px var(--shadow-main), 0 22px 50px var(--shadow-light);
 }
 
 /* ================================
-   タイトル（別フォント）
+   タイトル
 ================================ */
 .mode-title {
   font-family: "Playfair Display", "Noto Sans JP", serif;
   font-size: 1.48em;
   font-weight: 600;
   color: var(--text-main);
-  letter-spacing: 0.01em;
-}
-
-/* ================================
-   ボタン行
-================================ */
-.mode-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.8em;
-  margin: 2.2em 0 1.4em;
-  flex-wrap: wrap;
 }
 
 /* ================================
@@ -123,29 +107,10 @@ body {
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  box-sizing: border-box;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: 0.25s ease;
 }
 
-/* 青紫ガラス */
-.mode-btn,
-#uploadBtn {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.4);
-  box-shadow: 0 4px 10px var(--shadow-main), inset 0 0 18px rgba(255,255,255,0.25);
-}
-
-/* 白ガラス（戻る） */
-.back-btn {
-  background: linear-gradient(135deg, #f9fbff, #eef2fa);
-  color: #4a4a4a;
-  border: 1px solid rgba(255,255,255,0.7);
-  box-shadow: 0 3px 10px rgba(90,125,168,0.12), inset 0 0 18px rgba(255,255,255,0.25);
-  opacity: 0.95;
-}
-
-/* 光沢ライン */
+/* shine 共通 */
 .mode-btn::before,
 #uploadBtn::before,
 .back-btn::before {
@@ -159,14 +124,30 @@ body {
   transform: skewX(-25deg);
   transition: left 0.8s ease;
 }
-
 .mode-btn:hover::before,
 #uploadBtn:hover::before,
 .back-btn:hover::before {
   left: 120%;
 }
 
-/* ホバー */
+/* 青紫ガラス */
+.mode-btn,
+#uploadBtn {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 4px 10px var(--shadow-main), inset 0 0 18px rgba(255,255,255,0.25);
+}
+
+/* 白ガラス */
+.back-btn {
+  background: linear-gradient(135deg, #f9fbff, #eef2fa);
+  color: #4a4a4a;
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 3px 10px rgba(90,125,168,0.12), inset 0 0 18px rgba(255,255,255,0.25);
+}
+
+/* hover 共通 */
 .mode-btn:hover,
 #uploadBtn:hover,
 .back-btn:hover {
@@ -175,23 +156,7 @@ body {
 }
 
 /* ================================
-   アップロードボタン
-================================ */
-#uploadBtn {
-  margin: 1.6em auto 2.2em;
-  transform: scale(1.04);
-  box-shadow:
-    0 6px 20px var(--shadow-main),
-    inset 0 0 28px rgba(255,255,255,0.32),
-    0 8px 14px rgba(90,125,168,0.18);
-}
-
-#uploadBtn:hover {
-  transform: scale(1.07);
-}
-
-/* ================================
-   ラベル・入力欄
+   入力欄
 ================================ */
 label {
   display: flex;
@@ -202,20 +167,6 @@ label {
   color: var(--text-main);
 }
 
-.step-badge {
-  width: 1.6em;
-  height: 1.6em;
-  margin-right: 0.6em;
-  font-size: 0.85em;
-  font-weight: 600;
-  color: var(--text-main);
-  border-radius: 6px;
-  border: 1px solid rgba(90,125,168,0.35);
-  background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(6px);
-}
-
-/* 入力欄 */
 input[type="file"],
 input[type="text"] {
   width: 100%;
@@ -230,17 +181,13 @@ input[type="text"] {
   transition: 0.25s ease;
 }
 
-/* ファイル選択ボタン */
 input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
   padding: 0.6em 1em;
-  border: none;
   border-radius: 6px;
   background: linear-gradient(135deg, #eef2ff, #dfe6fa);
   color: var(--text-main);
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.25s ease;
 }
 
 /* ================================
@@ -261,13 +208,11 @@ input[type="file"]::-webkit-file-upload-button {
   max-width: 380px;
   border-radius: 12px;
   box-shadow: 0 4px 14px var(--shadow-main);
-  display: block;
   margin: 0 auto;
   opacity: 0;
   transform: scale(0.97);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: 0.3s ease;
 }
-
 #previewImage.show {
   opacity: 1;
   transform: scale(1);
@@ -296,32 +241,15 @@ input[type="file"]::-webkit-file-upload-button {
   max-width: 260px;
   max-height: 150px;
   object-fit: contain;
-  display: block;
   margin: 0 auto 0.6em;
-  background: #000;
   border-radius: 10px;
 }
 
 /* ================================
-   スマホ最適化
+   スマホ
 ================================ */
 @media (max-width: 600px) {
-
-  .mode-buttons {
-    gap: 1.2em;
-    margin-top: 2.6em;
-    margin-bottom: 1.2em;
-  }
-
-  #uploadBtn {
-    width: 54%;
-    min-width: 150px;
-    transform: scale(1.06);
-  }
-
-  .back-btn {
-    width: 40%;
-    min-width: 130px;
-    opacity: 0.92;
-  }
+  .mode-buttons { gap: 1.2em; margin-top: 2.6em; }
+  #uploadBtn { width: 54%; min-width: 150px; }
+  .back-btn { width: 40%; min-width: 130px; }
 }
