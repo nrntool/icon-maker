@@ -1,5 +1,5 @@
 /* ================================
-   FrameLab 管理画面 — 最終最適化版
+   FrameLab 管理画面 — 最終最適化版（フォント統一＋タイトル別フォント）
 ================================ */
 
 /* UIトークン */
@@ -17,16 +17,20 @@
 }
 
 /* ================================
-   ベース
+   ベース（フォント完全統一）
 ================================ */
+html, body, button, input, select, label, p, h1, h2, h3, div, span {
+  font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
 body {
   margin: 0;
-  font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
   background: radial-gradient(circle at top, #e8ecf5 0%, #f4f6fb 45%, #f2f3f8 100%);
   color: #222;
   text-align: center;
   line-height: 1.6;
-  letter-spacing: 0.02em;
 }
 
 /* ================================
@@ -65,12 +69,14 @@ body {
 }
 
 /* ================================
-   タイトル・説明
+   タイトル・説明（タイトルだけ別フォント）
 ================================ */
 .mode-title {
-  font-size: 1.35em;
-  font-weight: 500;
+  font-family: "Playfair Display", "Noto Sans JP", serif;
+  font-size: 1.45em;
+  font-weight: 600;
   color: var(--text-main);
+  letter-spacing: 0.01em;
 }
 
 .subtext {
@@ -102,7 +108,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 600;
+  font-weight: 500; /* 上品に */
   font-size: 0.95em;
   letter-spacing: 0.03em;
   cursor: pointer;
@@ -198,6 +204,7 @@ label {
   height: 1.6em;
   margin-right: 0.6em;
   font-size: 0.85em;
+  font-weight: 600;
   color: var(--text-main);
   border-radius: 6px;
   border: 1px solid rgba(90,125,168,0.35);
@@ -220,7 +227,7 @@ input[type="text"] {
   transition: 0.25s ease;
 }
 
-/* ファイル選択ボタン（青紫ガラス調） */
+/* ファイル選択ボタン */
 input[type="file"]::-webkit-file-upload-button {
   margin-right: 0.6em;
   padding: 0.6em 1em;
