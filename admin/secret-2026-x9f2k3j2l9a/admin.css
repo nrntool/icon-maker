@@ -79,17 +79,15 @@ body {
 }
 
 /* ================================
-   ボタン行（横並び最適化）
+   ボタン行
 ================================ */
-.upload-back-row {
+.mode-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1.6em;
-  margin: 2em auto;
+  gap: 1.8em;
+  margin: 2.2em 0 1.4em;
   flex-wrap: wrap;
-  width: 100%;
-  max-width: 420px;
 }
 
 /* ================================
@@ -130,6 +128,8 @@ body {
   border: 1px solid rgba(255,255,255,0.7);
   box-shadow: 0 3px 10px rgba(90,125,168,0.12), inset 0 0 18px rgba(255,255,255,0.25);
   opacity: 0.95;
+  display: block;
+  margin: 1.4em auto 2.2em;
 }
 
 /* 光沢ライン */
@@ -162,10 +162,11 @@ body {
 }
 
 /* ================================
-   アップロードボタン（横並び用）
+   アップロードボタン（中央寄せ）
 ================================ */
 #uploadBtn {
-  margin: 0;
+  display: block;
+  margin: 1.6em auto 2.2em;
   transform: scale(1.04);
   box-shadow:
     0 6px 20px var(--shadow-main),
@@ -219,7 +220,7 @@ input[type="text"] {
   transition: 0.25s ease;
 }
 
-/* ファイル選択ボタン */
+/* ファイル選択ボタン（青紫ガラス調） */
 input[type="file"]::-webkit-file-upload-button {
   margin-right: 0.6em;
   padding: 0.6em 1em;
@@ -300,13 +301,29 @@ input[type="file"]::-webkit-file-upload-button:hover {
 ================================ */
 @media (max-width: 600px) {
 
-  .upload-back-row {
+  .mode-buttons {
     gap: 1.2em;
+    margin-top: 2.6em;
+    margin-bottom: 1.2em;
   }
 
-  #uploadBtn,
+  #uploadBtn {
+    width: 54%;
+    min-width: 150px;
+    transform: scale(1.06);
+  }
+
+  #uploadBtn:hover {
+    transform: scale(1.09);
+  }
+
   .back-btn {
-    width: 46%;
+    width: 40%;
     min-width: 130px;
+    opacity: 0.92;
+  }
+
+  .back-btn:hover {
+    opacity: 1;
   }
 }
