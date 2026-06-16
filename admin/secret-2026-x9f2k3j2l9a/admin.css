@@ -128,8 +128,6 @@ body {
   border: 1px solid rgba(255,255,255,0.7);
   box-shadow: 0 3px 10px rgba(90,125,168,0.12), inset 0 0 18px rgba(255,255,255,0.25);
   opacity: 0.95;
-
-  /* 中央寄せ＋余白調整 */
   display: block;
   margin: 1.4em auto 2.2em;
 }
@@ -164,19 +162,23 @@ body {
 }
 
 /* ================================
-   アップロードボタン
+   アップロードボタン（中央寄せ）
 ================================ */
 #uploadBtn {
+  display: block;
+  margin: 1.6em auto 2.2em;
   transform: scale(1.04);
-  box-shadow: 0 6px 20px var(--shadow-main),
-              inset 0 0 28px rgba(255,255,255,0.32),
-              0 8px 14px rgba(90,125,168,0.18);
+  box-shadow:
+    0 6px 20px var(--shadow-main),
+    inset 0 0 28px rgba(255,255,255,0.32),
+    0 8px 14px rgba(90,125,168,0.18);
 }
 
 #uploadBtn:hover {
   transform: scale(1.07);
-  box-shadow: 0 10px 22px rgba(90,125,168,0.22),
-              inset 0 0 36px rgba(255,255,255,0.38);
+  box-shadow:
+    0 10px 22px rgba(90,125,168,0.22),
+    inset 0 0 36px rgba(255,255,255,0.38);
 }
 
 /* ================================
