@@ -1,59 +1,74 @@
 // ================================
-// FrameLab ユーザー画面 完全版（日本語名対応・ズレゼロ）
+// FrameLab ユーザー画面 完全版（Worker連携・日本語名対応・ズレゼロ）
 // ================================
 
+// ▼ Worker API（一覧取得）
+const WORKER_LIST_API = "https://framelab-uploader.narun091525-b98.workers.dev?mode=list";
+
+// ▼ DOM
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const saveBtn = document.getElementById("saveBtn");
+const resetBtn = document.getElementById("resetBtn");
 
-// ▼ フレーム一覧を読み込み（日本語名対応）
-async function loadFramesFromGitHub() {
-  const repo = "framesynth/icon-maker";
-  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
+// ▼ 画像オブジェクト
+let baseImage = null;
+let frameImage = null;
 
+// ▼ 変形パラメータ
+let scale = 1;
+let minScale = 0.3;
+let maxScale = 4;
+let offsetX = 0;
+let offsetY = 0;
+
+// ================================
+// ▼ Worker からフレーム一覧を取得（日本語名対応）
+// ================================
+async function loadFrames() {
   try {
-    const response = await fetch(framesUrl, { cache: "no-cache" });
-    const data = await response.json();
+    const res = await fetch(WORKER_LIST_API);
+    const data = await res.json();
+
+    if (!data.success) {
+      frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
+      return;
+    }
+
+    const frames = data.data.frames;
 
     frameSelect.innerHTML = '<option value="">選択してください</option>';
 
-    for (const item of data) {
-      if (!item.name.endsWith(".png")) continue;
-
-      // コミット履歴から日本語名を取得
-      const commitsUrl = `https://api.github.com/repos/${repo}/commits?path=frames/${item.name}&per_page=1`;
-      const commitRes = await fetch(commitsUrl);
-      const commitData = await commitRes.json();
-
-      let displayName = item.name.replace(".png", "");
-      if (commitData[0]?.commit?.message?.includes("Add frame: ")) {
-        displayName = commitData[0].commit.message.replace("Add frame: ", "");
-      }
-
-      const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
+    frames.forEach(frame => {
       const option = document.createElement("option");
-      option.value = rawUrl;
-      option.textContent = displayName;
+      option.value = frame.url;
+      option.textContent = frame.name.replace(".png", "");
       frameSelect.appendChild(option);
-    }
+    });
+
   } catch (err) {
-    console.error("GitHub API 読み込みエラー:", err);
+    console.error("フレーム一覧取得エラー:", err);
     frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
   }
 }
 
+// ================================
 // ▼ Canvas サイズ調整
+// ================================
 function resizeCanvas() {
   const size = canvas.clientWidth;
   if (!size) return;
+
   canvas.width = size;
   canvas.height = size;
+
   redraw();
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  loadFramesFromGitHub();
+  loadFrames();
   setTimeout(resizeCanvas, 50);
 });
 
@@ -61,15 +76,9 @@ window.addEventListener("resize", () => {
   setTimeout(resizeCanvas, 50);
 });
 
-let baseImage = null;
-let frameImage = null;
-let scale = 1;
-let minScale = 0.3;
-let maxScale = 4;
-let offsetX = 0;
-let offsetY = 0;
-
-// ▼ 画像読み込み
+// ================================
+// ▼ baseImage 読み込み
+// ================================
 imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -97,7 +106,9 @@ imageInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
+// ================================
 // ▼ フレーム選択
+// ================================
 frameSelect.addEventListener("change", () => {
   const value = frameSelect.value;
   if (!value) {
@@ -109,10 +120,14 @@ frameSelect.addEventListener("change", () => {
   frameImage = new Image();
   frameImage.crossOrigin = "anonymous";
   frameImage.onload = redraw;
-  frameImage.src = value;
+
+  // ▼ キャッシュ無効化
+  frameImage.src = value + "?t=" + Date.now();
 });
 
+// ================================
 // ▼ ピンチ距離
+// ================================
 function getDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
@@ -132,7 +147,9 @@ let lastX = null;
 let lastY = null;
 let lastDist = null;
 
+// ================================
 // ▼ タッチ開始
+// ================================
 canvas.addEventListener("touchstart", (e) => {
   const rect = canvas.getBoundingClientRect();
 
@@ -147,7 +164,9 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
+// ================================
 // ▼ タッチ移動（ピンチ＋ドラッグ）
+// ================================
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
@@ -184,7 +203,9 @@ canvas.addEventListener("touchmove", (e) => {
   }
 }, { passive: false });
 
+// ================================
 // ▼ タッチ終了
+// ================================
 canvas.addEventListener("touchend", () => {
   isDragging = false;
   lastX = null;
@@ -192,7 +213,9 @@ canvas.addEventListener("touchend", () => {
   lastDist = null;
 });
 
+// ================================
 // ▼ 描画処理
+// ================================
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -207,7 +230,9 @@ function redraw() {
   }
 }
 
-// ▼ 保存処理
+// ================================
+// ▼ 高解像度保存
+// ================================
 function saveHighRes() {
   if (!baseImage) {
     alert("画像が選択されていません。");
@@ -249,5 +274,19 @@ function saveHighRes() {
   }, "image/png");
 }
 
-document.getElementById("saveBtn").addEventListener("click", saveHighRes);
-document.getElementById("resetBtn").addEventListener("click", ()
+// ================================
+// ▼ リセット
+// ================================
+resetBtn.addEventListener("click", () => {
+  baseImage = null;
+  frameImage = null;
+  scale = 1;
+  offsetX = 0;
+  offsetY = 0;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+// ================================
+// ▼ 保存ボタン
+// ================================
+saveBtn.addEventListener("click", saveHighRes);
