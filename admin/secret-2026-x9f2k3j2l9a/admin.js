@@ -103,9 +103,6 @@ uploadBtn.addEventListener("click", async () => {
   if (!file) return (resultBox.textContent = "⚠ ファイルが選択されていません。");
   if (!frameName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
 
-  const filename = `${frameName}.png`;
-  const exists = await checkFileExists(filename);
-
   uploadFrame(file, frameName);
 });
 
@@ -204,7 +201,6 @@ async function loadFrameList() {
   try {
     const res = await fetch(url);
     const data = await res.json();
-
     listBox.innerHTML = "";
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -214,12 +210,12 @@ async function loadFrameList() {
 
     data.forEach(item => {
       if (!item.name.endsWith(".png")) return;
-
       const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
 
       const div = document.createElement("div");
       div.className = "frame-item";
 
+      // ▼ チェック式に統一
       div.innerHTML = `
         <input type="checkbox" class="frame-checkbox" data-name="${item.name}">
         <img src="${rawUrl}" class="frame-thumb">
