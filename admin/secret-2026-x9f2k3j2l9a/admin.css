@@ -345,7 +345,50 @@ input[type="file"]::-webkit-file-upload-button {
   transform: scale(1.02);
 }
 
-/* 削除ボタン行 */
+/* ================================
+   削除ボタン＋戻るボタン 横並び
+================================ */
 .delete-actions {
-  margin-top: 1.8em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.4em;
+  margin-top: 2em;
+  flex-wrap: wrap;
+}
+
+.delete-actions .delete-btn-main,
+.delete-actions .back-btn {
+  width: 180px;
+  height: 54px;
+}
+
+/* ================================
+   スマホ最適化（削除モード）
+================================ */
+@media (max-width: 600px) {
+  .frame-item {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .frame-thumb {
+    width: 70px;
+    height: 70px;
+  }
+
+  .frame-checkbox {
+    transform: scale(1.4);
+  }
+
+  .delete-actions {
+    gap: 1em;
+    margin-top: 2.2em;
+  }
+
+  .delete-actions .delete-btn-main,
+  .delete-actions .back-btn {
+    width: 46%;
+    min-width: 140px;
+  }
 }
