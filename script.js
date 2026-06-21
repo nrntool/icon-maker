@@ -50,7 +50,7 @@ async function loadFrames() {
 
   } catch (err) {
     console.error("フレーム一覧取得エラー:", err);
-    frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
+    frameSelect.innerHTML = '<option value="">フレーム読み込みできません</option>';
   }
 }
 
