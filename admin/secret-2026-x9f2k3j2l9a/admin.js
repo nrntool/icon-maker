@@ -1,289 +1,272 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（完全版）
+// FrameLab ドラッグ慣性なし完全版（ズレゼロ）
 // ================================
 
-const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
+const imageInput = document.getElementById("imageInput");
+const frameSelect = document.getElementById("frameSelect");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-// ▼ モード切り替え要素
-const addModeBtn = document.getElementById("addModeBtn");
-const deleteModeBtn = document.getElementById("deleteModeBtn");
-const addModeCard = document.getElementById("addModeCard");
-const deleteModeCard = document.getElementById("deleteModeCard");
-const modeSelect = document.getElementById("modeSelect");
+// ▼ GitHub raw URLからフレーム一覧を取得
+async function loadFramesFromGitHub() {
+  const repo = "framesynth/icon-maker";
+  const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
 
-// ▼ 戻るボタン
-const backToSelectFromAdd = document.getElementById("backToSelectFromAdd");
-const backToSelectFromDelete = document.getElementById("backToSelectFromDelete");
+  try {
+    const response = await fetch(framesUrl, { cache: "no-cache" });
+    const data = await response.json();
 
-// ▼ フェード表示
-function showCard(card) {
-  card.style.display = "block";
-  requestAnimationFrame(() => card.classList.add("show"));
-}
+    frameSelect.innerHTML = '<option value="">選択してください</option>';
 
-function hideCard(card) {
-  card.classList.remove("show");
-  setTimeout(() => (card.style.display = "none"), 300);
-}
-
-// ▼ モード切り替え
-addModeBtn.onclick = () => {
-  hideCard(modeSelect);
-  hideCard(deleteModeCard);
-  showCard(addModeCard);
-};
-
-deleteModeBtn.onclick = () => {
-  hideCard(modeSelect);
-  hideCard(addModeCard);
-  showCard(deleteModeCard);
-  loadFrameList();
-};
-
-backToSelectFromAdd.onclick = () => {
-  hideCard(addModeCard);
-  showCard(modeSelect);
-};
-
-backToSelectFromDelete.onclick = () => {
-  hideCard(deleteModeCard);
-  showCard(modeSelect);
-};
-
-// ================================
-// ▼ 追加モード
-// ================================
-const uploadBtn = document.getElementById("uploadBtn");
-const frameInput = document.getElementById("frameInput");
-const frameNameInput = document.getElementById("frameName");
-const resultBox = document.getElementById("result");
-const previewBox = document.getElementById("previewBox");
-const previewImage = document.getElementById("previewImage");
-
-// ▼ 上書きダイアログ
-const overwriteDialog = document.getElementById("overwriteDialog");
-const overwriteYes = document.getElementById("overwriteYes");
-const overwriteNo = document.getElementById("overwriteNo");
-
-// Base64 変換
-const toBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
-// ▼ プレビュー
-frameInput.onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) {
-    previewBox.style.display = "none";
-    previewImage.src = "";
-    return;
+    data.forEach(item => {
+      if (item.name.endsWith(".png")) {
+        const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
+        const option = document.createElement("option");
+        option.value = rawUrl;
+        option.textContent = item.name.replace(".png", "");
+        frameSelect.appendChild(option);
+      }
+    });
+  } catch (err) {
+    console.error("GitHub API 読み込みエラー:", err);
+    frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
   }
+}
+
+// ▼ Canvas サイズ調整
+function resizeCanvas() {
+  const size = canvas.clientWidth;
+  if (!size) return;
+  canvas.width = size;
+  canvas.height = size;
+  redraw();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadFramesFromGitHub();
+  setTimeout(resizeCanvas, 50);
+});
+
+window.addEventListener("resize", () => {
+  setTimeout(resizeCanvas, 50);
+});
+
+let baseImage = null;
+let frameImage = null;
+
+let scale = 1;
+let minScale = 0.3;
+let maxScale = 4;
+
+let offsetX = 0;
+let offsetY = 0;
+
+// ▼ 画像読み込み
+imageInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
   const reader = new FileReader();
   reader.onload = () => {
-    previewImage.src = reader.result;
-    previewBox.style.display = "block";
-    previewImage.classList.add("show");
+    baseImage = new Image();
+    baseImage.onload = () => {
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const iw = baseImage.width;
+      const ih = baseImage.height;
+
+      const fitScale = Math.min(cw / iw, ch / ih);
+      scale = fitScale;
+      minScale = fitScale * 0.3;
+
+      offsetX = cw / 2 - (iw * scale) / 2;
+      offsetY = ch / 2 - (ih * scale) / 2;
+
+      redraw();
+    };
+    baseImage.src = reader.result;
   };
   reader.readAsDataURL(file);
-};
+});
 
-// ▼ GitHub raw で存在チェック
-async function checkFileExists(filename) {
-  const rawUrl = `https://raw.githubusercontent.com/framesynth/icon-maker/main/frames/${filename}`;
-  const res = await fetch(rawUrl, { method: "HEAD" });
-  return res.ok;
-}
-
-// ▼ アップロード処理（日本語名OK → 内部はランダム英数字）
-uploadBtn.onclick = async () => {
-  const file = frameInput.files[0];
-  const frameDisplayName = frameNameInput.value.trim();
-
-  if (!file) return (resultBox.textContent = "⚠ ファイルが選択されていません。");
-  if (!frameDisplayName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
-
-  // GitHub 保存名（英数字ランダム）
-  const frameFileName = Math.random().toString(36).substring(2, 10) + ".png";
-
-  const exists = await checkFileExists(frameFileName);
-
-  if (!overwriteDialog) return uploadFrame(file, frameDisplayName, frameFileName);
-
-  if (exists) {
-    overwriteDialog.style.display = "block";
-
-    overwriteYes.onclick = () => {
-      overwriteDialog.style.display = "none";
-      uploadFrame(file, frameDisplayName, frameFileName);
-    };
-
-    overwriteNo.onclick = () => {
-      overwriteDialog.style.display = "none";
-    };
-
+// ▼ フレーム選択
+frameSelect.addEventListener("change", () => {
+  const value = frameSelect.value;
+  if (!value) {
+    frameImage = null;
+    redraw();
     return;
   }
 
-  uploadFrame(file, frameDisplayName, frameFileName);
-};
+  frameImage = new Image();
+  frameImage.crossOrigin = "anonymous";
+  frameImage.onload = redraw;
+  frameImage.src = value;
+});
 
-// ▼ 実際のアップロード
-async function uploadFrame(file, frameDisplayName, frameFileName) {
-  uploadBtn.disabled = true;
-  uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
-
-  try {
-    const base64Data = await toBase64(file);
-
-    const response = await fetch(WORKER_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        frameDisplayName, // 日本語名（UI表示用）
-        frameFileName,    // 英数字ランダム名（GitHub保存用）
-        content: base64Data
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      const rawUrl = data.data.url;
-      const userPageUrl = "https://framesynth.github.io/icon-maker/";
-
-      resultBox.innerHTML = `
-        <div class="success-box fade-in">
-          <div class="success-icon">✓</div>
-          <div class="success-text">
-            アップロードが完了しました。<br>
-            反映をご確認ください。
-          </div>
-        </div>
-
-        <div class="success-links fade-in">
-          <p>📁 GitHub 反映URL：</p>
-          <a href="${rawUrl}" target="_blank">${rawUrl}</a>
-
-          <p>👀 ユーザー画面：</p>
-          <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
-
-          <button id="checkReflectBtn" class="reflect-btn">反映チェック</button>
-          <div id="reflectStatus"></div>
-        </div>
-      `;
-    } else {
-      resultBox.innerHTML = `<div class="error-box fade-in">❌ エラー：${data.error?.message || "不明なエラー"}</div>`;
-    }
-  } catch {
-    resultBox.innerHTML = `<div class="error-box fade-in">⚠ 通信エラーが発生しました。</div>`;
-  }
-
-  uploadBtn.disabled = false;
-  uploadBtn.innerHTML = "アップロード";
+// ▼ ピンチ距離
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
-// ▼ 反映チェック
-document.addEventListener("click", async (e) => {
-  if (e.target.id !== "checkReflectBtn") return;
+// ▼ ピンチ中心
+function getCenter(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  };
+}
 
-  const statusBox = document.getElementById("reflectStatus");
-  statusBox.textContent = "⏳ チェック中…";
+let isDragging = false;
+let lastX = null;
+let lastY = null;
+let lastDist = null;
 
-  const rawUrl = document.querySelector("#result a").href;
+// ================================
+// ▼ タッチ開始（ズレゼロ）
+// ================================
+canvas.addEventListener("touchstart", (e) => {
+  const rect = canvas.getBoundingClientRect();
 
-  try {
-    const res = await fetch(rawUrl + "?t=" + Date.now(), {
-      method: "HEAD",
-      cache: "no-store"
-    });
+  if (e.touches.length === 1) {
+    isDragging = true;
 
-    if (res.status === 200) {
-      statusBox.innerHTML = `✅ 反映されています。`;
-      statusBox.style.color = "#0a8a0a";
-    } else {
-      statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
-      statusBox.style.color = "#b8860b";
-    }
-  } catch {
-    statusBox.innerHTML = `⚠ チェック中にエラーが発生しました`;
-    statusBox.style.color = "#c0392b";
+    lastX = e.touches[0].clientX - rect.left;
+    lastY = e.touches[0].clientY - rect.top;
+  }
+
+  if (e.touches.length === 2) {
+    lastDist = getDistance(e.touches);
   }
 });
 
 // ================================
-// ▼ 削除モード
+// ▼ タッチ移動（ピンチ＋ドラッグ）
 // ================================
-async function loadFrameList() {
-  const repo = "framesynth/icon-maker";
-  const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
 
-  const listBox = document.getElementById("frameList");
-  listBox.textContent = "読み込み中…";
+  // ▼ 2本指ピンチ
+  if (e.touches.length === 2) {
+    const dist = getDistance(e.touches);
+    const center = getCenter(e.touches);
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
+    const cx = center.x - rect.left;
+    const cy = center.y - rect.top;
 
-    listBox.innerHTML = "";
+    const oldScale = scale;
+    const delta = (dist - lastDist) * 0.004;
 
-    if (!Array.isArray(data) || data.length === 0) {
-      listBox.textContent = "現在、削除できるフレームはありません。";
-      return;
-    }
+    scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
-    data.forEach(item => {
-      if (!item.name.endsWith(".png")) return;
+    const zoomRatio = scale / oldScale;
+    offsetX = cx - (cx - offsetX) * zoomRatio;
+    offsetY = cy - (cy - offsetY) * zoomRatio;
 
-      const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
+    lastDist = dist;
+    redraw();
+    return;
+  }
 
-      const div = document.createElement("div");
-      div.className = "frame-item";
+  // ▼ 1本指ドラッグ
+  if (e.touches.length === 1 && isDragging) {
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
 
-      div.innerHTML = `
-        <img src="${rawUrl}" class="frame-thumb">
-        <div>${item.name}</div>
-        <button class="delete-btn" data-name="${item.name}">削除</button>
-      `;
+    const dx = x - lastX;
+    const dy = y - lastY;
 
-      listBox.appendChild(div);
-    });
+    offsetX += dx;
+    offsetY += dy;
 
-  } catch {
-    listBox.textContent = "⚠ フレーム一覧の取得に失敗しました。通信状況を確認してください。";
+    lastX = x;
+    lastY = y;
+
+    redraw();
+  }
+}, { passive: false });
+
+// ================================
+// ▼ タッチ終了（慣性なし → ピタッと止まる）
+// ================================
+canvas.addEventListener("touchend", () => {
+  isDragging = false;
+  lastX = null;
+  lastY = null;
+  lastDist = null;
+});
+
+// ▼ 描画
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (baseImage) {
+    const drawW = baseImage.width * scale;
+    const drawH = baseImage.height * scale;
+    ctx.drawImage(baseImage, offsetX, offsetY, drawW, drawH);
+  }
+
+  if (frameImage && frameImage.complete) {
+    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
   }
 }
 
-// ▼ 削除処理
-document.addEventListener("click", async (e) => {
-  if (!e.target.classList.contains("delete-btn")) return;
-
-  const filename = e.target.dataset.name;
-
-  if (!confirm(`${filename} を削除しますか？`)) return;
-
-  e.target.textContent = "削除中…";
-  e.target.disabled = true;
-
-  try {
-    const res = await fetch(WORKER_ENDPOINT, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      e.target.parentElement.remove();
-    } else {
-      alert(`削除に失敗しました：${data.error.message}`);
-    }
-  } catch {
-    alert("通信エラーが発生しました");
+// ▼ 保存処理
+function saveHighRes() {
+  if (!baseImage) {
+    alert("画像が選択されていません。");
+    return;
   }
+
+  const scaleFactor = 3;
+  const saveCanvas = document.createElement("canvas");
+  saveCanvas.width = canvas.width * scaleFactor;
+  saveCanvas.height = canvas.height * scaleFactor;
+  const sctx = saveCanvas.getContext("2d");
+
+  sctx.fillStyle = "#ffffff";
+  sctx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
+
+  const drawW = baseImage.width * scale * scaleFactor;
+  const drawH = baseImage.height * scale * scaleFactor;
+  const x = offsetX * scaleFactor;
+  const y = offsetY * scaleFactor;
+
+  sctx.drawImage(baseImage, x, y, drawW, drawH);
+
+  if (frameImage && frameImage.complete) {
+    sctx.drawImage(frameImage, 0, 0, saveCanvas.width, saveCanvas.height);
+  }
+
+  const now = new Date();
+  const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
+
+  saveCanvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  }, "image/png");
+}
+
+document.getElementById("saveBtn").addEventListener("click", saveHighRes);
+document.getElementById("resetBtn").addEventListener("click", () => {
+  baseImage = null;
+  frameImage = null;
+  scale = 1;
+  offsetX = 0;
+  offsetY = 0;
+  imageInput.value = "";
+  frameSelect.value = "";
+  redraw();
 });
