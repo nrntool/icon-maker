@@ -1,5 +1,5 @@
 // ================================
-// FrameLab ユーザー画面
+// FrameLab ユーザー画面 完全版（日本語名対応・ズレゼロ）
 // ================================
 
 const imageInput = document.getElementById("imageInput");
