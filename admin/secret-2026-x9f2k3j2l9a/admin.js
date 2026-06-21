@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（日本語名対応・ランダム保存版）
+// FrameLab 管理パネル用 admin.js（反映チェック付き完全版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -87,10 +87,10 @@ frameInput.onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// ▼ アップロード処理（日本語名OK・GitHub保存名はランダム）
+// ▼ アップロード処理（反映チェック付き）
 uploadBtn.onclick = async () => {
   const file = frameInput.files[0];
-  const frameDisplayName = frameNameInput.value.trim(); // ← 日本語名
+  const frameDisplayName = frameNameInput.value.trim();
 
   if (!file) return (resultBox.textContent = "⚠ ファイルが選択されていません。");
   if (!frameDisplayName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
@@ -105,7 +105,7 @@ uploadBtn.onclick = async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        frameDisplayName, // ← 日本語名を送信
+        frameDisplayName,
         content: base64Data
       })
     });
@@ -113,14 +113,48 @@ uploadBtn.onclick = async () => {
     const data = await response.json();
 
     if (data.success) {
+      const rawUrl = data.data.url;
+      const userPageUrl = "https://framesynth.github.io/icon-maker/";
+
+      // ▼ 反映待ちアニメーション
       resultBox.innerHTML = `
-        <div class="success-box fade-in">
-          <div class="success-icon">✓</div>
-          <div class="success-text">
-            「${frameDisplayName}」のアップロードが完了しました。
-          </div>
+        <div class="loading-box fade-in">
+          <div class="loading-bar"></div>
+          <div class="loading-text">反映中です… 少々お待ちください</div>
         </div>
       `;
+
+      // ▼ GitHub 反映チェック
+      const checkInterval = setInterval(async () => {
+        try {
+          const res = await fetch(rawUrl + "?t=" + Date.now(), {
+            method: "HEAD",
+            cache: "no-store"
+          });
+
+          if (res.status === 200) {
+            clearInterval(checkInterval);
+
+            // ▼ 反映完了表示
+            resultBox.innerHTML = `
+              <div class="success-box fade-in">
+                <div class="success-icon">✓</div>
+                <div class="success-text">
+                  「${frameDisplayName}」の反映が完了しました。<br>
+                  ユーザー画面で確認できます。
+                </div>
+              </div>
+
+              <div class="success-links fade-in">
+                <p>ユーザー画面：</p>
+                <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
+              </div>
+            `;
+          }
+        } catch (err) {
+          console.error("反映チェックエラー:", err);
+        }
+      }, 2000);
     } else {
       resultBox.innerHTML = `<div class="error-box fade-in">❌ エラー：${data.error.message}</div>`;
     }
