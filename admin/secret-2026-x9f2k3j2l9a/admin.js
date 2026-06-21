@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（最適化版）
+// FrameLab 管理パネル用 admin.js（完全版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -60,11 +60,6 @@ const resultBox = document.getElementById("result");
 const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
 
-// ▼ 上書きダイアログ
-const overwriteDialog = document.getElementById("overwriteDialog");
-const overwriteYes = document.getElementById("overwriteYes");
-const overwriteNo = document.getElementById("overwriteNo");
-
 // Base64 変換
 function toBase64(file) {
   return new Promise((resolve, reject) => {
@@ -105,37 +100,11 @@ uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
 
-  if (!file) {
-    resultBox.textContent = "⚠ ファイルが選択されていません。";
-    return;
-  }
-  if (!frameName) {
-    resultBox.textContent = "⚠ フレーム名を入力してください。";
-    return;
-  }
+  if (!file) return (resultBox.textContent = "⚠ ファイルが選択されていません。");
+  if (!frameName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
 
   const filename = `${frameName}.png`;
   const exists = await checkFileExists(filename);
-
-  if (!overwriteDialog) {
-    uploadFrame(file, frameName);
-    return;
-  }
-
-  if (exists) {
-    overwriteDialog.style.display = "block";
-
-    overwriteYes.onclick = () => {
-      overwriteDialog.style.display = "none";
-      uploadFrame(file, frameName);
-    };
-
-    overwriteNo.onclick = () => {
-      overwriteDialog.style.display = "none";
-    };
-
-    return;
-  }
 
   uploadFrame(file, frameName);
 });
@@ -163,17 +132,16 @@ async function uploadFrame(file, frameName) {
       const rawUrl = data.data.url;
       const userPageUrl = "https://framesynth.github.io/icon-maker/";
 
-      // ▼ 成功メッセージ（最適化版）
       resultBox.innerHTML = `
-        <div class="success-box">
+        <div class="success-box fade-in">
           <div class="success-icon">✓</div>
           <div class="success-text">
-            ${data.data.overwrite ? "上書きが完了しました。" : "アップロードが完了しました。"}<br>
+            アップロードが完了しました。<br>
             反映をご確認ください。
           </div>
         </div>
 
-        <div class="success-links">
+        <div class="success-links fade-in">
           <p>📁 GitHub 反映URL：</p>
           <a href="${rawUrl}" target="_blank">${rawUrl}</a>
 
@@ -185,12 +153,7 @@ async function uploadFrame(file, frameName) {
         </div>
       `;
     } else {
-      // ▼ 同名エラー最適化
-      if (data.error?.message?.includes("sha")) {
-        resultBox.innerHTML = `❌ 同じ名前のフレームがすでに登録されています。`;
-      } else {
-        resultBox.innerHTML = `❌ エラーが発生しました：${data.error?.message || "不明なエラー"}`;
-      }
+      resultBox.innerHTML = `❌ エラー：${data.error?.message || "不明なエラー"}`;
     }
   } catch {
     resultBox.textContent = "⚠ 通信エラーが発生しました。";
@@ -229,7 +192,7 @@ document.addEventListener("click", async (e) => {
 });
 
 // ================================
-// ▼ 削除モード
+// ▼ 削除モード（チェック式・複数削除対応）
 // ================================
 async function loadFrameList() {
   const repo = "framesynth/icon-maker";
@@ -258,9 +221,9 @@ async function loadFrameList() {
       div.className = "frame-item";
 
       div.innerHTML = `
+        <input type="checkbox" class="frame-checkbox" data-name="${item.name}">
         <img src="${rawUrl}" class="frame-thumb">
-        <div>${item.name}</div>
-        <button class="delete-btn" data-name="${item.name}">削除</button>
+        <div class="frame-name">${item.name}</div>
       `;
 
       listBox.appendChild(div);
@@ -271,32 +234,37 @@ async function loadFrameList() {
   }
 }
 
-// ▼ 削除処理
-document.addEventListener("click", async (e) => {
-  if (!e.target.classList.contains("delete-btn")) return;
-
-  const filename = e.target.dataset.name;
-
-  if (!confirm(`${filename} を削除しますか？`)) return;
-
-  e.target.textContent = "削除中…";
-  e.target.disabled = true;
-
-  try {
-    const res = await fetch(WORKER_ENDPOINT, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      e.target.parentElement.remove();
-    } else {
-      alert(`削除に失敗しました：${data.error.message}`);
-    }
-  } catch {
-    alert("通信エラーが発生しました");
+// ▼ 複数削除ボタン
+document.getElementById("deleteSelectedBtn")?.addEventListener("click", async () => {
+  const checked = [...document.querySelectorAll(".frame-checkbox:checked")];
+  if (checked.length === 0) {
+    alert("削除するフレームを選択してください。");
+    return;
   }
+
+  if (!confirm(`${checked.length} 件のフレームを削除しますか？`)) return;
+
+  for (const checkbox of checked) {
+    const filename = checkbox.dataset.name;
+
+    try {
+      const res = await fetch(WORKER_ENDPOINT, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        checkbox.closest(".frame-item").remove();
+      } else {
+        alert(`削除失敗: ${filename} (${data.error.message})`);
+      }
+    } catch {
+      alert(`通信エラー: ${filename}`);
+    }
+  }
+
+  alert("削除が完了しました。");
 });
