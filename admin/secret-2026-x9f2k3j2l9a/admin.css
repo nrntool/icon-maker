@@ -141,8 +141,6 @@ body {
 .delete-btn-main {
   background: linear-gradient(135deg, #d9534f, #c0392b);
   box-shadow: 0 4px 10px rgba(192,57,43,0.25), inset 0 0 18px rgba(255,255,255,0.25);
-
-  /* ▼ 改行防止＋横幅調整（今回の修正点） */
   white-space: nowrap;
   padding: 0.8em 1.6em;
 }
@@ -180,16 +178,9 @@ body {
 }
 
 /* ================================
-   削除モード（チェック式）
+   ▼ 削除モード（チェック式・追加モードと衝突しない）
 ================================ */
-.frame-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.4em;
-  margin-top: 1.6em;
-}
-
-.frame-item {
+.delete-frame-item {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -199,12 +190,12 @@ body {
   box-shadow: 0 3px 10px var(--shadow-main);
 }
 
-.frame-checkbox {
+.delete-frame-checkbox {
   transform: scale(1.4);
   cursor: pointer;
 }
 
-.frame-thumb {
+.delete-frame-thumb {
   width: 120px;
   height: 80px;
   object-fit: contain;
@@ -212,7 +203,7 @@ body {
   background: #000;
 }
 
-.frame-name {
+.delete-frame-name {
   flex: 1;
   text-align: left;
   font-size: 0.92em;
@@ -220,8 +211,8 @@ body {
 }
 
 /* 選択時ハイライト */
-.frame-checkbox:checked + img,
-.frame-checkbox:checked ~ .frame-name {
+.delete-frame-checkbox:checked + img,
+.delete-frame-checkbox:checked ~ .delete-frame-name {
   filter: brightness(1.15);
   transform: scale(1.02);
 }
@@ -236,17 +227,17 @@ body {
 ================================ */
 @media (max-width: 600px) {
 
-  .frame-item {
+  .delete-frame-item {
     flex-direction: column;
     text-align: center;
   }
 
-  .frame-thumb {
+  .delete-frame-thumb {
     width: 90%;
     height: auto;
   }
 
-  .frame-checkbox {
+  .delete-frame-checkbox {
     transform: scale(1.6);
   }
 
