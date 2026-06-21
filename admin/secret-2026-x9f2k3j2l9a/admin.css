@@ -246,3 +246,61 @@ body {
     min-width: 160px;
   }
 }
+
+/* ================================
+   ▼ 追加モードレイアウト調整
+================================ */
+
+/* プレビューエリアの整列 */
+#previewBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 1.4em 0;
+  padding: 1.2em;
+  background: var(--glass-soft);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px var(--shadow-main);
+}
+
+/* プレビュー画像 */
+#previewImage {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px var(--shadow-main);
+  display: block;
+  margin: 0 auto 0.6em;
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#previewImage.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 入力欄とラベルの間隔 */
+label {
+  display: flex;
+  align-items: center;
+  margin: 1.2em 0 0.6em;
+  font-size: 0.92em;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+/* ファイル選択ボタンの整列 */
+input[type="file"] {
+  margin-top: 0.6em;
+  margin-bottom: 1.2em;
+}
+
+/* アップロードボタンの位置調整 */
+#uploadBtn {
+  margin: 1.8em auto 1.4em;
+  transform: scale(1.04);
+}
