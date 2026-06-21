@@ -391,3 +391,66 @@ input[type="text"] {
   animation-delay: 0.8s;
 }
 
+/* ================================
+   チェックマーク光演出（完全版）
+================================ */
+
+/* ▼ チェックマークのフェードイン */
+@keyframes checkFadeIn {
+  0% { opacity: 0; transform: scale(0.8); filter: blur(2px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+/* ▼ 光が走るアニメーション */
+@keyframes checkGlow {
+  0% {
+    text-shadow:
+      0 0 4px rgba(255,255,255,0.4),
+      0 0 8px rgba(130,160,220,0.4),
+      0 0 14px rgba(130,160,220,0.3);
+  }
+  50% {
+    text-shadow:
+      0 0 6px rgba(255,255,255,0.9),
+      0 0 14px rgba(130,160,220,0.8),
+      0 0 22px rgba(130,160,220,0.6),
+      0 0 40px rgba(130,160,220,0.4);
+  }
+  100% {
+    text-shadow:
+      0 0 4px rgba(255,255,255,0.4),
+      0 0 8px rgba(130,160,220,0.4),
+      0 0 14px rgba(130,160,220,0.3);
+  }
+}
+
+/* ▼ チェックマーク本体 */
+.check-icon {
+  font-size: 2.8em;
+  color: var(--accent-blue);
+  opacity: 0;
+  animation:
+    checkFadeIn 0.6s ease forwards,
+    checkGlow 2.4s ease-in-out infinite;
+  margin-top: 0.4em;
+}
+
+/* ▼ チェック後のテキスト */
+.check-text {
+  font-size: 0.95em;
+  color: var(--text-main);
+  font-weight: 500;
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
+  animation-delay: 0.5s;
+}
+
+/* ▼ バーのフェードアウト */
+@keyframes barFadeOut {
+  0% { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(0.9); }
+}
+
+.loading-bar.fade-out {
+  animation: barFadeOut 0.6s ease forwards;
+}
