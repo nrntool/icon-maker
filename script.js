@@ -1,5 +1,5 @@
 // ================================
-// FrameLab ユーザー画面 完全版（Worker連携・日本語名対応・ズレゼロ）
+// FrameLab ユーザー画面 
 // ================================
 
 // ▼ Worker API（一覧取得）
@@ -33,13 +33,13 @@ async function loadFrames() {
     const data = await res.json();
 
     if (!data.success) {
-      frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
+      frameSelect.innerHTML = '<option value="">未選択</option>';
       return;
     }
 
     const frames = data.data.frames;
 
-    frameSelect.innerHTML = '<option value="">選択してください</option>';
+    frameSelect.innerHTML = '<option value="">未選択</option>';
 
     frames.forEach(frame => {
       const option = document.createElement("option");
@@ -50,7 +50,7 @@ async function loadFrames() {
 
   } catch (err) {
     console.error("フレーム一覧取得エラー:", err);
-    frameSelect.innerHTML = '<option value="">フレーム読み込みできません</option>';
+    frameSelect.innerHTML = '<option value="">未選択</option>';
   }
 }
 
@@ -275,15 +275,28 @@ function saveHighRes() {
 }
 
 // ================================
-// ▼ リセット
+// ▼ 完全リセット（やり直し）
 // ================================
 resetBtn.addEventListener("click", () => {
+  // 画像データをリセット
   baseImage = null;
   frameImage = null;
+
+  // パラメータ初期化
   scale = 1;
   offsetX = 0;
   offsetY = 0;
+
+  // Canvas クリア
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // ファイル選択リセット
+  imageInput.value = "";
+
+  // フレーム選択リセット
+  frameSelect.selectedIndex = 0;
+
+  console.log("完全リセット完了");
 });
 
 // ================================
