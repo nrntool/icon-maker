@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（最適化版）
+// FrameLab 管理パネル用 admin.js（日本語名対応・ランダム保存版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -60,11 +60,6 @@ const resultBox = document.getElementById("result");
 const previewBox = document.getElementById("previewBox");
 const previewImage = document.getElementById("previewImage");
 
-// ▼ 上書きダイアログ
-const overwriteDialog = document.getElementById("overwriteDialog");
-const overwriteYes = document.getElementById("overwriteYes");
-const overwriteNo = document.getElementById("overwriteNo");
-
 // Base64 変換
 const toBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -92,46 +87,14 @@ frameInput.onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// ▼ GitHub raw で存在チェック
-async function checkFileExists(filename) {
-  const rawUrl = `https://raw.githubusercontent.com/framesynth/icon-maker/main/frames/${filename}`;
-  const res = await fetch(rawUrl, { method: "HEAD" });
-  return res.ok;
-}
-
-// ▼ アップロード処理
+// ▼ アップロード処理（日本語名OK・GitHub保存名はランダム）
 uploadBtn.onclick = async () => {
   const file = frameInput.files[0];
-  const frameName = frameNameInput.value.trim();
+  const frameDisplayName = frameNameInput.value.trim(); // ← 日本語名
 
   if (!file) return (resultBox.textContent = "⚠ ファイルが選択されていません。");
-  if (!frameName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
+  if (!frameDisplayName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
 
-  const filename = `${frameName}.png`;
-  const exists = await checkFileExists(filename);
-
-  if (!overwriteDialog) return uploadFrame(file, frameName);
-
-  if (exists) {
-    overwriteDialog.style.display = "block";
-
-    overwriteYes.onclick = () => {
-      overwriteDialog.style.display = "none";
-      uploadFrame(file, frameName);
-    };
-
-    overwriteNo.onclick = () => {
-      overwriteDialog.style.display = "none";
-    };
-
-    return;
-  }
-
-  uploadFrame(file, frameName);
-};
-
-// ▼ 実際のアップロード
-async function uploadFrame(file, frameName) {
   uploadBtn.disabled = true;
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
 
@@ -142,7 +105,7 @@ async function uploadFrame(file, frameName) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: `${frameName}.png`,
+        frameDisplayName, // ← 日本語名を送信
         content: base64Data
       })
     });
@@ -150,36 +113,16 @@ async function uploadFrame(file, frameName) {
     const data = await response.json();
 
     if (data.success) {
-      const rawUrl = data.data.url;
-      const userPageUrl = "https://framesynth.github.io/icon-maker/";
-
       resultBox.innerHTML = `
         <div class="success-box fade-in">
           <div class="success-icon">✓</div>
           <div class="success-text">
-            ${data.data.overwrite ? "上書きが完了しました。" : "アップロードが完了しました。"}<br>
-            反映をご確認ください。
+            「${frameDisplayName}」のアップロードが完了しました。
           </div>
-        </div>
-
-        <div class="success-links fade-in">
-          <p>📁 GitHub 反映URL：</p>
-          <a href="${rawUrl}" target="_blank">${rawUrl}</a>
-
-          <p>👀 ユーザー画面：</p>
-          <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
-
-          <button id="checkReflectBtn" class="reflect-btn">反映チェック</button>
-          <div id="reflectStatus"></div>
         </div>
       `;
     } else {
-      // ▼ 同名エラー最適化
-      if (data.error?.message?.includes("sha")) {
-        resultBox.innerHTML = `<div class="error-box fade-in">❌ 同じ名前のフレームがすでに登録されています。</div>`;
-      } else {
-        resultBox.innerHTML = `<div class="error-box fade-in">❌ エラーが発生しました：${data.error?.message || "不明なエラー"}</div>`;
-      }
+      resultBox.innerHTML = `<div class="error-box fade-in">❌ エラー：${data.error.message}</div>`;
     }
   } catch {
     resultBox.innerHTML = `<div class="error-box fade-in">⚠ 通信エラーが発生しました。</div>`;
@@ -187,35 +130,7 @@ async function uploadFrame(file, frameName) {
 
   uploadBtn.disabled = false;
   uploadBtn.innerHTML = "アップロード";
-}
-
-// ▼ 反映チェック
-document.addEventListener("click", async (e) => {
-  if (e.target.id !== "checkReflectBtn") return;
-
-  const statusBox = document.getElementById("reflectStatus");
-  statusBox.textContent = "⏳ チェック中…";
-
-  const rawUrl = document.querySelector("#result a").href;
-
-  try {
-    const res = await fetch(rawUrl + "?t=" + Date.now(), {
-      method: "HEAD",
-      cache: "no-store"
-    });
-
-    if (res.status === 200) {
-      statusBox.innerHTML = `✅ 反映されています。`;
-      statusBox.style.color = "#0a8a0a";
-    } else {
-      statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
-      statusBox.style.color = "#b8860b";
-    }
-  } catch {
-    statusBox.innerHTML = `⚠ チェック中にエラーが発生しました`;
-    statusBox.style.color = "#c0392b";
-  }
-});
+};
 
 // ================================
 // ▼ 削除モード
