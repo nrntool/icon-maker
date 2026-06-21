@@ -349,23 +349,3 @@ input[type="file"]::-webkit-file-upload-button {
 .delete-actions {
   margin-top: 1.8em;
 }
-
-/* ================================
-   スマホ最適化（削除モード）
-================================ */
-@media (max-width: 600px) {
-  .frame-item {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .frame-thumb {
-    width: 85%;
-    height: auto;
-  }
-
-  .frame-checkbox {
-    transform: scale(1.6);
-  }
-     }
