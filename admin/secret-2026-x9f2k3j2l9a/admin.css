@@ -346,7 +346,7 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 /* ================================
-   削除ボタン＋戻るボタン 横並び
+   削除ボタン＋戻るボタン 横並び（スマホ対応）
 ================================ */
 .delete-actions {
   display: flex;
@@ -354,33 +354,19 @@ input[type="file"]::-webkit-file-upload-button {
   align-items: center;
   gap: 1.4em;
   margin-top: 2em;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* ← 折り返し禁止で常に横並び */
 }
 
+/* ボタンの幅を調整してスマホでも収まるように */
 .delete-actions .delete-btn-main,
 .delete-actions .back-btn {
-  width: 180px;
+  width: 45%;
+  min-width: 130px;
   height: 54px;
 }
 
-/* ================================
-   スマホ最適化（削除モード）
-================================ */
+/* スマホ最適化 */
 @media (max-width: 600px) {
-  .frame-item {
-    flex-direction: row;
-    text-align: left;
-  }
-
-  .frame-thumb {
-    width: 70px;
-    height: 70px;
-  }
-
-  .frame-checkbox {
-    transform: scale(1.4);
-  }
-
   .delete-actions {
     gap: 1em;
     margin-top: 2.2em;
@@ -388,7 +374,7 @@ input[type="file"]::-webkit-file-upload-button {
 
   .delete-actions .delete-btn-main,
   .delete-actions .back-btn {
-    width: 46%;
-    min-width: 140px;
+    width: 42%; /* ← 横並び維持しつつ少し縮める */
+    min-width: 120px;
   }
 }
