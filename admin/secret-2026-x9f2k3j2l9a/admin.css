@@ -1,5 +1,5 @@
 /* ================================
-   FrameLab 管理画面 — 最終最適化版
+   FrameLab 管理画面 — 完全安定版
 ================================ */
 
 /* UIトークン */
@@ -17,7 +17,7 @@
 }
 
 /* ================================
-   ベース（フォント完全統一）
+   ベース
 ================================ */
 html, body, button, input, select, label, p, h1, h2, h3, div, span {
   font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
@@ -31,20 +31,6 @@ body {
   color: #222;
   text-align: center;
   line-height: 1.6;
-}
-
-/* ================================
-   フェードイン（成功メッセージ用）
-================================ */
-.fade-in {
-  opacity: 0;
-  transform: translateY(6px);
-  animation: fadeInUp 0.45s ease-out forwards;
-}
-
-@keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
 }
 
 /* ================================
@@ -83,25 +69,13 @@ body {
 }
 
 /* ================================
-   タイトル（別フォント）
+   タイトル
 ================================ */
 .mode-title {
   font-family: "Playfair Display", "Noto Sans JP", serif;
   font-size: 1.48em;
   font-weight: 600;
   color: var(--text-main);
-}
-
-/* ================================
-   ボタン行
-================================ */
-.mode-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.8em;
-  margin: 2.2em 0 1.4em;
-  flex-wrap: wrap;
 }
 
 /* ================================
@@ -137,14 +111,6 @@ body {
   box-shadow: 0 4px 10px var(--shadow-main), inset 0 0 18px rgba(255,255,255,0.25);
 }
 
-/* 削除ボタン（赤系） */
-.delete-btn-main {
-  background: linear-gradient(135deg, #d9534f, #c0392b);
-  box-shadow: 0 4px 10px rgba(192,57,43,0.25), inset 0 0 18px rgba(255,255,255,0.25);
-  white-space: nowrap;
-  padding: 0.8em 1.6em;
-}
-
 /* 白ガラス（戻る） */
 .back-btn {
   background: linear-gradient(135deg, #f9fbff, #eef2fa);
@@ -178,7 +144,41 @@ body {
 }
 
 /* ================================
-   ▼ 削除モード（追加モードと衝突しない）
+   プレビューエリア（崩れ修正）
+================================ */
+#previewBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 1.4em 0;
+  padding: 1.4em;
+  background: var(--glass-soft);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  box-shadow: 0 3px 12px var(--shadow-main);
+  min-height: 120px;
+}
+
+#previewImage {
+  width: 100%;
+  max-width: 340px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px var(--shadow-main);
+  display: block;
+  margin: 0 auto 0.6em;
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#previewImage.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ================================
+   削除モード（分離版）
 ================================ */
 .delete-frame-item {
   display: flex;
@@ -222,11 +222,17 @@ body {
   margin-top: 1.8em;
 }
 
+/* 削除ボタン（赤系） */
+.delete-btn-main {
+  background: linear-gradient(135deg, #d9534f, #c0392b);
+  box-shadow: 0 4px 10px rgba(192,57,43,0.25), inset 0 0 18px rgba(255,255,255,0.25);
+  white-space: nowrap;
+}
+
 /* ================================
    スマホ最適化
 ================================ */
 @media (max-width: 600px) {
-
   .delete-frame-item {
     flex-direction: column;
     text-align: center;
@@ -245,62 +251,4 @@ body {
     width: 70%;
     min-width: 160px;
   }
-}
-
-/* ================================
-   ▼ 追加モードレイアウト調整
-================================ */
-
-/* プレビューエリアの整列 */
-#previewBox {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  margin: 1.4em 0;
-  padding: 1.2em;
-  background: var(--glass-soft);
-  backdrop-filter: blur(10px);
-  border-radius: 14px;
-  box-shadow: 0 3px 12px var(--shadow-main);
-}
-
-/* プレビュー画像 */
-#previewImage {
-  width: 100%;
-  max-width: 320px;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px var(--shadow-main);
-  display: block;
-  margin: 0 auto 0.6em;
-  opacity: 0;
-  transform: scale(0.97);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-#previewImage.show {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* 入力欄とラベルの間隔 */
-label {
-  display: flex;
-  align-items: center;
-  margin: 1.2em 0 0.6em;
-  font-size: 0.92em;
-  font-weight: 500;
-  color: var(--text-main);
-}
-
-/* ファイル選択ボタンの整列 */
-input[type="file"] {
-  margin-top: 0.6em;
-  margin-bottom: 1.2em;
-}
-
-/* アップロードボタンの位置調整 */
-#uploadBtn {
-  margin: 1.8em auto 1.4em;
-  transform: scale(1.04);
 }
