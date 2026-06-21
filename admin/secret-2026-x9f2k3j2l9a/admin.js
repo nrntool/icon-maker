@@ -27,28 +27,28 @@ function hideCard(card) {
 }
 
 // ▼ モード切り替え
-addModeBtn.onclick = () => {
+addModeBtn.addEventListener("click", () => {
   hideCard(modeSelect);
   hideCard(deleteModeCard);
   showCard(addModeCard);
-};
+});
 
-deleteModeBtn.onclick = () => {
+deleteModeBtn.addEventListener("click", () => {
   hideCard(modeSelect);
   hideCard(addModeCard);
   showCard(deleteModeCard);
   loadFrameList();
-};
+});
 
-backToSelectFromAdd.onclick = () => {
+backToSelectFromAdd.addEventListener("click", () => {
   hideCard(addModeCard);
   showCard(modeSelect);
-};
+});
 
-backToSelectFromDelete.onclick = () => {
+backToSelectFromDelete.addEventListener("click", () => {
   hideCard(deleteModeCard);
   showCard(modeSelect);
-};
+});
 
 // ================================
 // ▼ 追加モード
@@ -66,16 +66,17 @@ const overwriteYes = document.getElementById("overwriteYes");
 const overwriteNo = document.getElementById("overwriteNo");
 
 // Base64 変換
-const toBase64 = (file) =>
-  new Promise((resolve, reject) => {
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
 
 // ▼ プレビュー
-frameInput.onchange = (e) => {
+frameInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
     previewBox.style.display = "none";
@@ -90,7 +91,7 @@ frameInput.onchange = (e) => {
     previewImage.classList.add("show");
   };
   reader.readAsDataURL(file);
-};
+});
 
 // ▼ GitHub raw で存在チェック
 async function checkFileExists(filename) {
@@ -100,17 +101,26 @@ async function checkFileExists(filename) {
 }
 
 // ▼ アップロード処理
-uploadBtn.onclick = async () => {
+uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
 
-  if (!file) return (resultBox.textContent = "⚠ ファイルが選択されていません。");
-  if (!frameName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
+  if (!file) {
+    resultBox.textContent = "⚠ ファイルが選択されていません。";
+    return;
+  }
+  if (!frameName) {
+    resultBox.textContent = "⚠ フレーム名を入力してください。";
+    return;
+  }
 
   const filename = `${frameName}.png`;
   const exists = await checkFileExists(filename);
 
-  if (!overwriteDialog) return uploadFrame(file, frameName);
+  if (!overwriteDialog) {
+    uploadFrame(file, frameName);
+    return;
+  }
 
   if (exists) {
     overwriteDialog.style.display = "block";
@@ -128,7 +138,7 @@ uploadBtn.onclick = async () => {
   }
 
   uploadFrame(file, frameName);
-};
+});
 
 // ▼ 実際のアップロード
 async function uploadFrame(file, frameName) {
@@ -153,8 +163,9 @@ async function uploadFrame(file, frameName) {
       const rawUrl = data.data.url;
       const userPageUrl = "https://framesynth.github.io/icon-maker/";
 
+      // ▼ 成功メッセージ（最適化版）
       resultBox.innerHTML = `
-        <div class="success-box fade-in">
+        <div class="success-box">
           <div class="success-icon">✓</div>
           <div class="success-text">
             ${data.data.overwrite ? "上書きが完了しました。" : "アップロードが完了しました。"}<br>
@@ -162,7 +173,7 @@ async function uploadFrame(file, frameName) {
           </div>
         </div>
 
-        <div class="success-links fade-in">
+        <div class="success-links">
           <p>📁 GitHub 反映URL：</p>
           <a href="${rawUrl}" target="_blank">${rawUrl}</a>
 
@@ -176,13 +187,13 @@ async function uploadFrame(file, frameName) {
     } else {
       // ▼ 同名エラー最適化
       if (data.error?.message?.includes("sha")) {
-        resultBox.innerHTML = `<div class="error-box fade-in">❌ 同じ名前のフレームがすでに登録されています。</div>`;
+        resultBox.innerHTML = `❌ 同じ名前のフレームがすでに登録されています。`;
       } else {
-        resultBox.innerHTML = `<div class="error-box fade-in">❌ エラーが発生しました：${data.error?.message || "不明なエラー"}</div>`;
+        resultBox.innerHTML = `❌ エラーが発生しました：${data.error?.message || "不明なエラー"}`;
       }
     }
   } catch {
-    resultBox.innerHTML = `<div class="error-box fade-in">⚠ 通信エラーが発生しました。</div>`;
+    resultBox.textContent = "⚠ 通信エラーが発生しました。";
   }
 
   uploadBtn.disabled = false;
@@ -225,7 +236,7 @@ async function loadFrameList() {
   const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
 
   const listBox = document.getElementById("frameList");
-  listBox.textContent = "読み込み中…";
+  listBox.innerHTML = "読み込み中…";
 
   try {
     const res = await fetch(url);
@@ -234,7 +245,7 @@ async function loadFrameList() {
     listBox.innerHTML = "";
 
     if (!Array.isArray(data) || data.length === 0) {
-      listBox.textContent = "現在、削除できるフレームはありません。";
+      listBox.innerHTML = "現在、削除できるフレームはありません。";
       return;
     }
 
@@ -256,7 +267,7 @@ async function loadFrameList() {
     });
 
   } catch {
-    listBox.textContent = "⚠ フレーム一覧の取得に失敗しました。通信状況を確認してください。";
+    listBox.innerHTML = "⚠ フレーム一覧の取得に失敗しました。通信状況を確認してください。";
   }
 }
 
