@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（最適化版）
+// FrameLab 管理パネル用 admin.js（完全版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -99,25 +99,27 @@ async function checkFileExists(filename) {
   return res.ok;
 }
 
-// ▼ アップロード処理
+// ▼ アップロード処理（日本語名OK → 内部はランダム英数字）
 uploadBtn.onclick = async () => {
   const file = frameInput.files[0];
-  const frameName = frameNameInput.value.trim();
+  const frameDisplayName = frameNameInput.value.trim();
 
   if (!file) return (resultBox.textContent = "⚠ ファイルが選択されていません。");
-  if (!frameName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
+  if (!frameDisplayName) return (resultBox.textContent = "⚠ フレーム名を入力してください。");
 
-  const filename = `${frameName}.png`;
-  const exists = await checkFileExists(filename);
+  // GitHub 保存名（英数字ランダム）
+  const frameFileName = Math.random().toString(36).substring(2, 10) + ".png";
 
-  if (!overwriteDialog) return uploadFrame(file, frameName);
+  const exists = await checkFileExists(frameFileName);
+
+  if (!overwriteDialog) return uploadFrame(file, frameDisplayName, frameFileName);
 
   if (exists) {
     overwriteDialog.style.display = "block";
 
     overwriteYes.onclick = () => {
       overwriteDialog.style.display = "none";
-      uploadFrame(file, frameName);
+      uploadFrame(file, frameDisplayName, frameFileName);
     };
 
     overwriteNo.onclick = () => {
@@ -127,11 +129,11 @@ uploadBtn.onclick = async () => {
     return;
   }
 
-  uploadFrame(file, frameName);
+  uploadFrame(file, frameDisplayName, frameFileName);
 };
 
 // ▼ 実際のアップロード
-async function uploadFrame(file, frameName) {
+async function uploadFrame(file, frameDisplayName, frameFileName) {
   uploadBtn.disabled = true;
   uploadBtn.innerHTML = `<span class="loading-spinner"></span>アップロード中…`;
 
@@ -142,7 +144,8 @@ async function uploadFrame(file, frameName) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: `${frameName}.png`,
+        frameDisplayName, // 日本語名（UI表示用）
+        frameFileName,    // 英数字ランダム名（GitHub保存用）
         content: base64Data
       })
     });
@@ -157,7 +160,7 @@ async function uploadFrame(file, frameName) {
         <div class="success-box fade-in">
           <div class="success-icon">✓</div>
           <div class="success-text">
-            ${data.data.overwrite ? "上書きが完了しました。" : "アップロードが完了しました。"}<br>
+            アップロードが完了しました。<br>
             反映をご確認ください。
           </div>
         </div>
@@ -174,12 +177,7 @@ async function uploadFrame(file, frameName) {
         </div>
       `;
     } else {
-      // ▼ 同名エラー最適化
-      if (data.error?.message?.includes("sha")) {
-        resultBox.innerHTML = `<div class="error-box fade-in">❌ 同じ名前のフレームがすでに登録されています。</div>`;
-      } else {
-        resultBox.innerHTML = `<div class="error-box fade-in">❌ エラーが発生しました：${data.error?.message || "不明なエラー"}</div>`;
-      }
+      resultBox.innerHTML = `<div class="error-box fade-in">❌ エラー：${data.error?.message || "不明なエラー"}</div>`;
     }
   } catch {
     resultBox.innerHTML = `<div class="error-box fade-in">⚠ 通信エラーが発生しました。</div>`;
