@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（反映チェック付き完全版）
+// FrameLab 管理パネル用 admin.js（反映チェック＋演出＋自動遷移 完全版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -87,7 +87,7 @@ frameInput.onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// ▼ アップロード処理（反映チェック付き）
+// ▼ アップロード処理（反映チェック＋演出付き）
 uploadBtn.onclick = async () => {
   const file = frameInput.files[0];
   const frameDisplayName = frameNameInput.value.trim();
@@ -119,7 +119,7 @@ uploadBtn.onclick = async () => {
       // ▼ 反映待ちアニメーション
       resultBox.innerHTML = `
         <div class="loading-box fade-in">
-          <div class="loading-bar"></div>
+          <div class="loading-bar" id="loadingBar"></div>
           <div class="loading-text">反映中です… 少々お待ちください</div>
         </div>
       `;
@@ -135,21 +135,31 @@ uploadBtn.onclick = async () => {
           if (res.status === 200) {
             clearInterval(checkInterval);
 
-            // ▼ 反映完了表示
-            resultBox.innerHTML = `
-              <div class="success-box fade-in">
-                <div class="success-icon">✓</div>
-                <div class="success-text">
-                  「${frameDisplayName}」の反映が完了しました。<br>
-                  ユーザー画面で確認できます。
-                </div>
-              </div>
+            // ▼ バーをフェードアウト
+            const bar = document.getElementById("loadingBar");
+            bar.classList.add("fade-out");
 
-              <div class="success-links fade-in">
-                <p>ユーザー画面：</p>
-                <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
-              </div>
-            `;
+            // ▼ 0.6秒後にチェック演出へ切り替え
+            setTimeout(() => {
+              resultBox.innerHTML = `
+                <div class="success-box fade-in">
+                  <div class="check-icon glow-check">✓</div>
+                  <div class="check-text">
+                    「${frameDisplayName}」の反映が完了しました。
+                  </div>
+                  <div class="success-links fade-in">
+                    <p>ユーザー画面：</p>
+                    <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
+                  </div>
+                </div>
+              `;
+
+              // ▼ 自動でユーザー画面を開く（1秒後）
+              setTimeout(() => {
+                window.open(userPageUrl, "_blank");
+              }, 1000);
+
+            }, 600);
           }
         } catch (err) {
           console.error("反映チェックエラー:", err);
