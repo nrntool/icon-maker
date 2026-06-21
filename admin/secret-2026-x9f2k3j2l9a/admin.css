@@ -90,7 +90,6 @@ body {
   font-size: 1.48em;
   font-weight: 600;
   color: var(--text-main);
-  letter-spacing: 0.01em;
 }
 
 /* ================================
@@ -110,7 +109,8 @@ body {
 ================================ */
 .mode-btn,
 #uploadBtn,
-.back-btn {
+.back-btn,
+.delete-btn-main {
   width: 180px;
   height: 54px;
   border-radius: var(--radius-btn);
@@ -129,11 +129,20 @@ body {
 
 /* 青紫ガラス */
 .mode-btn,
-#uploadBtn {
+#uploadBtn,
+.delete-btn-main {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
   color: #fff;
   border: 1px solid rgba(255,255,255,0.4);
   box-shadow: 0 4px 10px var(--shadow-main), inset 0 0 18px rgba(255,255,255,0.25);
+}
+
+/* 削除ボタン（赤系） */
+.delete-btn-main {
+  background: linear-gradient(135deg, #d9534f, #c0392b);
+  box-shadow: 0 4px 10px rgba(192,57,43,0.25), inset 0 0 18px rgba(255,255,255,0.25);
+  white-space: nowrap;
+  padding: 0.8em 1.6em;
 }
 
 /* 白ガラス（戻る） */
@@ -148,7 +157,8 @@ body {
 /* 光沢ライン */
 .mode-btn::before,
 #uploadBtn::before,
-.back-btn::before {
+.back-btn::before,
+.delete-btn-main::before {
   content: "";
   position: absolute;
   top: 0;
@@ -162,144 +172,54 @@ body {
 
 .mode-btn:hover::before,
 #uploadBtn:hover::before,
-.back-btn:hover::before {
+.back-btn:hover::before,
+.delete-btn-main:hover::before {
   left: 120%;
 }
 
-/* ホバー */
-.mode-btn:hover,
-#uploadBtn:hover,
-.back-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px var(--shadow-main), inset 0 0 28px rgba(255,255,255,0.3);
-}
-
 /* ================================
-   アップロードボタン
+   ▼ 削除モード（追加モードと衝突しない）
 ================================ */
-#uploadBtn {
-  margin: 1.6em auto 2.2em;
-  transform: scale(1.04);
-  box-shadow:
-    0 6px 20px var(--shadow-main),
-    inset 0 0 28px rgba(255,255,255,0.32),
-    0 8px 14px rgba(90,125,168,0.18);
-}
-
-#uploadBtn:hover {
-  transform: scale(1.07);
-}
-
-/* ================================
-   ラベル・入力欄
-================================ */
-label {
+.delete-frame-item {
   display: flex;
   align-items: center;
-  margin: 1.2em 0 0.4em;
-  font-size: 0.92em;
-  font-weight: 500;
-  color: var(--text-main);
-}
-
-.step-badge {
-  width: 1.6em;
-  height: 1.6em;
-  margin-right: 0.6em;
-  font-size: 0.85em;
-  font-weight: 600;
-  color: var(--text-main);
-  border-radius: 6px;
-  border: 1px solid rgba(90,125,168,0.35);
-  background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(6px);
-}
-
-/* 入力欄 */
-input[type="file"],
-input[type="text"] {
-  width: 100%;
-  max-width: 400px;
-  padding: 0.75em 1em;
-  font-size: 0.92em;
-  background: rgba(255,255,255,0.75);
-  border: 1px solid rgba(90,125,168,0.25);
-  border-radius: var(--radius-input);
-  box-shadow: 0 2px 6px var(--shadow-main);
-  margin-bottom: 1.2em;
-  transition: 0.25s ease;
-}
-
-/* ファイル選択ボタン */
-input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
-  padding: 0.6em 1em;
-  border: none;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #eef2ff, #dfe6fa);
-  color: var(--text-main);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease;
-}
-
-/* ================================
-   プレビュー
-================================ */
-#previewBox {
-  margin: 1.2em 0;
-  padding: 1.2em;
-  background: var(--glass-soft);
-  backdrop-filter: blur(10px);
-  border-radius: 14px;
-  box-shadow: 0 3px 12px var(--shadow-main);
-  display: none;
-}
-
-#previewImage {
-  width: 100%;
-  max-width: 380px;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px var(--shadow-main);
-  display: block;
-  margin: 0 auto;
-  opacity: 0;
-  transform: scale(0.97);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-#previewImage.show {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* ================================
-   フレーム一覧
-================================ */
-.frame-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.4em;
-  margin-top: 1.6em;
-}
-
-.frame-item {
+  gap: 14px;
   padding: 1em;
   background: var(--glass-soft);
   border-radius: 14px;
   box-shadow: 0 3px 10px var(--shadow-main);
-  text-align: center;
 }
 
-.frame-item img {
-  width: 100%;
-  max-width: 260px;
-  max-height: 150px;
+.delete-frame-checkbox {
+  transform: scale(1.4);
+  cursor: pointer;
+}
+
+.delete-frame-thumb {
+  width: 120px;
+  height: 80px;
   object-fit: contain;
-  display: block;
-  margin: 0 auto 0.6em;
-  background: #000;
   border-radius: 10px;
+  background: #000;
+}
+
+.delete-frame-name {
+  flex: 1;
+  text-align: left;
+  font-size: 0.92em;
+  color: var(--text-main);
+}
+
+/* 選択時ハイライト */
+.delete-frame-checkbox:checked + img,
+.delete-frame-checkbox:checked ~ .delete-frame-name {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
+/* 削除ボタン行 */
+.delete-actions {
+  margin-top: 1.8em;
 }
 
 /* ================================
@@ -307,21 +227,22 @@ input[type="file"]::-webkit-file-upload-button {
 ================================ */
 @media (max-width: 600px) {
 
-  .mode-buttons {
-    gap: 1.2em;
-    margin-top: 2.6em;
-    margin-bottom: 1.2em;
+  .delete-frame-item {
+    flex-direction: column;
+    text-align: center;
   }
 
-  #uploadBtn {
-    width: 54%;
-    min-width: 150px;
-    transform: scale(1.06);
+  .delete-frame-thumb {
+    width: 90%;
+    height: auto;
   }
 
-  .back-btn {
-    width: 40%;
-    min-width: 130px;
-    opacity: 0.92;
+  .delete-frame-checkbox {
+    transform: scale(1.6);
+  }
+
+  .delete-btn-main {
+    width: 70%;
+    min-width: 160px;
   }
 }
