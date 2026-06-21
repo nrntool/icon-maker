@@ -24,34 +24,37 @@
   </div>
 
   <!-- ▼ 追加モード -->
-<div id="addModeCard" class="app-card" style="display:none;">
-  <h2 class="mode-title">フレーム追加モード</h2>
-  <p class="subtext">フレーム画像をアップロードして登録できます。</p>
+  <div id="addModeCard" class="app-card" style="display:none;">
+    <h2 class="mode-title">フレーム追加モード</h2>
+    <p class="subtext">フレーム画像をアップロードして登録できます。</p>
 
-  <!-- 既存のフォーム部分 -->
-  <label><span class="step-badge">1</span>画像を選択</label>
-  <input type="file" id="frameInput" accept="image/*" />
-  <div id="previewBox"><img id="previewImage" src="" alt="プレビュー" /></div>
+    <label><span class="step-badge">1</span>画像を選択</label>
+    <input type="file" id="frameInput" accept="image/*" />
+    <div id="previewBox"><img id="previewImage" src="" alt="プレビュー" /></div>
 
-  <label><span class="step-badge">2</span>フレーム名を入力</label>
-  <input type="text" id="frameName" placeholder="例：予約バトル" />
-  <button id="uploadBtn">アップロード</button>
-  <div id="result"></div>
+    <label><span class="step-badge">2</span>フレーム名を入力</label>
+    <input type="text" id="frameName" placeholder="例：予約バトル" />
+    <button id="uploadBtn">アップロード</button>
+    <div id="result"></div>
 
-  <!-- ▼ 戻るボタン -->
-  <button id="backToSelectFromAdd" class="back-btn">← 戻る</button>
-</div>
+    <button id="backToSelectFromAdd" class="back-btn">← 戻る</button>
+  </div>
 
-<!-- ▼ 削除モード -->
-<div id="deleteModeCard" class="app-card" style="display:none;">
-  <h2 class="mode-title">フレーム削除モード</h2>
-  <p class="subtext">アップロード済みのフレームを一覧から削除できます。</p>
+  <!-- ▼ 削除モード（チェック式・複数削除対応） -->
+  <div id="deleteModeCard" class="app-card" style="display:none;">
+    <h2 class="mode-title">フレーム削除モード</h2>
+    <p class="subtext">削除したいフレームにチェックを入れてください。</p>
 
-  <div id="frameList" class="frame-list"></div>
+    <!-- ▼ フレーム一覧（チェック付き） -->
+    <div id="frameList" class="frame-list"></div>
 
-  <!-- ▼ 戻るボタン -->
-  <button id="backToSelectFromDelete" class="back-btn">← 戻る</button>
-</div>
+    <!-- ▼ 削除ボタン（複数対応） -->
+    <div class="delete-actions">
+      <button id="deleteSelectedBtn" class="delete-btn-main">選択したフレームを削除</button>
+    </div>
+
+    <button id="backToSelectFromDelete" class="back-btn">← 戻る</button>
+  </div>
 
   <script src="admin.js"></script>
 </body>
