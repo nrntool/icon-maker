@@ -1,5 +1,5 @@
 // ================================
-// FrameLab ドラッグ慣性なし完全版（ズレゼロ）
+// FrameLab ユーザー画面
 // ================================
 
 const imageInput = document.getElementById("imageInput");
@@ -7,7 +7,7 @@ const frameSelect = document.getElementById("frameSelect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ▼ GitHub raw URLからフレーム一覧を取得
+// ▼ フレーム一覧を読み込み（日本語名対応）
 async function loadFramesFromGitHub() {
   const repo = "framesynth/icon-maker";
   const framesUrl = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
@@ -18,15 +18,25 @@ async function loadFramesFromGitHub() {
 
     frameSelect.innerHTML = '<option value="">選択してください</option>';
 
-    data.forEach(item => {
-      if (item.name.endsWith(".png")) {
-        const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
-        const option = document.createElement("option");
-        option.value = rawUrl;
-        option.textContent = item.name.replace(".png", "");
-        frameSelect.appendChild(option);
+    for (const item of data) {
+      if (!item.name.endsWith(".png")) continue;
+
+      // コミット履歴から日本語名を取得
+      const commitsUrl = `https://api.github.com/repos/${repo}/commits?path=frames/${item.name}&per_page=1`;
+      const commitRes = await fetch(commitsUrl);
+      const commitData = await commitRes.json();
+
+      let displayName = item.name.replace(".png", "");
+      if (commitData[0]?.commit?.message?.includes("Add frame: ")) {
+        displayName = commitData[0].commit.message.replace("Add frame: ", "");
       }
-    });
+
+      const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
+      const option = document.createElement("option");
+      option.value = rawUrl;
+      option.textContent = displayName;
+      frameSelect.appendChild(option);
+    }
   } catch (err) {
     console.error("GitHub API 読み込みエラー:", err);
     frameSelect.innerHTML = '<option value="">読み込み失敗</option>';
@@ -53,11 +63,9 @@ window.addEventListener("resize", () => {
 
 let baseImage = null;
 let frameImage = null;
-
 let scale = 1;
 let minScale = 0.3;
 let maxScale = 4;
-
 let offsetX = 0;
 let offsetY = 0;
 
@@ -124,15 +132,12 @@ let lastX = null;
 let lastY = null;
 let lastDist = null;
 
-// ================================
-// ▼ タッチ開始（ズレゼロ）
-// ================================
+// ▼ タッチ開始
 canvas.addEventListener("touchstart", (e) => {
   const rect = canvas.getBoundingClientRect();
 
   if (e.touches.length === 1) {
     isDragging = true;
-
     lastX = e.touches[0].clientX - rect.left;
     lastY = e.touches[0].clientY - rect.top;
   }
@@ -142,24 +147,20 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
-// ================================
 // ▼ タッチ移動（ピンチ＋ドラッグ）
-// ================================
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
 
-  // ▼ 2本指ピンチ
+  // ピンチ操作
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
     const center = getCenter(e.touches);
-
     const cx = center.x - rect.left;
     const cy = center.y - rect.top;
 
     const oldScale = scale;
     const delta = (dist - lastDist) * 0.004;
-
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
 
     const zoomRatio = scale / oldScale;
@@ -171,27 +172,19 @@ canvas.addEventListener("touchmove", (e) => {
     return;
   }
 
-  // ▼ 1本指ドラッグ
+  // ドラッグ操作
   if (e.touches.length === 1 && isDragging) {
     const x = e.touches[0].clientX - rect.left;
     const y = e.touches[0].clientY - rect.top;
-
-    const dx = x - lastX;
-    const dy = y - lastY;
-
-    offsetX += dx;
-    offsetY += dy;
-
+    offsetX += x - lastX;
+    offsetY += y - lastY;
     lastX = x;
     lastY = y;
-
     redraw();
   }
 }, { passive: false });
 
-// ================================
-// ▼ タッチ終了（慣性なし → ピタッと止まる）
-// ================================
+// ▼ タッチ終了
 canvas.addEventListener("touchend", () => {
   isDragging = false;
   lastX = null;
@@ -199,7 +192,7 @@ canvas.addEventListener("touchend", () => {
   lastDist = null;
 });
 
-// ▼ 描画
+// ▼ 描画処理
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -246,27 +239,15 @@ function saveHighRes() {
 
   saveCanvas.toBlob((blob) => {
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement("a");
     link.href = url;
     link.download = filename;
-
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
     URL.revokeObjectURL(url);
   }, "image/png");
 }
 
 document.getElementById("saveBtn").addEventListener("click", saveHighRes);
-document.getElementById("resetBtn").addEventListener("click", () => {
-  baseImage = null;
-  frameImage = null;
-  scale = 1;
-  offsetX = 0;
-  offsetY = 0;
-  imageInput.value = "";
-  frameSelect.value = "";
-  redraw();
-});
+document.getElementById("resetBtn").addEventListener("click", ()
