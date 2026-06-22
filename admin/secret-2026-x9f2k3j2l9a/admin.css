@@ -366,7 +366,7 @@ input[type="text"] {
 }
 
 /* ================================
-   追加モード：戻る＋アップロード横並び（青系・PC/スマホ共通）
+   追加モード：ボタン配置
 ================================ */
 .upload-actions {
   display: flex;
@@ -424,10 +424,10 @@ input[type="text"] {
     inset 0 0 28px rgba(255,255,255,0.3);
 }
 
-/* スマホ最適化（横並び維持） */
+/* スマホでも横並び維持 */
 @media (max-width: 600px) {
   .upload-actions {
-    flex-direction: row; /* ← スマホでも横並び維持 */
+    flex-direction: row;
     gap: 0.8em;
     margin-top: 2.2em;
   }
