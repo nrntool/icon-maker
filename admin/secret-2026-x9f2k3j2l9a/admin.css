@@ -344,32 +344,36 @@ input[type="file"]::-webkit-file-upload-button {
   filter: brightness(1.15);
   transform: scale(1.02);
 }
-
 /* ================================
-   削除ボタン＋戻るボタン 横並び（スマホ対応）
+   削除ボタン＋戻るボタン
 ================================ */
 .delete-actions {
   display: flex;
-  justify-content: space-between; /* 左：戻る / 右：削除 */
+  justify-content: space-between; /* 左：戻る / 右：選択削除 */
   align-items: center;
   margin-top: 2em;
   gap: 1.4em;
   flex-wrap: nowrap; /* ← 折り返し禁止で常に横並び */
 }
 
-/* ボタン幅を調整してスマホでも収まるように */
+/* ▼ 戻るボタン（左側） */
 .delete-actions .back-btn {
-  order: 1; /* 左側 */
+  order: 1;
   width: 45%;
   min-width: 120px;
   height: 54px;
+  white-space: nowrap;
 }
 
+/* ▼ 選択削除ボタン（右側） */
 .delete-actions .delete-btn-main {
-  order: 2; /* 右側 */
+  order: 2;
   width: 45%;
   min-width: 120px;
   height: 54px;
+  white-space: nowrap; /* ← 文字が折れないように */
+  font-size: 0.92em;   /* ← 「選択削除」が見切れない最適値 */
+  letter-spacing: 0.03em;
 }
 
 /* スマホ最適化 */
