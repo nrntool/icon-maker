@@ -4,10 +4,9 @@
 
 /* UIトークン */
 :root {
-  --accent-blue: #7fa0d0;   /* 中間青 */
-  --accent-dark: #6a8fc0;   /* 濃い青 */
-  --accent-light: #e9edf8;  /* 淡い青白 */
-  --text-main: #364766;
+  --accent-blue: #6a8fc0;
+  --accent-light: #7fa0d0;
+  --text-main: #4a5f85;
   --glass: rgba(255,255,255,0.72);
   --glass-soft: rgba(255,255,255,0.65);
   --shadow-main: rgba(90,125,168,0.15);
@@ -29,7 +28,7 @@ html, body, button, input, select, label, p, h1, h2, h3, div, span {
 body {
   margin: 0;
   background: radial-gradient(circle at top, #e8ecf5 0%, #f4f6fb 45%, #f2f3f8 100%);
-  color: var(--text-main);
+  color: #222;
   text-align: center;
   line-height: 1.6;
 }
@@ -123,11 +122,11 @@ body {
 }
 
 /* ================================
-   主操作ボタン（追加／削除）
+   主操作ボタン（削除／追加）
 ================================ */
 .delete-btn-main,
 .upload-btn-main {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-dark));
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-blue));
   color: #fff;
   border: 1px solid rgba(255,255,255,0.55);
   box-shadow:
@@ -143,11 +142,11 @@ body {
 }
 
 /* ================================
-   戻るボタン（淡い青白）
+   戻るボタン
 ================================ */
 .back-btn {
-  background: linear-gradient(135deg, var(--accent-light), #dfe6f7);
-  color: var(--text-main);
+  background: linear-gradient(135deg, #e9edf8, #dfe6f7);
+  color: #364766;
   border: 1px solid rgba(255,255,255,0.45);
   box-shadow:
     0 2px 8px rgba(90,125,168,0.12),
@@ -183,49 +182,13 @@ body {
 }
 
 /* ================================
-   入力欄
-================================ */
-label {
-  display: flex;
-  align-items: center;
-  margin: 1.2em 0 0.4em;
-  font-size: 0.92em;
-  font-weight: 500;
-  color: var(--text-main);
-}
-
-.step-badge {
-  width: 1.6em;
-  height: 1.6em;
-  margin-right: 0.6em;
-  font-size: 0.85em;
-  font-weight: 600;
-  color: var(--text-main);
-  border-radius: 6px;
-  border: 1px solid rgba(90,125,168,0.35);
-  background: rgba(255,255,255,0.55);
-}
-
-input[type="file"],
-input[type="text"] {
-  width: 100%;
-  max-width: 400px;
-  padding: 0.75em 1em;
-  font-size: 0.92em;
-  background: rgba(255,255,255,0.75);
-  border: 1px solid rgba(90,125,168,0.25);
-  border-radius: var(--radius-input);
-  box-shadow: 0 2px 6px var(--shadow-main);
-  margin-bottom: 1.2em;
-}
-
-/* ================================
    プレビュー
 ================================ */
 #previewBox {
   margin: 1.2em 0;
   padding: 1.2em;
   background: var(--glass-soft);
+  backdrop-filter: blur(10px);
   border-radius: 14px;
   box-shadow: 0 3px 12px var(--shadow-main);
   display: none;
@@ -288,6 +251,12 @@ input[type="text"] {
   word-break: break-all;
 }
 
+.frame-checkbox:checked + img,
+.frame-checkbox:checked ~ .frame-name {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
 /* ================================
    削除モード：横並び
 ================================ */
@@ -306,7 +275,7 @@ input[type="text"] {
 }
 
 /* ================================
-   追加モード：横並び
+   追加モード：横並び（削除と統一）
 ================================ */
 .upload-actions {
   display: flex;
