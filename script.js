@@ -278,22 +278,16 @@ function saveHighRes() {
 // ▼ 完全リセット（やり直し）
 // ================================
 resetBtn.addEventListener("click", () => {
-  // 画像データをリセット
   baseImage = null;
   frameImage = null;
 
-  // パラメータ初期化
   scale = 1;
   offsetX = 0;
   offsetY = 0;
 
-  // Canvas クリア
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // ファイル選択リセット
   imageInput.value = "";
-
-  // フレーム選択リセット
   frameSelect.selectedIndex = 0;
 
   console.log("完全リセット完了");
