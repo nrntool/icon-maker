@@ -25,7 +25,7 @@ let offsetX = 0;
 let offsetY = 0;
 
 // ================================
-// ▼ Worker からフレーム一覧を取得（日本語名対応）
+// ▼ Worker からフレーム一覧を取得（displayName対応）
 // ================================
 async function loadFrames() {
   try {
@@ -43,8 +43,13 @@ async function loadFrames() {
 
     frames.forEach(frame => {
       const option = document.createElement("option");
+
+      // ▼ 表示名は displayName を優先
+      option.textContent = frame.displayName || frame.filename || "名称未設定";
+
+      // ▼ 実際に読み込む画像URL
       option.value = frame.url;
-      option.textContent = frame.name.replace(".png", "");
+
       frameSelect.appendChild(option);
     });
 
