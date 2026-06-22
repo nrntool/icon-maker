@@ -143,20 +143,20 @@ body {
   box-shadow: 0 4px 10px var(--shadow-main), inset 0 0 18px rgba(255,255,255,0.25);
 }
 
-/* 削除ボタン（赤系） */
+/* 削除ボタン（赤系 → オレンジ寄りに変更） */
 .delete-btn-main {
-  background: linear-gradient(135deg, #d9534f, #c0392b);
-  box-shadow: 0 4px 10px rgba(192,57,43,0.25), inset 0 0 18px rgba(255,255,255,0.25);
+  background: linear-gradient(135deg, #ff9a4f, #ff7b2f);
+  box-shadow: 0 4px 10px rgba(255,140,60,0.25), inset 0 0 18px rgba(255,255,255,0.25);
   white-space: nowrap;
 }
 
 /* 白ガラス（戻る） */
 .back-btn {
-  background: linear-gradient(135deg, #f9fbff, #eef2fa);
-  color: #4a4a4a;
-  border: 1px solid rgba(255,255,255,0.7);
-  box-shadow: 0 3px 10px rgba(90,125,168,0.12), inset 0 0 18px rgba(255,255,255,0.25);
-  opacity: 0.95;
+  background: linear-gradient(135deg, #f5f7fb, #e3e8f5);
+  color: #3f4e6b;
+  border: 1px solid rgba(90,125,168,0.25);
+  box-shadow: 0 3px 10px rgba(90,125,168,0.15), inset 0 0 18px rgba(255,255,255,0.25);
+  opacity: 1;
 }
 
 /* 光沢ライン */
@@ -350,28 +350,27 @@ input[type="file"]::-webkit-file-upload-button {
 ================================ */
 .delete-actions {
   display: flex;
-  justify-content: center; /* 中央寄せ */
+  justify-content: center;
   align-items: center;
-  gap: 1em; /* ← ボタン間の距離を少し近づける */
+  gap: 0.9em;
   margin-top: 2em;
   flex-wrap: nowrap;
 }
 
-/* ▼ 戻るボタン（左側） */
+/* ▼ 戻るボタン（濃くした版） */
 .delete-actions .back-btn {
   order: 1;
   width: 45%;
   min-width: 120px;
   height: 54px;
-  background: linear-gradient(135deg, #f5f7fb, #e3e8f5); /* ← 少し濃くして視認性UP */
-  color: #3f4e6b;
-  border: 1px solid rgba(90,125,168,0.25);
-  box-shadow: 0 3px 10px rgba(90,125,168,0.15), inset 0 0 18px rgba(255,255,255,0.25);
-  opacity: 1; /* ← 背景をはっきり見せる */
+  background: linear-gradient(135deg, #dbe2f5, #c9d3ee);
+  color: #364766;
+  border: 1px solid rgba(90,125,168,0.35);
+  box-shadow: 0 4px 12px rgba(90,125,168,0.22), inset 0 0 18px rgba(255,255,255,0.28);
   font-weight: 500;
 }
 
-/* ▼ 選択削除ボタン（右側） */
+/* ▼ 選択削除ボタン（オレンジ寄り） */
 .delete-actions .delete-btn-main {
   order: 2;
   width: 45%;
@@ -380,12 +379,17 @@ input[type="file"]::-webkit-file-upload-button {
   white-space: nowrap;
   font-size: 0.92em;
   letter-spacing: 0.03em;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ff9a4f, #ff7b2f);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 4px 10px rgba(255,140,60,0.25), inset 0 0 18px rgba(255,255,255,0.25);
 }
 
 /* スマホ最適化 */
 @media (max-width: 600px) {
   .delete-actions {
-    gap: 0.8em; /* ← スマホでも距離を近めに */
+    gap: 0.8em;
     margin-top: 2.2em;
   }
 
@@ -394,4 +398,4 @@ input[type="file"]::-webkit-file-upload-button {
     width: 44%;
     min-width: 110px;
   }
-}
+     }
