@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル用 admin.js（完全版）
+// FrameLab 管理パネル admin.js
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -88,11 +88,12 @@ frameInput.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-// ▼ GitHub raw で存在チェック
-async function checkFileExists(filename) {
-  const rawUrl = `https://raw.githubusercontent.com/framesynth/icon-maker/main/frames/${filename}`;
-  const res = await fetch(rawUrl, { method: "HEAD" });
-  return res.ok;
+// ▼ ランダム英数字ファイル名生成
+function randomFilename() {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let name = "";
+  for (let i = 0; i < 12; i++) name += chars[Math.floor(Math.random() * chars.length)];
+  return name + ".png";
 }
 
 // ▼ アップロード処理
@@ -113,12 +114,14 @@ async function uploadFrame(file, frameName) {
 
   try {
     const base64Data = await toBase64(file);
+    const randomName = randomFilename();
 
     const response = await fetch(WORKER_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: `${frameName}.png`,
+        filename: randomName,      // ← ランダム英数字
+        displayName: frameName,    // ← 日本語フレーム名
         content: base64Data
       })
     });
@@ -189,48 +192,44 @@ document.addEventListener("click", async (e) => {
 });
 
 // ================================
-// ▼ 削除モード（チェック式・複数削除対応）
+// ▼ 削除モード（日本語名対応）
 // ================================
 async function loadFrameList() {
-  const repo = "framesynth/icon-maker";
-  const url = `https://api.github.com/repos/${repo}/contents/frames?t=${Date.now()}`;
-
+  const url = WORKER_ENDPOINT + "?mode=list&t=" + Date.now();
   const listBox = document.getElementById("frameList");
+
   listBox.innerHTML = "読み込み中…";
 
   try {
     const res = await fetch(url);
     const data = await res.json();
-    listBox.innerHTML = "";
 
-    if (!Array.isArray(data) || data.length === 0) {
+    if (!data.success || !data.data.frames.length) {
       listBox.innerHTML = "現在、削除できるフレームはありません。";
       return;
     }
 
-    data.forEach(item => {
-      if (!item.name.endsWith(".png")) return;
-      const rawUrl = `https://raw.githubusercontent.com/${repo}/main/frames/${item.name}`;
+    listBox.innerHTML = "";
 
+    data.data.frames.forEach(item => {
       const div = document.createElement("div");
       div.className = "frame-item";
 
-      // ▼ チェック式に統一
       div.innerHTML = `
-        <input type="checkbox" class="frame-checkbox" data-name="${item.name}">
-        <img src="${rawUrl}" class="frame-thumb">
-        <div class="frame-name">${item.name}</div>
+        <input type="checkbox" class="frame-checkbox" data-name="${item.filename}">
+        <img src="${item.url}" class="frame-thumb">
+        <div class="frame-name">${item.displayName || item.filename}</div>
       `;
 
       listBox.appendChild(div);
     });
 
   } catch {
-    listBox.innerHTML = "⚠ フレーム一覧の取得に失敗しました。通信状況を確認してください。";
+    listBox.innerHTML = "⚠ フレーム一覧の取得に失敗しました。";
   }
 }
 
-// ▼ 複数削除ボタン
+// ▼ 複数削除
 document.getElementById("deleteSelectedBtn")?.addEventListener("click", async () => {
   const checked = [...document.querySelectorAll(".frame-checkbox:checked")];
   if (checked.length === 0) {
