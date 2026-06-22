@@ -98,6 +98,7 @@ body {
   margin-top: 0.4em;
 }
 
+/* 注意文（note-text） */
 .note-text {
   font-size: 0.85em;
   color: #5c6b8a;
@@ -153,18 +154,24 @@ body {
 }
 
 /* ================================
-   主操作ボタン（削除／追加）濃いラベンダーで統一
+   主操作ボタン（削除／追加）
 ================================ */
 .delete-btn-main,
 .upload-btn-main {
-  background: linear-gradient(135deg, #b49ae8, #967fd8);
+  background: linear-gradient(135deg, #7fa0d0, #6a8fc0);
   color: #fff;
   border: 1px solid rgba(255,255,255,0.55);
   box-shadow:
-    0 4px 10px rgba(150,127,216,0.25),
+    0 4px 10px rgba(122,150,200,0.25),
     inset 0 0 18px rgba(255,255,255,0.25);
   font-weight: 600;
   white-space: nowrap;
+}
+
+.delete-btn-main:hover,
+.upload-btn-main:hover {
+  background: linear-gradient(135deg, #8fb2e0, #7698c8);
+  transform: translateY(-2px);
 }
 
 /* ================================
@@ -177,6 +184,11 @@ body {
   box-shadow:
     0 2px 8px rgba(90,125,168,0.12),
     inset 0 0 18px rgba(255,255,255,0.28);
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #f0f3fb, #e4e9f9);
+  transform: translateY(-2px);
 }
 
 /* 光沢ライン */
@@ -202,32 +214,6 @@ body {
 .delete-btn-main:hover::before,
 .upload-btn-main:hover::before {
   left: 120%;
-}
-
-/* ホバー */
-.mode-btn:hover,
-#uploadBtn:hover,
-.back-btn:hover,
-.delete-btn-main:hover,
-.upload-btn-main:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px var(--shadow-main), inset 0 0 28px rgba(255,255,255,0.3);
-}
-
-/* ================================
-   アップロードボタン（旧）
-================================ */
-#uploadBtn {
-  margin: 1.6em auto 2.2em;
-  transform: scale(1.04);
-  box-shadow:
-    0 6px 20px var(--shadow-main),
-    inset 0 0 28px rgba(255,255,255,0.32),
-    0 8px 14px rgba(90,125,168,0.18);
-}
-
-#uploadBtn:hover {
-  transform: scale(1.07);
 }
 
 /* ================================
@@ -266,21 +252,9 @@ input[type="text"] {
   border: 1px solid rgba(90,125,168,0.25);
   border-radius: var(--radius-input);
   box-shadow: 0 2px 6px var(--shadow-main);
-  margin-bottom: 1.2em;
+  margin-bottom: 1
+     margin-bottom: 1.2em;
   transition: 0.25s ease;
-}
-
-/* ファイル選択ボタン */
-input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
-  padding: 0.6em 1em;
-  border: none;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #eef2ff, #dfe6fa);
-  color: var(--text-main);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease;
 }
 
 /* ================================
@@ -392,7 +366,7 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 /* ================================
-   追加モード：ボタン配置（削除と統一）
+   追加モード：戻る＋アップロード横並び（青系）
 ================================ */
 .upload-actions {
   display: flex;
@@ -403,23 +377,55 @@ input[type="file"]::-webkit-file-upload-button {
   flex-wrap: nowrap;
 }
 
+/* 戻るボタン（左） */
 .upload-actions .back-btn {
   order: 1;
   width: 45%;
   min-width: 120px;
   height: 54px;
   border-radius: 12px;
+  background: linear-gradient(135deg, #dfe5f7, #cfd8f0);
+  color: #364766;
+  border: 1px solid rgba(255,255,255,0.45);
+  box-shadow:
+    0 2px 8px rgba(90,125,168,0.12),
+    inset 0 0 18px rgba(255,255,255,0.28);
+  transition: background 0.25s ease, transform 0.25s ease;
 }
 
+.upload-actions .back-btn:hover {
+  background: linear-gradient(135deg, #f0f3fb, #e4e9f9);
+  transform: translateY(-2px);
+}
+
+/* アップロードボタン（右・青ガラス） */
 .upload-actions .upload-btn-main {
   order: 2;
   width: 45%;
   min-width: 120px;
   height: 54px;
   border-radius: 12px;
+  background: linear-gradient(135deg, #7fa0d0, #6a8fc0);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow:
+    0 4px 10px rgba(122,150,200,0.25),
+    inset 0 0 18px rgba(255,255,255,0.25);
+  font-weight: 600;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
-/* スマホ最適化 */
+.upload-actions .upload-btn-main:hover {
+  background: linear-gradient(135deg, #8fb2e0, #7698c8);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 16px rgba(122,150,200,0.35),
+    inset 0 0 28px rgba(255,255,255,0.3);
+}
+
+/* ================================
+   スマホ最適化
+================================ */
 @media (max-width: 600px) {
   .delete-actions,
   .upload-actions {
