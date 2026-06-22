@@ -143,16 +143,20 @@ body {
   box-shadow: 0 4px 10px var(--shadow-main), inset 0 0 18px rgba(255,255,255,0.25);
 }
 
-/* 削除ボタン（ラベンダー系に変更） */
+/* ================================
+   選択削除ボタン（濃いラベンダー）
+================================ */
 .delete-btn-main {
-  background: linear-gradient(135deg, #c7b6f0, #a99bdd);
+  background: linear-gradient(135deg, #b49ae8, #967fd8);
   box-shadow:
-    0 4px 10px rgba(169,155,221,0.25),
+    0 4px 10px rgba(150,127,216,0.25),
     inset 0 0 18px rgba(255,255,255,0.25);
   white-space: nowrap;
 }
 
-/* 白ガラス（戻る） */
+/* ================================
+   戻るボタン（縁取りを薄く上品に）
+================================ */
 .back-btn {
   background: linear-gradient(135deg, #dfe5f7, #cfd8f0);
   color: #364766;
@@ -372,7 +376,7 @@ input[type="file"]::-webkit-file-upload-button {
   border-radius: 12px;
 }
 
-/* ▼ 選択削除ボタン（ラベンダー系） */
+/* ▼ 選択削除ボタン（濃いラベンダー） */
 .delete-actions .delete-btn-main {
   order: 2;
   width: 45%;
@@ -382,11 +386,11 @@ input[type="file"]::-webkit-file-upload-button {
   font-size: 0.92em;
   letter-spacing: 0.03em;
   font-weight: 600;
-  background: linear-gradient(135deg, #c7b6f0, #a99bdd);
+  background: linear-gradient(135deg, #b49ae8, #967fd8);
   color: #fff;
   border: 1px solid rgba(255,255,255,0.55);
   box-shadow:
-    0 4px 10px rgba(169,155,221,0.25),
+    0 4px 10px rgba(150,127,216,0.25),
     inset 0 0 18px rgba(255,255,255,0.25);
 }
 
