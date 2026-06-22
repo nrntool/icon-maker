@@ -350,18 +350,25 @@ input[type="file"]::-webkit-file-upload-button {
 ================================ */
 .delete-actions {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* 左：戻る / 右：削除 */
   align-items: center;
-  gap: 1.4em;
   margin-top: 2em;
+  gap: 1.4em;
   flex-wrap: nowrap; /* ← 折り返し禁止で常に横並び */
 }
 
-/* ボタンの幅を調整してスマホでも収まるように */
-.delete-actions .delete-btn-main,
+/* ボタン幅を調整してスマホでも収まるように */
 .delete-actions .back-btn {
+  order: 1; /* 左側 */
   width: 45%;
-  min-width: 130px;
+  min-width: 120px;
+  height: 54px;
+}
+
+.delete-actions .delete-btn-main {
+  order: 2; /* 右側 */
+  width: 45%;
+  min-width: 120px;
   height: 54px;
 }
 
@@ -372,9 +379,9 @@ input[type="file"]::-webkit-file-upload-button {
     margin-top: 2.2em;
   }
 
-  .delete-actions .delete-btn-main,
-  .delete-actions .back-btn {
-    width: 42%; /* ← 横並び維持しつつ少し縮める */
-    min-width: 120px;
+  .delete-actions .back-btn,
+  .delete-actions .delete-btn-main {
+    width: 44%; /* ← 横並び維持しつつ少し縮める */
+    min-width: 110px;
   }
 }
