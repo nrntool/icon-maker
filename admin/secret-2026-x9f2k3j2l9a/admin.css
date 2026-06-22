@@ -95,15 +95,8 @@ body {
 .subtext {
   font-size: 0.9em;
   color: #6b7a99;
-  margin-top: 0.4em;
-}
-
-/* 注意文（note-text） */
-.note-text {
-  font-size: 0.85em;
-  color: #5c6b8a;
-  margin-top: 0.2em;
-  opacity: 0.9;
+  margin-top: 0.2em; 
+  line-height: 1.4;
 }
 
 /* ================================
