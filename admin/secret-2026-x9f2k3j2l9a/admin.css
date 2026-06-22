@@ -116,7 +116,8 @@ body {
 .mode-btn,
 #uploadBtn,
 .back-btn,
-.delete-btn-main {
+.delete-btn-main,
+.upload-btn-main {
   width: 180px;
   height: 54px;
   border-radius: var(--radius-btn);
@@ -133,10 +134,11 @@ body {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 青紫ガラス */
+/* ================================
+   青紫ガラス（基本）
+================================ */
 .mode-btn,
-#uploadBtn,
-.delete-btn-main {
+#uploadBtn {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
   color: #fff;
   border: 1px solid rgba(255,255,255,0.4);
@@ -144,18 +146,22 @@ body {
 }
 
 /* ================================
-   選択削除ボタン（濃いラベンダー）
+   主操作ボタン（削除／追加）濃いラベンダーで統一
 ================================ */
-.delete-btn-main {
+.delete-btn-main,
+.upload-btn-main {
   background: linear-gradient(135deg, #b49ae8, #967fd8);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.55);
   box-shadow:
     0 4px 10px rgba(150,127,216,0.25),
     inset 0 0 18px rgba(255,255,255,0.25);
+  font-weight: 600;
   white-space: nowrap;
 }
 
 /* ================================
-   戻るボタン（縁取りを薄く上品に）
+   戻るボタン（白ガラス）
 ================================ */
 .back-btn {
   background: linear-gradient(135deg, #dfe5f7, #cfd8f0);
@@ -164,14 +170,14 @@ body {
   box-shadow:
     0 2px 8px rgba(90,125,168,0.12),
     inset 0 0 18px rgba(255,255,255,0.28);
-  opacity: 1;
 }
 
 /* 光沢ライン */
 .mode-btn::before,
 #uploadBtn::before,
 .back-btn::before,
-.delete-btn-main::before {
+.delete-btn-main::before,
+.upload-btn-main::before {
   content: "";
   position: absolute;
   top: 0;
@@ -186,7 +192,8 @@ body {
 .mode-btn:hover::before,
 #uploadBtn:hover::before,
 .back-btn:hover::before,
-.delete-btn-main:hover::before {
+.delete-btn-main:hover::before,
+.upload-btn-main:hover::before {
   left: 120%;
 }
 
@@ -194,13 +201,14 @@ body {
 .mode-btn:hover,
 #uploadBtn:hover,
 .back-btn:hover,
-.delete-btn-main:hover {
+.delete-btn-main:hover,
+.upload-btn-main:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px var(--shadow-main), inset 0 0 28px rgba(255,255,255,0.3);
 }
 
 /* ================================
-   アップロードボタン
+   アップロードボタン（旧）
 ================================ */
 #uploadBtn {
   margin: 1.6em auto 2.2em;
@@ -349,7 +357,7 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 /* ================================
-   選択削除ボタン＋戻るボタン
+   削除モード：ボタン配置
 ================================ */
 .delete-actions {
   display: flex;
@@ -360,49 +368,62 @@ input[type="file"]::-webkit-file-upload-button {
   flex-wrap: nowrap;
 }
 
-/* ▼ 戻るボタン（縁取りを薄くして上品に） */
 .delete-actions .back-btn {
   order: 1;
   width: 45%;
   min-width: 120px;
   height: 54px;
-  background: linear-gradient(135deg, #dfe5f7, #cfd8f0);
-  color: #364766;
-  border: 1px solid rgba(255,255,255,0.45);
-  box-shadow:
-    0 2px 8px rgba(90,125,168,0.12),
-    inset 0 0 18px rgba(255,255,255,0.28);
-  font-weight: 500;
   border-radius: 12px;
 }
 
-/* ▼ 選択削除ボタン（濃いラベンダー） */
 .delete-actions .delete-btn-main {
   order: 2;
   width: 45%;
   min-width: 120px;
   height: 54px;
-  white-space: nowrap;
-  font-size: 0.92em;
-  letter-spacing: 0.03em;
-  font-weight: 600;
-  background: linear-gradient(135deg, #b49ae8, #967fd8);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.55);
-  box-shadow:
-    0 4px 10px rgba(150,127,216,0.25),
-    inset 0 0 18px rgba(255,255,255,0.25);
+  border-radius: 12px;
+}
+
+/* ================================
+   追加モード：ボタン配置（削除と統一）
+================================ */
+.upload-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.9em;
+  margin-top: 2em;
+  flex-wrap: nowrap;
+}
+
+.upload-actions .back-btn {
+  order: 1;
+  width: 45%;
+  min-width: 120px;
+  height: 54px;
+  border-radius: 12px;
+}
+
+.upload-actions .upload-btn-main {
+  order: 2;
+  width: 45%;
+  min-width: 120px;
+  height: 54px;
+  border-radius: 12px;
 }
 
 /* スマホ最適化 */
 @media (max-width: 600px) {
-  .delete-actions {
+  .delete-actions,
+  .upload-actions {
     gap: 0.8em;
     margin-top: 2.2em;
   }
 
   .delete-actions .back-btn,
-  .delete-actions .delete-btn-main {
+  .delete-actions .delete-btn-main,
+  .upload-actions .back-btn,
+  .upload-actions .upload-btn-main {
     width: 44%;
     min-width: 110px;
   }
