@@ -344,16 +344,17 @@ input[type="file"]::-webkit-file-upload-button {
   filter: brightness(1.15);
   transform: scale(1.02);
 }
+
 /* ================================
-   削除ボタン＋戻るボタン
+   選択削除ボタン＋戻るボタン
 ================================ */
 .delete-actions {
   display: flex;
-  justify-content: space-between; /* 左：戻る / 右：選択削除 */
+  justify-content: center; /* 中央寄せ */
   align-items: center;
+  gap: 1em; /* ← ボタン間の距離を少し近づける */
   margin-top: 2em;
-  gap: 1.4em;
-  flex-wrap: nowrap; /* ← 折り返し禁止で常に横並び */
+  flex-wrap: nowrap;
 }
 
 /* ▼ 戻るボタン（左側） */
@@ -362,7 +363,12 @@ input[type="file"]::-webkit-file-upload-button {
   width: 45%;
   min-width: 120px;
   height: 54px;
-  white-space: nowrap;
+  background: linear-gradient(135deg, #f5f7fb, #e3e8f5); /* ← 少し濃くして視認性UP */
+  color: #3f4e6b;
+  border: 1px solid rgba(90,125,168,0.25);
+  box-shadow: 0 3px 10px rgba(90,125,168,0.15), inset 0 0 18px rgba(255,255,255,0.25);
+  opacity: 1; /* ← 背景をはっきり見せる */
+  font-weight: 500;
 }
 
 /* ▼ 選択削除ボタン（右側） */
@@ -371,21 +377,21 @@ input[type="file"]::-webkit-file-upload-button {
   width: 45%;
   min-width: 120px;
   height: 54px;
-  white-space: nowrap; /* ← 文字が折れないように */
-  font-size: 0.92em;   /* ← 「選択削除」が見切れない最適値 */
+  white-space: nowrap;
+  font-size: 0.92em;
   letter-spacing: 0.03em;
 }
 
 /* スマホ最適化 */
 @media (max-width: 600px) {
   .delete-actions {
-    gap: 1em;
+    gap: 0.8em; /* ← スマホでも距離を近めに */
     margin-top: 2.2em;
   }
 
   .delete-actions .back-btn,
   .delete-actions .delete-btn-main {
-    width: 44%; /* ← 横並び維持しつつ少し縮める */
+    width: 44%;
     min-width: 110px;
   }
 }
