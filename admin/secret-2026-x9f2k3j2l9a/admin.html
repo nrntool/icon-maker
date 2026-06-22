@@ -28,6 +28,7 @@
     <h2 class="mode-title">フレーム追加モード</h2>
     <p class="subtext">フレーム画像をアップロードして登録できます。</p>
     <p class="subtext">フレームの内側のみ透過した画像を登録してください。</p>
+
     <label><span class="step-badge">1</span>画像を選択</label>
     <input type="file" id="frameInput" accept="image/*" />
     <div id="previewBox"><img id="previewImage" src="" alt="プレビュー" /></div>
@@ -35,17 +36,16 @@
     <label><span class="step-badge">2</span>フレーム名を入力</label>
     <input type="text" id="frameName" placeholder="例：予約バトル" />
 
-      <div class="upload-actions">
-        <button id="backToSelectFromAdd" class="back-btn">← 戻る</button>
-        <button id="uploadBtn" class="upload-btn-main">アップロード</button>
-      </div>
+    <div class="upload-actions">
+      <button id="backToSelectFromAdd" class="back-btn">← 戻る</button>
+      <button id="uploadBtn" class="upload-btn-main">アップロード</button>
     </div>
+  </div> <!-- ★ 正しく閉じた -->
 
   <!-- ▼ 削除モード（チェック式・複数削除対応） -->
   <div id="deleteModeCard" class="app-card" style="display:none;">
     <h2 class="mode-title">フレーム削除モード</h2>
     <p class="subtext">削除したいフレームにチェックを入れてください。</p>
-  </div>
 
     <!-- ▼ フレーム一覧（チェック付き） -->
     <div id="frameList" class="frame-list"></div>
