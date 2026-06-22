@@ -140,7 +140,7 @@ select:focus {
 }
 
 /* ================================
-   File Button — 統一デザイン
+   File Button
 ================================ */
 input[type="file"]::-webkit-file-upload-button {
   margin-right: 0.6em;
@@ -182,7 +182,7 @@ canvas {
 }
 
 /* ================================
-   Buttons（保存・やり直す）
+   Buttons（左＝リセット／右＝保存）
 ================================ */
 .button-row {
   display: flex;
@@ -193,61 +193,54 @@ canvas {
   flex-wrap: nowrap;
 }
 
-.button-row button {
+/* リセット（白ガラス） */
+.button-row .btn-reset {
+  order: 1;
   width: 45%;
   min-width: 120px;
   height: 54px;
   border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: linear-gradient(135deg, #dfe5f7, #cfd8f0);
+  color: #364766;
+  border: 1px solid rgba(255,255,255,0.45);
   font-weight: 600;
-  font-size: 0.95em;
-  letter-spacing: 0.03em;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #5a7da8, #6f8fbc);
-  color: #fff;
-  border: none;
   box-shadow:
-    0 4px 12px rgba(90,125,168,0.18),
-    inset 0 0 20px rgba(255,255,255,0.25);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    0 2px 8px rgba(90,125,168,0.12),
+    inset 0 0 18px rgba(255,255,255,0.28);
+  transition: 0.25s ease;
 }
 
-/* Shine */
-.button-row button::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -40%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.45), transparent);
-  transform: skewX(-25deg);
-  transition: left 0.8s ease;
-}
-
-.button-row button:hover::before {
-  left: 120%;
-}
-
-/* Hover */
-.button-row button:hover {
-  background: linear-gradient(135deg, #6f8fbc, #7fa0d0);
+.button-row .btn-reset:hover {
+  background: linear-gradient(135deg, #f0f3fb, #e4e9f9);
   transform: translateY(-2px);
-  box-shadow:
-    0 6px 18px rgba(90,125,168,0.25),
-    inset 0 0 30px rgba(255,255,255,0.3);
 }
 
-/* Active */
-.button-row button:active {
-  transform: scale(0.97);
+/* 保存（青紫） */
+.button-row .btn-save {
+  order: 2;
+  width: 45%;
+  min-width: 120px;
+  height: 54px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7fa0d0, #6a8fc0);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.55);
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
   box-shadow:
-    0 3px 10px rgba(90,125,168,0.25),
-    inset 0 0 20px rgba(255,255,255,0.25);
+    0 4px 10px rgba(122,150,200,0.25),
+    inset 0 0 18px rgba(255,255,255,0.25);
+  transition: 0.25s ease;
+}
+
+.button-row .btn-save:hover {
+  background: linear-gradient(135deg, #8fb2e0, #7698c8);
+  transform: translateY(-2px);
 }
 
 /* スマホ対応 */
