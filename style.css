@@ -182,24 +182,26 @@ canvas {
 }
 
 /* ================================
-   Buttons
+   Buttons（保存・やり直す）
 ================================ */
 .button-row {
   display: flex;
   justify-content: center;
-  gap: 0.8em;
-  margin-top: 1.4em;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9em;
+  margin-top: 1.6em;
+  flex-wrap: nowrap;
 }
 
 .button-row button {
-  width: 240px;
+  width: 45%;
+  min-width: 120px;
   height: 54px;
   border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.95em;
   letter-spacing: 0.03em;
   cursor: pointer;
@@ -211,7 +213,7 @@ canvas {
   box-shadow:
     0 4px 12px rgba(90,125,168,0.18),
     inset 0 0 20px rgba(255,255,255,0.25);
-  transition: 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 /* Shine */
@@ -222,7 +224,7 @@ canvas {
   left: -40%;
   width: 80%;
   height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.45), rgba(255,255,255,0));
+  background: linear-gradient(120deg, rgba(255,255,255,0.45), transparent);
   transform: skewX(-25deg);
   transition: left 0.8s ease;
 }
@@ -233,6 +235,7 @@ canvas {
 
 /* Hover */
 .button-row button:hover {
+  background: linear-gradient(135deg, #6f8fbc, #7fa0d0);
   transform: translateY(-2px);
   box-shadow:
     0 6px 18px rgba(90,125,168,0.25),
@@ -245,4 +248,18 @@ canvas {
   box-shadow:
     0 3px 10px rgba(90,125,168,0.25),
     inset 0 0 20px rgba(255,255,255,0.25);
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+  .button-row {
+    flex-direction: row;
+    gap: 0.8em;
+    margin-top: 2em;
+  }
+
+  .button-row button {
+    width: 44%;
+    min-width: 110px;
+  }
 }
