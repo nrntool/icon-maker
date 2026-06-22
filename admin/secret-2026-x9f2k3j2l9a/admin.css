@@ -4,9 +4,10 @@
 
 /* UIトークン */
 :root {
-  --accent-blue: #6a8fc0;
-  --accent-light: #7fa0d0;
-  --text-main: #4a5f85;
+  --accent-blue: #7fa0d0;   /* 中間青 */
+  --accent-dark: #6a8fc0;   /* 濃い青 */
+  --accent-light: #e9edf8;  /* 淡い青白 */
+  --text-main: #364766;
   --glass: rgba(255,255,255,0.72);
   --glass-soft: rgba(255,255,255,0.65);
   --shadow-main: rgba(90,125,168,0.15);
@@ -17,7 +18,7 @@
 }
 
 /* ================================
-   ベース（フォント完全統一）
+   ベース
 ================================ */
 html, body, button, input, select, label, p, h1, h2, h3, div, span {
   font-family: "Noto Sans JP", "Segoe UI", "Helvetica Neue", sans-serif;
@@ -28,7 +29,7 @@ html, body, button, input, select, label, p, h1, h2, h3, div, span {
 body {
   margin: 0;
   background: radial-gradient(circle at top, #e8ecf5 0%, #f4f6fb 45%, #f2f3f8 100%);
-  color: #222;
+  color: var(--text-main);
   text-align: center;
   line-height: 1.6;
 }
@@ -62,7 +63,7 @@ body {
 }
 
 /* ================================
-   カード（青紫ガラス）
+   カード
 ================================ */
 .app-card {
   width: 92%;
@@ -83,7 +84,7 @@ body {
 }
 
 /* ================================
-   タイトル・サブテキスト
+   タイトル
 ================================ */
 .mode-title {
   font-family: "Playfair Display", "Noto Sans JP", serif;
@@ -99,22 +100,9 @@ body {
 }
 
 /* ================================
-   ボタン行
-================================ */
-.mode-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.8em;
-  margin: 2.2em 0 1.4em;
-  flex-wrap: wrap;
-}
-
-/* ================================
    ボタン共通
 ================================ */
 .mode-btn,
-#uploadBtn,
 .back-btn,
 .delete-btn-main,
 .upload-btn-main {
@@ -135,46 +123,44 @@ body {
 }
 
 /* ================================
-   青紫ガラス（基本）
-================================ */
-.mode-btn,
-#uploadBtn {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-light));
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.4);
-  box-shadow: 0 4px 10px var(--shadow-main), inset 0 0 18px rgba(255,255,255,0.25);
-}
-
-/* ================================
-   主操作ボタン（削除／追加）濃いラベンダーで統一
+   主操作ボタン（追加／削除）
 ================================ */
 .delete-btn-main,
 .upload-btn-main {
-  background: linear-gradient(135deg, #b49ae8, #967fd8);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-dark));
   color: #fff;
   border: 1px solid rgba(255,255,255,0.55);
   box-shadow:
-    0 4px 10px rgba(150,127,216,0.25),
+    0 4px 10px rgba(122,150,200,0.25),
     inset 0 0 18px rgba(255,255,255,0.25);
   font-weight: 600;
-  white-space: nowrap;
+}
+
+.delete-btn-main:hover,
+.upload-btn-main:hover {
+  background: linear-gradient(135deg, #8fb2e0, #7698c8);
+  transform: translateY(-2px);
 }
 
 /* ================================
-   戻るボタン（白ガラス）
+   戻るボタン（淡い青白）
 ================================ */
 .back-btn {
-  background: linear-gradient(135deg, #dfe5f7, #cfd8f0);
-  color: #364766;
+  background: linear-gradient(135deg, var(--accent-light), #dfe6f7);
+  color: var(--text-main);
   border: 1px solid rgba(255,255,255,0.45);
   box-shadow:
     0 2px 8px rgba(90,125,168,0.12),
     inset 0 0 18px rgba(255,255,255,0.28);
 }
 
+.back-btn:hover {
+  background: linear-gradient(135deg, #f0f3fb, #e4e9f9);
+  transform: translateY(-2px);
+}
+
 /* 光沢ライン */
 .mode-btn::before,
-#uploadBtn::before,
 .back-btn::before,
 .delete-btn-main::before,
 .upload-btn-main::before {
@@ -190,41 +176,14 @@ body {
 }
 
 .mode-btn:hover::before,
-#uploadBtn:hover::before,
 .back-btn:hover::before,
 .delete-btn-main:hover::before,
 .upload-btn-main:hover::before {
   left: 120%;
 }
 
-/* ホバー */
-.mode-btn:hover,
-#uploadBtn:hover,
-.back-btn:hover,
-.delete-btn-main:hover,
-.upload-btn-main:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px var(--shadow-main), inset 0 0 28px rgba(255,255,255,0.3);
-}
-
 /* ================================
-   アップロードボタン（旧）
-================================ */
-#uploadBtn {
-  margin: 1.6em auto 2.2em;
-  transform: scale(1.04);
-  box-shadow:
-    0 6px 20px var(--shadow-main),
-    inset 0 0 28px rgba(255,255,255,0.32),
-    0 8px 14px rgba(90,125,168,0.18);
-}
-
-#uploadBtn:hover {
-  transform: scale(1.07);
-}
-
-/* ================================
-   ラベル・入力欄
+   入力欄
 ================================ */
 label {
   display: flex;
@@ -245,10 +204,8 @@ label {
   border-radius: 6px;
   border: 1px solid rgba(90,125,168,0.35);
   background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(6px);
 }
 
-/* 入力欄 */
 input[type="file"],
 input[type="text"] {
   width: 100%;
@@ -260,20 +217,6 @@ input[type="text"] {
   border-radius: var(--radius-input);
   box-shadow: 0 2px 6px var(--shadow-main);
   margin-bottom: 1.2em;
-  transition: 0.25s ease;
-}
-
-/* ファイル選択ボタン */
-input[type="file"]::-webkit-file-upload-button {
-  margin-right: 0.6em;
-  padding: 0.6em 1em;
-  border: none;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #eef2ff, #dfe6fa);
-  color: var(--text-main);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease;
 }
 
 /* ================================
@@ -283,7 +226,6 @@ input[type="file"]::-webkit-file-upload-button {
   margin: 1.2em 0;
   padding: 1.2em;
   background: var(--glass-soft);
-  backdrop-filter: blur(10px);
   border-radius: 14px;
   box-shadow: 0 3px 12px var(--shadow-main);
   display: none;
@@ -307,7 +249,7 @@ input[type="file"]::-webkit-file-upload-button {
 }
 
 /* ================================
-   フレーム一覧（削除モード）
+   フレーム一覧
 ================================ */
 .frame-list {
   display: flex;
@@ -319,19 +261,16 @@ input[type="file"]::-webkit-file-upload-button {
 .frame-item {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 1.2em;
   padding: 1em;
   background: var(--glass-soft);
   border-radius: 14px;
   box-shadow: 0 3px 10px var(--shadow-main);
-  text-align: left;
 }
 
 .frame-checkbox {
   transform: scale(1.3);
   cursor: pointer;
-  flex-shrink: 0;
 }
 
 .frame-thumb {
@@ -340,7 +279,6 @@ input[type="file"]::-webkit-file-upload-button {
   object-fit: contain;
   border-radius: 10px;
   background: #000;
-  flex-shrink: 0;
 }
 
 .frame-name {
@@ -350,69 +288,43 @@ input[type="file"]::-webkit-file-upload-button {
   word-break: break-all;
 }
 
-.frame-checkbox:checked + img,
-.frame-checkbox:checked ~ .frame-name {
-  filter: brightness(1.15);
-  transform: scale(1.02);
-}
-
 /* ================================
-   削除モード：ボタン配置
+   削除モード：横並び
 ================================ */
 .delete-actions {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 0.9em;
   margin-top: 2em;
-  flex-wrap: nowrap;
 }
 
-.delete-actions .back-btn {
-  order: 1;
-  width: 45%;
-  min-width: 120px;
-  height: 54px;
-  border-radius: 12px;
-}
-
+.delete-actions .back-btn,
 .delete-actions .delete-btn-main {
-  order: 2;
   width: 45%;
   min-width: 120px;
   height: 54px;
-  border-radius: 12px;
 }
 
 /* ================================
-   追加モード：ボタン配置（削除と統一）
+   追加モード：横並び
 ================================ */
 .upload-actions {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 0.9em;
   margin-top: 2em;
-  flex-wrap: nowrap;
 }
 
-.upload-actions .back-btn {
-  order: 1;
-  width: 45%;
-  min-width: 120px;
-  height: 54px;
-  border-radius: 12px;
-}
-
+.upload-actions .back-btn,
 .upload-actions .upload-btn-main {
-  order: 2;
   width: 45%;
   min-width: 120px;
   height: 54px;
-  border-radius: 12px;
 }
 
-/* スマホ最適化 */
+/* ================================
+   スマホ最適化
+================================ */
 @media (max-width: 600px) {
   .delete-actions,
   .upload-actions {
