@@ -1,5 +1,5 @@
 // ================================
-// FrameLab ユーザー画面
+// FrameLab ユーザー画面 
 // ================================
 
 // ▼ Worker API（一覧取得）
@@ -29,9 +29,7 @@ let offsetY = 0;
 // ================================
 async function loadFrames() {
   try {
-    const res = await fetch(WORKER_LIST_API + "&t=" + Date.now(), {
-      cache: "no-store"
-    });
+    const res = await fetch(WORKER_LIST_API);
     const data = await res.json();
 
     if (!data.success) {
@@ -49,7 +47,7 @@ async function loadFrames() {
       // ▼ 表示名は displayName を優先
       option.textContent = frame.displayName || frame.filename || "名称未設定";
 
-      // ▼ Worker 経由の PNG URL
+      // ▼ 実際に読み込む画像URL
       option.value = frame.url;
 
       frameSelect.appendChild(option);
@@ -114,7 +112,7 @@ imageInput.addEventListener("change", (e) => {
 });
 
 // ================================
-// ▼ フレーム選択（Worker 経由）
+// ▼ フレーム選択
 // ================================
 frameSelect.addEventListener("change", () => {
   const value = frameSelect.value;
@@ -129,7 +127,7 @@ frameSelect.addEventListener("change", () => {
   frameImage.onload = redraw;
 
   // ▼ キャッシュ無効化
-  frameImage.src = value + "&t=" + Date.now();
+  frameImage.src = value + "?t=" + Date.now();
 });
 
 // ================================
@@ -282,7 +280,7 @@ function saveHighRes() {
 }
 
 // ================================
-// ▼ 完全リセット
+// ▼ 完全リセット（やり直し）
 // ================================
 resetBtn.addEventListener("click", () => {
   baseImage = null;
