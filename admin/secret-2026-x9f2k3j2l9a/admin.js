@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル admin.js（完全版）
+// FrameLab 管理パネル admin.js
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -96,48 +96,7 @@ function randomFilename() {
   return name + ".png";
 }
 
-// ================================
-// ▼ 自動反映チェックループ（4段階表示）
-// ================================
-async function startReflectCheck(randomName, frameName) {
-  const statusBox = document.getElementById("reflectStatus");
-  statusBox.textContent = "⏳ 反映確認中…"; // アップロード直後
-
-  async function check() {
-    try {
-      const listRes = await fetch(WORKER_ENDPOINT + "?mode=list&t=" + Date.now());
-      const listData = await listRes.json();
-
-      const found = listData.data.frames.find(f => f.filename === randomName);
-
-      // ▼ 完全反映後
-      if (found && found.displayName === frameName) {
-        statusBox.innerHTML = "✅ 反映されました";
-        statusBox.style.color = "#0a8a0a";
-        return;
-      }
-
-      // ▼ GitHub 反映中
-      statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中）";
-      statusBox.style.color = "#b8860b";
-
-      setTimeout(check, 2000); // 2秒後に再チェック
-
-    } catch {
-      // ▼ 一時的な通信エラー
-      statusBox.innerHTML = "⚠ 一時的な通信エラー。再試行しています…";
-      statusBox.style.color = "#c0392b";
-
-      setTimeout(check, 3000); // 3秒後に再試行
-    }
-  }
-
-  check(); // 最初のチェック開始
-}
-
-// ================================
 // ▼ アップロード処理
-// ================================
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
@@ -161,8 +120,8 @@ async function uploadFrame(file, frameName) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: randomName,
-        displayName: frameName,
+        filename: randomName,      // ← ランダム英数字
+        displayName: frameName,    // ← 日本語フレーム名
         content: base64Data
       })
     });
@@ -178,7 +137,7 @@ async function uploadFrame(file, frameName) {
           <div class="success-icon">✓</div>
           <div class="success-text">
             アップロードが完了しました。<br>
-            GitHub反映を確認しています…
+            反映をご確認ください。
           </div>
         </div>
 
@@ -189,13 +148,10 @@ async function uploadFrame(file, frameName) {
           <p>👀 ユーザー画面：</p>
           <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
 
+          <button id="checkReflectBtn" class="reflect-btn">反映チェック</button>
           <div id="reflectStatus"></div>
         </div>
       `;
-
-      // ▼ 自動反映チェック開始
-      startReflectCheck(randomName, frameName);
-
     } else {
       resultBox.innerHTML = `❌ エラー：${data.error?.message || "不明なエラー"}`;
     }
@@ -206,6 +162,34 @@ async function uploadFrame(file, frameName) {
   uploadBtn.disabled = false;
   uploadBtn.innerHTML = "アップロード";
 }
+
+// ▼ 反映チェック
+document.addEventListener("click", async (e) => {
+  if (e.target.id !== "checkReflectBtn") return;
+
+  const statusBox = document.getElementById("reflectStatus");
+  statusBox.textContent = "⏳ チェック中…";
+
+  const rawUrl = document.querySelector("#result a").href;
+
+  try {
+    const res = await fetch(rawUrl + "?t=" + Date.now(), {
+      method: "HEAD",
+      cache: "no-store"
+    });
+
+    if (res.status === 200) {
+      statusBox.innerHTML = `✅ 反映されています。`;
+      statusBox.style.color = "#0a8a0a";
+    } else {
+      statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
+      statusBox.style.color = "#b8860b";
+    }
+  } catch {
+    statusBox.innerHTML = `⚠ チェック中にエラーが発生しました`;
+    statusBox.style.color = "#c0392b";
+  }
+});
 
 // ================================
 // ▼ 削除モード（日本語名対応）
