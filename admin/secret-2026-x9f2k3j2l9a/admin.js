@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル admin.js
+// FrameLab 管理パネル admin.js（完全版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -97,40 +97,42 @@ function randomFilename() {
 }
 
 // ================================
-// ▼ 自動反映チェックループ（Worker版）
+// ▼ 自動反映チェックループ（4段階表示）
 // ================================
 async function startReflectCheck(randomName, frameName) {
   const statusBox = document.getElementById("reflectStatus");
-  statusBox.textContent = "⏳ 反映確認中…";
+  statusBox.textContent = "⏳ 反映確認中…"; // アップロード直後
 
   async function check() {
     try {
-      const listRes = await fetch(WORKER_ENDPOINT + "?mode=list&t=" + Date.now(), {
-        cache: "no-store"
-      });
+      const listRes = await fetch(WORKER_ENDPOINT + "?mode=list&t=" + Date.now());
       const listData = await listRes.json();
 
       const found = listData.data.frames.find(f => f.filename === randomName);
 
+      // ▼ 完全反映後
       if (found && found.displayName === frameName) {
         statusBox.innerHTML = "✅ 反映されました";
         statusBox.style.color = "#0a8a0a";
         return;
       }
 
+      // ▼ GitHub 反映中
       statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中）";
       statusBox.style.color = "#b8860b";
 
-      setTimeout(check, 2000);
+      setTimeout(check, 2000); // 2秒後に再チェック
 
     } catch {
+      // ▼ 一時的な通信エラー
       statusBox.innerHTML = "⚠ 一時的な通信エラー。再試行しています…";
       statusBox.style.color = "#c0392b";
-      setTimeout(check, 3000);
+
+      setTimeout(check, 3000); // 3秒後に再試行
     }
   }
 
-  check();
+  check(); // 最初のチェック開始
 }
 
 // ================================
@@ -168,25 +170,30 @@ async function uploadFrame(file, frameName) {
     const data = await response.json();
 
     if (data.success) {
-      const workerUrl = data.data.url;
+      const rawUrl = data.data.url;
+      const userPageUrl = "https://framesynth.github.io/icon-maker/";
 
       resultBox.innerHTML = `
         <div class="success-box fade-in">
           <div class="success-icon">✓</div>
           <div class="success-text">
             アップロードが完了しました。<br>
-            Worker反映を確認しています…
+            GitHub反映を確認しています…
           </div>
         </div>
 
         <div class="success-links fade-in">
-          <p>📁 Worker 画像URL：</p>
-          <a href="${workerUrl}" target="_blank">${workerUrl}</a>
+          <p>📁 GitHub 反映URL：</p>
+          <a href="${rawUrl}" target="_blank">${rawUrl}</a>
+
+          <p>👀 ユーザー画面：</p>
+          <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
 
           <div id="reflectStatus"></div>
         </div>
       `;
 
+      // ▼ 自動反映チェック開始
       startReflectCheck(randomName, frameName);
 
     } else {
@@ -201,7 +208,7 @@ async function uploadFrame(file, frameName) {
 }
 
 // ================================
-// ▼ 削除モード（Worker版）
+// ▼ 削除モード（日本語名対応）
 // ================================
 async function loadFrameList() {
   const url = WORKER_ENDPOINT + "?mode=list&t=" + Date.now();
@@ -210,7 +217,7 @@ async function loadFrameList() {
   listBox.innerHTML = "読み込み中…";
 
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url);
     const data = await res.json();
 
     if (!data.success || !data.data.frames.length) {
@@ -226,7 +233,7 @@ async function loadFrameList() {
 
       div.innerHTML = `
         <input type="checkbox" class="frame-checkbox" data-name="${item.filename}">
-        <img src="${item.url}&t=${Date.now()}" class="frame-thumb">
+        <img src="${item.url}" class="frame-thumb">
         <div class="frame-name">${item.displayName || item.filename}</div>
       `;
 
