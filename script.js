@@ -25,12 +25,17 @@ let offsetX = 0;
 let offsetY = 0;
 
 // ================================
-// ▼ Worker からフレーム一覧を取得（displayName対応）
+// ▼ Worker からフレーム一覧を取得（UTF-8強制デコード版）
 // ================================
 async function loadFrames() {
   try {
-    const res = await fetch(WORKER_LIST_API);
-    const data = await res.json();
+    const res = await fetch(WORKER_LIST_API, { cache: "no-store" });
+
+    // ▼ UTF-8 強制デコード（iOS Safari 対策）
+    const text = await res.text();
+    const data = JSON.parse(
+      new TextDecoder("utf-8").decode(new TextEncoder().encode(text))
+    );
 
     if (!data.success) {
       frameSelect.innerHTML = '<option value="">未選択</option>';
