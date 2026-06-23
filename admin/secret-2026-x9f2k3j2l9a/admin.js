@@ -110,22 +110,24 @@ async function startReflectCheck(randomName, frameName) {
 
       const found = listData.data.frames.find(f => f.filename === randomName);
 
+      // ▼ 完全反映後
       if (found && found.displayName === frameName) {
         statusBox.innerHTML = "✅ 反映されました";
         statusBox.style.color = "#0a8a0a";
-        return; // 完全反映 → ループ終了
+        return;
       }
 
-      // GitHub反映中
+      // ▼ GitHub 反映中
       statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中）";
       statusBox.style.color = "#b8860b";
 
       setTimeout(check, 2000); // 2秒後に再チェック
 
     } catch {
-      // 一時的な通信エラー → 再試行
+      // ▼ 一時的な通信エラー
       statusBox.innerHTML = "⚠ 一時的な通信エラー。再試行しています…";
       statusBox.style.color = "#c0392b";
+
       setTimeout(check, 3000); // 3秒後に再試行
     }
   }
@@ -251,7 +253,6 @@ document.getElementById("deleteSelectedBtn")?.addEventListener("click", async ()
     return;
   }
 
-  if (!confirm(`${checked.length} 件のフレームを削除
   if (!confirm(`${checked.length} 件のフレームを削除しますか？`)) return;
 
   for (const checkbox of checked) {
@@ -278,4 +279,3 @@ document.getElementById("deleteSelectedBtn")?.addEventListener("click", async ()
 
   alert("削除が完了しました。");
 });
-  
