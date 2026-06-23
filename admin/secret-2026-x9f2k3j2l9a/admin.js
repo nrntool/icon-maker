@@ -142,10 +142,10 @@ async function uploadFrame(file, frameName) {
         </div>
 
         <div class="success-links fade-in">
-          <p>📁 GitHub 反映URL：</p>
+          <p>【GitHub 反映URL】</p>
           <a href="${rawUrl}" target="_blank">${rawUrl}</a>
 
-          <p>👀 ユーザー画面：</p>
+          <p>【ユーザー画面】</p>
           <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
 
           <button id="checkReflectBtn" class="reflect-btn">反映チェック</button>
