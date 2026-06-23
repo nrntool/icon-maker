@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル admin.js
+// FrameLab 管理パネル admin.js（完全版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -96,7 +96,44 @@ function randomFilename() {
   return name + ".png";
 }
 
+// ================================
+// ▼ 自動反映チェックループ
+// ================================
+async function startReflectCheck(randomName, frameName) {
+  const statusBox = document.getElementById("reflectStatus");
+  statusBox.textContent = "⏳ 反映確認中…";
+
+  async function check() {
+    try {
+      const listRes = await fetch(WORKER_ENDPOINT + "?mode=list&t=" + Date.now());
+      const listData = await listRes.json();
+
+      const found = listData.data.frames.find(f => f.filename === randomName);
+
+      if (found && found.displayName === frameName) {
+        statusBox.innerHTML = "✅ 反映されました（日本語名が確認できました）";
+        statusBox.style.color = "#0a8a0a";
+        return; // ← 完全反映 → ループ終了
+      }
+
+      // まだ反映されていない → 自動で再チェック
+      statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中）";
+      statusBox.style.color = "#b8860b";
+
+      setTimeout(check, 2000); // 2秒後に再チェック
+
+    } catch {
+      statusBox.innerHTML = "⚠ 反映確認中にエラーが発生しました";
+      statusBox.style.color = "#c0392b";
+    }
+  }
+
+  check(); // 最初のチェック開始
+}
+
+// ================================
 // ▼ アップロード処理
+// ================================
 uploadBtn.addEventListener("click", async () => {
   const file = frameInput.files[0];
   const frameName = frameNameInput.value.trim();
@@ -152,29 +189,8 @@ async function uploadFrame(file, frameName) {
         </div>
       `;
 
-      // ▼ 自動反映チェック（3秒後）
-      const statusBox = document.getElementById("reflectStatus");
-      statusBox.textContent = "⏳ 反映確認中…";
-
-      setTimeout(async () => {
-        try {
-          const listRes = await fetch(WORKER_ENDPOINT + "?mode=list&t=" + Date.now());
-          const listData = await listRes.json();
-
-          const found = listData.data.frames.find(f => f.filename === randomName);
-
-          if (found && found.displayName === frameName) {
-            statusBox.innerHTML = "✅ 反映されました（日本語名が確認できました）";
-            statusBox.style.color = "#0a8a0a";
-          } else {
-            statusBox.innerHTML = "⌛ 反映待ち中（数秒後に再読み込みしてください）";
-            statusBox.style.color = "#b8860b";
-          }
-        } catch {
-          statusBox.innerHTML = "⚠ 反映確認中にエラーが発生しました";
-          statusBox.style.color = "#c0392b";
-        }
-      }, 3000);
+      // ▼ 自動反映チェック開始
+      startReflectCheck(randomName, frameName);
 
     } else {
       resultBox.innerHTML = `❌ エラー：${data.error?.message || "不明なエラー"}`;
