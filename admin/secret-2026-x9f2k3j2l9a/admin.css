@@ -250,6 +250,35 @@ input[type="text"] {
 }
 
 /* ================================
+   File Button（太字解除・フォント統一）
+================================ */
+input[type="file"]::-webkit-file-upload-button {
+  margin-right: 0.6em;
+  padding: 0.6em 1em;
+  background: linear-gradient(135deg, #eef2ff, #dfe6fa);
+  border: none;
+  border-radius: 6px;
+  color: #4a5f85;
+
+  font-family: "Noto Sans JP", sans-serif;
+  font-weight: 400; /* ← 太字解除 */
+  font-size: 0.9em;
+
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow:
+    0 2px 6px rgba(90,125,168,0.15),
+    inset 0 0 12px rgba(255,255,255,0.25);
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background: linear-gradient(135deg, #e3e8ff, #d6defa);
+  box-shadow:
+    0 4px 10px rgba(90,125,168,0.22),
+    inset 0 0 18px rgba(255,255,255,0.3);
+}
+
+/* ================================
    プレビュー
 ================================ */
 #previewBox {
@@ -358,11 +387,11 @@ input[type="text"] {
 }
 
 /* ================================
-   追加モード：戻る＋アップロード横並び（青系）
+   追加モード：戻る＋アップロード横並び
 ================================ */
 .upload-actions {
   display: flex;
-  flex-direction: row; /* ← 横並びを強制 */
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 0.9em;
@@ -370,7 +399,6 @@ input[type="text"] {
   flex-wrap: nowrap;
 }
 
-/* 戻るボタン（左） */
 .upload-actions .back-btn {
   order: 1;
   width: 45%;
@@ -391,7 +419,6 @@ input[type="text"] {
   transform: translateY(-2px);
 }
 
-/* アップロードボタン（右・青ガラス） */
 .upload-actions .upload-btn-main {
   order: 2;
   width: 45%;
