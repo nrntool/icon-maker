@@ -120,8 +120,8 @@ async function uploadFrame(file, frameName) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: randomName,      // ← ランダム英数字
-        displayName: frameName,    // ← 日本語フレーム名
+        filename: randomName,
+        displayName: frameName,
         content: base64Data
       })
     });
@@ -137,7 +137,7 @@ async function uploadFrame(file, frameName) {
           <div class="success-icon">✓</div>
           <div class="success-text">
             アップロードが完了しました。<br>
-            反映をご確認ください。
+            GitHub反映を確認しています…
           </div>
         </div>
 
@@ -148,10 +148,34 @@ async function uploadFrame(file, frameName) {
           <p>👀 ユーザー画面：</p>
           <a href="${userPageUrl}" target="_blank">${userPageUrl}</a>
 
-          <button id="checkReflectBtn" class="reflect-btn">反映チェック</button>
           <div id="reflectStatus"></div>
         </div>
       `;
+
+      // ▼ 自動反映チェック（3秒後）
+      const statusBox = document.getElementById("reflectStatus");
+      statusBox.textContent = "⏳ 反映確認中…";
+
+      setTimeout(async () => {
+        try {
+          const listRes = await fetch(WORKER_ENDPOINT + "?mode=list&t=" + Date.now());
+          const listData = await listRes.json();
+
+          const found = listData.data.frames.find(f => f.filename === randomName);
+
+          if (found && found.displayName === frameName) {
+            statusBox.innerHTML = "✅ 反映されました（日本語名が確認できました）";
+            statusBox.style.color = "#0a8a0a";
+          } else {
+            statusBox.innerHTML = "⌛ 反映待ち中（数秒後に再読み込みしてください）";
+            statusBox.style.color = "#b8860b";
+          }
+        } catch {
+          statusBox.innerHTML = "⚠ 反映確認中にエラーが発生しました";
+          statusBox.style.color = "#c0392b";
+        }
+      }, 3000);
+
     } else {
       resultBox.innerHTML = `❌ エラー：${data.error?.message || "不明なエラー"}`;
     }
@@ -162,34 +186,6 @@ async function uploadFrame(file, frameName) {
   uploadBtn.disabled = false;
   uploadBtn.innerHTML = "アップロード";
 }
-
-// ▼ 反映チェック
-document.addEventListener("click", async (e) => {
-  if (e.target.id !== "checkReflectBtn") return;
-
-  const statusBox = document.getElementById("reflectStatus");
-  statusBox.textContent = "⏳ チェック中…";
-
-  const rawUrl = document.querySelector("#result a").href;
-
-  try {
-    const res = await fetch(rawUrl + "?t=" + Date.now(), {
-      method: "HEAD",
-      cache: "no-store"
-    });
-
-    if (res.status === 200) {
-      statusBox.innerHTML = `✅ 反映されています。`;
-      statusBox.style.color = "#0a8a0a";
-    } else {
-      statusBox.innerHTML = `⌛ まだ反映されていません（${res.status}）`;
-      statusBox.style.color = "#b8860b";
-    }
-  } catch {
-    statusBox.innerHTML = `⚠ チェック中にエラーが発生しました`;
-    statusBox.style.color = "#c0392b";
-  }
-});
 
 // ================================
 // ▼ 削除モード（日本語名対応）
