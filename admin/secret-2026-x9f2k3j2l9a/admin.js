@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル admin.js
+// FrameLab 管理パネル admin.js（完全版）
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -97,11 +97,11 @@ function randomFilename() {
 }
 
 // ================================
-// ▼ 自動反映チェックループ
+// ▼ 自動反映チェックループ（4段階表示）
 // ================================
 async function startReflectCheck(randomName, frameName) {
   const statusBox = document.getElementById("reflectStatus");
-  statusBox.textContent = "⏳ 反映確認中…";
+  statusBox.textContent = "⏳ 反映確認中…"; // アップロード直後
 
   async function check() {
     try {
@@ -113,18 +113,20 @@ async function startReflectCheck(randomName, frameName) {
       if (found && found.displayName === frameName) {
         statusBox.innerHTML = "✅ 反映されました";
         statusBox.style.color = "#0a8a0a";
-        return; // ← 完全反映 → ループ終了
+        return; // 完全反映 → ループ終了
       }
 
-      // まだ反映されていない → 自動で再チェック
-      statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中/しばらくお待ちください）";
+      // GitHub反映中
+      statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中）";
       statusBox.style.color = "#b8860b";
 
       setTimeout(check, 2000); // 2秒後に再チェック
 
     } catch {
-      statusBox.innerHTML = "⚠ 反映確認中にエラーが発生しました";
+      // 一時的な通信エラー → 再試行
+      statusBox.innerHTML = "⚠ 一時的な通信エラー。再試行しています…";
       statusBox.style.color = "#c0392b";
+      setTimeout(check, 3000); // 3秒後に再試行
     }
   }
 
@@ -249,6 +251,7 @@ document.getElementById("deleteSelectedBtn")?.addEventListener("click", async ()
     return;
   }
 
+  if (!confirm(`${checked.length} 件のフレームを削除
   if (!confirm(`${checked.length} 件のフレームを削除しますか？`)) return;
 
   for (const checkbox of checked) {
@@ -275,3 +278,4 @@ document.getElementById("deleteSelectedBtn")?.addEventListener("click", async ()
 
   alert("削除が完了しました。");
 });
+  
