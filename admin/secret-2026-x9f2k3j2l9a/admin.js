@@ -1,5 +1,5 @@
 // ================================
-// FrameLab 管理パネル admin.js（完全版）
+// FrameLab 管理パネル admin.js
 // ================================
 
 const WORKER_ENDPOINT = "https://framelab-uploader.narun091525-b98.workers.dev";
@@ -111,13 +111,13 @@ async function startReflectCheck(randomName, frameName) {
       const found = listData.data.frames.find(f => f.filename === randomName);
 
       if (found && found.displayName === frameName) {
-        statusBox.innerHTML = "✅ 反映されました（日本語名が確認できました）";
+        statusBox.innerHTML = "✅ 反映されました";
         statusBox.style.color = "#0a8a0a";
         return; // ← 完全反映 → ループ終了
       }
 
       // まだ反映されていない → 自動で再チェック
-      statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中）";
+      statusBox.innerHTML = "⌛ 反映待ち中…（自動チェック中/しばらくお待ちください）";
       statusBox.style.color = "#b8860b";
 
       setTimeout(check, 2000); // 2秒後に再チェック
