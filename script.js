@@ -25,17 +25,12 @@ let offsetX = 0;
 let offsetY = 0;
 
 // ================================
-// ▼ Worker からフレーム一覧を取得（UTF-8強制デコード版）
+// ▼ Worker からフレーム一覧を取得（displayName対応）
 // ================================
 async function loadFrames() {
   try {
     const res = await fetch(WORKER_LIST_API, { cache: "no-store" });
-
-    // ▼ UTF-8 強制デコード（iOS Safari 対策）
-    const text = await res.text();
-    const data = JSON.parse(
-      new TextDecoder("utf-8").decode(new TextEncoder().encode(text))
-    );
+    const data = await res.json(); // ← これでOK（UTF-8はWorker側で保証済み）
 
     if (!data.success) {
       frameSelect.innerHTML = '<option value="">未選択</option>';
@@ -49,10 +44,7 @@ async function loadFrames() {
     frames.forEach(frame => {
       const option = document.createElement("option");
 
-      // ▼ 表示名は displayName を優先
       option.textContent = frame.displayName || frame.filename || "名称未設定";
-
-      // ▼ 実際に読み込む画像URL
       option.value = frame.url;
 
       frameSelect.appendChild(option);
@@ -131,7 +123,6 @@ frameSelect.addEventListener("change", () => {
   frameImage.crossOrigin = "anonymous";
   frameImage.onload = redraw;
 
-  // ▼ キャッシュ無効化
   frameImage.src = value + "?t=" + Date.now();
 });
 
@@ -181,7 +172,6 @@ canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
 
-  // ピンチ操作
   if (e.touches.length === 2) {
     const dist = getDistance(e.touches);
     const center = getCenter(e.touches);
@@ -201,7 +191,6 @@ canvas.addEventListener("touchmove", (e) => {
     return;
   }
 
-  // ドラッグ操作
   if (e.touches.length === 1 && isDragging) {
     const x = e.touches[0].clientX - rect.left;
     const y = e.touches[0].clientY - rect.top;
