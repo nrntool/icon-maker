@@ -37,22 +37,22 @@
   </form>
 
   <script>
+    // ★ あなたのテスト Worker の URL（書き換え済み）
+    const workerBase = "https://framelab-uploader-test.narun091525-b98.workers.dev";
+
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const form = new FormData(e.target);
 
-      // ★ テスト用 Worker の URL に変更すること！
-      const workerUrl = "https://framelab-uploader-test.あなたのID.workers.dev/admin-login";
-
-      const res = await fetch(workerUrl, {
+      const res = await fetch(`${workerBase}/admin-login`, {
         method: "POST",
         body: form,
       });
 
       if (res.ok) {
         // ログイン成功 → 管理画面へ
-        location.href = "https://framelab-uploader-test.あなたのID.workers.dev/admin";
+        location.href = `${workerBase}/admin`;
       } else {
         alert("パスワードが違います");
       }
