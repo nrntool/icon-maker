@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>管理ログイン（テスト）</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 40px;
+      max-width: 400px;
+      margin: auto;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #333;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>管理画面ログイン（テスト環境）</h2>
+
+  <form id="loginForm">
+    <input type="password" name="password" placeholder="パスワード" required>
+    <button type="submit">ログイン</button>
+  </form>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = new FormData(e.target);
+
+      // ★ テスト用 Worker の URL に変更すること！
+      const workerUrl = "https://framelab-uploader-test.あなたのID.workers.dev/admin-login";
+
+      const res = await fetch(workerUrl, {
+        method: "POST",
+        body: form,
+      });
+
+      if (res.ok) {
+        // ログイン成功 → 管理画面へ
+        location.href = "https://framelab-uploader-test.あなたのID.workers.dev/admin";
+      } else {
+        alert("パスワードが違います");
+      }
+    });
+  </script>
+
+</body>
+</html>
