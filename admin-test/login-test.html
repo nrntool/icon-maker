@@ -48,7 +48,9 @@
       const res = await fetch(`${workerBase}/admin-login`, {
         method: "POST",
         body: form,
+        credentials: "include", // ←これを追加
       });
+
 
       if (res.ok) {
         // ログイン成功 → 管理画面へ
