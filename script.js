@@ -5,7 +5,6 @@
 // ▼ Worker API (Fetch frame list)
 const WORKER_LIST_API = "https://framelab.narun091525-b98.workers.dev?mode=list";
 
-
 // ▼ DOM elements
 const imageInput = document.getElementById("imageInput");
 const frameSelect = document.getElementById("frameSelect");
