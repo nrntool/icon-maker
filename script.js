@@ -332,7 +332,7 @@ function saveHighRes() {
       // Safariはここで「表示／ダウンロード」ダイアログを出す
       window.location.href = blobURL;
 
-      alert("Safariでは「表示」を押すと画像が同じタブで開きます。開いた画像を長押しして保存してください。");
+      alert("Safariでは画像が表示されます。表示された画像を長押しして保存してください。");
     }, "image/png");
 
     return;
