@@ -324,15 +324,15 @@ function saveHighRes() {
   const ua = navigator.userAgent;
   const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
 
-  // ▼ Safari専用：ダウンロードを出さず「表示のみ」
+  // ▼ Safari専用：勝手に新規タブを開かず、表示を押したら同じタブで開く
   if (isSafari) {
-    const newTab = window.open("about:blank", "_blank");
-
     saveCanvas.toBlob((blob) => {
       const blobURL = URL.createObjectURL(blob);
-      newTab.location.href = blobURL;
 
-      alert("画像を開きました。Safariでは長押しして保存してください。");
+      // Safariはここで「表示／ダウンロード」ダイアログを出す
+      window.location.href = blobURL;
+
+      alert("Safariでは「表示」を押すと画像が同じタブで開きます。開いた画像を長押しして保存してください。");
     }, "image/png");
 
     return;
