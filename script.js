@@ -3,7 +3,7 @@
 // ================================
 
 // ▼ Worker API (Fetch frame list)
-const WORKER_LIST_API = "https://framelab.narun091525-b98.workers.dev?mode=list";
+const WORKER_LIST_API = "https://framelab.sngk-tool.workers.dev?mode=list";
 
 // ▼ DOM elements
 const imageInput = document.getElementById("imageInput");
@@ -286,7 +286,7 @@ function redraw() {
 }
 
 // ================================
-// ▼ High-resolution save
+// ▼ High-resolution save（Safari＝表示のみ）
 // ================================
 function saveHighRes() {
   if (!baseImage) {
@@ -315,8 +315,30 @@ function saveHighRes() {
   }
 
   const now = new Date();
-  const filename = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}.png`;
+  const filename =
+    `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}` +
+    `${String(now.getDate()).padStart(2, "0")}_` +
+    `${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}` +
+    `${String(now.getSeconds()).padStart(2, "0")}.png`;
 
+  const ua = navigator.userAgent;
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+
+  // ▼ Safari専用：ダウンロードを出さず「表示のみ」
+  if (isSafari) {
+    const newTab = window.open("about:blank", "_blank");
+
+    saveCanvas.toBlob((blob) => {
+      const blobURL = URL.createObjectURL(blob);
+      newTab.location.href = blobURL;
+
+      alert("画像を開きました。Safariでは長押しして保存してください。");
+    }, "image/png");
+
+    return;
+  }
+
+  // ▼ Chrome / Android / PC：通常のダウンロード
   saveCanvas.toBlob((blob) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
