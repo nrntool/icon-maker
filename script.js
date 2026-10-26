@@ -70,17 +70,12 @@ function resizeCanvas() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-
   loadFrames();
   setTimeout(resizeCanvas, 50);
+});
 
-  const ua = navigator.userAgent.toLowerCase();
-
-const isLine = ua.includes("line");
-
-if (isLine) {
-  document.getElementById("lineGuide").style.display = "block";
-}
+window.addEventListener("resize", () => {
+  setTimeout(resizeCanvas, 50);
 });
 
 // ================================
