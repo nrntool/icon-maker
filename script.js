@@ -80,11 +80,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const ua = navigator.userAgent.toLowerCase();
 
+  alert(ua);
+
   const isLine = ua.includes("line");
 
-if (isLine) {
-  document.getElementById("lineGuide").style.display = "block";
-}
+  alert("LINE判定: " + isLine);
+
+  if (isLine) {
+    document.getElementById("lineGuide").style.display = "block";
+  }
 });
 
 // ================================
