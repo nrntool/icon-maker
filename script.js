@@ -76,13 +76,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const ua = navigator.userAgent.toLowerCase();
 
-  const isLine =
-    ua.includes("line") &&
-    !ua.includes("chrome");
+  const isLine = ua.includes("line");
 
-  if (isLine) {
-    document.getElementById("lineGuide").style.display = "block";
-  }
+if (isLine) {
+  document.getElementById("lineGuide").style.display = "block";
+}
 });
 
 window.addEventListener("resize", () => {
