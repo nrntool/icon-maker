@@ -74,12 +74,19 @@ function resizeCanvas() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+
   loadFrames();
   setTimeout(resizeCanvas, 50);
-});
 
-window.addEventListener("resize", () => {
-  setTimeout(resizeCanvas, 50);
+  const ua = navigator.userAgent.toLowerCase();
+
+  const isLine =
+    ua.includes("line") &&
+    !ua.includes("chrome");
+
+  if (isLine) {
+    document.getElementById("lineGuide").style.display = "block";
+  }
 });
 
 // ================================
