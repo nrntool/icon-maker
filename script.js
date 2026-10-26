@@ -80,11 +80,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const ua = navigator.userAgent.toLowerCase();
 
-  alert(ua);
-
-  const isLine = ua.includes("line");
-
-  alert("LINE判定: " + isLine);
+  const isLine =
+    ua.includes("line") &&
+    !ua.includes("chrome");
 
   if (isLine) {
     document.getElementById("lineGuide").style.display = "block";
