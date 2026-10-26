@@ -1,5 +1,5 @@
 // ================================
-// FrameLab User Interface (PRO EDITION)
+// FrameLab User Interface
 // ================================
 
 // ▼ Worker API (Fetch frame list)
@@ -24,24 +24,13 @@ let maxScale = 4;
 let offsetX = 0;
 let offsetY = 0;
 
-// ▼ DPI (Retina) 対応
-function applyDPI() {
-  const dpr = window.devicePixelRatio || 1;
-  const size = canvas.clientWidth;
-
-  canvas.width = size * dpr;
-  canvas.height = size * dpr;
-
-  ctx.scale(dpr, dpr);
-}
-
 // ================================
 // ▼ Fetch frame list from Worker
 // ================================
 async function loadFrames() {
   try {
     const res = await fetch(WORKER_LIST_API, { cache: "no-store" });
-    const data = await res.json();
+    const data = await res.json(); 
 
     if (!data.success) {
       frameSelect.innerHTML = '<option value="">未選択</option>';
@@ -54,8 +43,10 @@ async function loadFrames() {
 
     frames.forEach(frame => {
       const option = document.createElement("option");
+
       option.textContent = frame.displayName || frame.filename || "名称未設定";
       option.value = frame.url;
+
       frameSelect.appendChild(option);
     });
 
@@ -69,7 +60,12 @@ async function loadFrames() {
 // ▼ Canvas resizing
 // ================================
 function resizeCanvas() {
-  applyDPI();
+  const size = canvas.clientWidth;
+  if (!size) return;
+
+  canvas.width = size;
+  canvas.height = size;
+
   redraw();
 }
 
@@ -88,52 +84,39 @@ if (isLine) {
 });
 
 // ================================
-// ▼ EXIF 回転補正
-// ================================
-async function fixExifOrientation(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = function () {
-      const img = new Image();
-      img.onload = function () {
-        resolve(img);
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// ================================
 // ▼ Load baseImage
 // ================================
-imageInput.addEventListener("change", async (e) => {
+imageInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  baseImage = await fixExifOrientation(file);
+  const reader = new FileReader();
+  reader.onload = () => {
+    baseImage = new Image();
+    baseImage.onload = () => {
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const iw = baseImage.width;
+      const ih = baseImage.height;
 
-  const cw = canvas.clientWidth;
-  const ch = canvas.clientHeight;
-  const iw = baseImage.width;
-  const ih = baseImage.height;
+      const fitScale = Math.min(cw / iw, ch / ih);
+      scale = fitScale;
+      minScale = fitScale * 0.3;
 
-  const fitScale = Math.min(cw / iw, ch / ih);
-  scale = fitScale;
+      offsetX = cw / 2 - (iw * scale) / 2;
+      offsetY = ch / 2 - (ih * scale) / 2;
 
-  minScale = fitScale * 0.25;
-  maxScale = fitScale * 6.0;
-
-  offsetX = cw / 2 - (iw * scale) / 2;
-  offsetY = ch / 2 - (ih * scale) / 2;
-
-  redraw();
+      redraw();
+    };
+    baseImage.src = reader.result;
+  };
+  reader.readAsDataURL(file);
 });
 
 // ================================
-// ▼ Frame selection（Safari高速化）
+// ▼ Frame selection
 // ================================
-frameSelect.addEventListener("change", async () => {
+frameSelect.addEventListener("change", () => {
   const value = frameSelect.value;
   if (!value) {
     frameImage = null;
@@ -141,154 +124,135 @@ frameSelect.addEventListener("change", async () => {
     return;
   }
 
-  const res = await fetch(value + "?t=" + Date.now());
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-
   frameImage = new Image();
-  frameImage.onload = () => {
-    URL.revokeObjectURL(url);
-    redraw();
+  frameImage.crossOrigin = "anonymous";
+  frameImage.onload = redraw;
+
+  frameImage.src = value + "?t=" + Date.now();
+});
+
+// ================================
+// ▼ Pinch distance
+// ================================
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// ▼ Pinch center
+function getCenter(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
   };
-  frameImage.src = url;
-});
+}
+
+let isDragging = false;
+let lastX = null;
+let lastY = null;
+let lastDist = null;
 
 // ================================
-// ▼ PointerEvent（ドラッグ + ピンチズーム）完全版
+// ▼ Touch start
 // ================================
-let pointerState = {
-  pointers: new Map(),
-  isDragging: false,
-  lastX: 0,
-  lastY: 0,
-  lastDist: 0,
-  lastCenterX: 0,
-  lastCenterY: 0,
-  velocityX: 0,
-  velocityY: 0
-};
-
-canvas.addEventListener("pointerdown", (e) => {
-  canvas.setPointerCapture(e.pointerId);
-
+canvas.addEventListener("touchstart", (e) => {
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
 
-  pointerState.pointers.set(e.pointerId, { x, y });
-
-  if (pointerState.pointers.size === 1) {
-    pointerState.isDragging = true;
-    pointerState.lastX = x;
-    pointerState.lastY = y;
+  if (e.touches.length === 1) {
+    isDragging = true;
+    lastX = e.touches[0].clientX - rect.left;
+    lastY = e.touches[0].clientY - rect.top;
   }
 
-  if (pointerState.pointers.size === 2) {
-    const pts = [...pointerState.pointers.values()];
-    pointerState.lastDist = Math.hypot(
-      pts[0].x - pts[1].x,
-      pts[0].y - pts[1].y
-    );
-
-    pointerState.lastCenterX = (pts[0].x + pts[1].x) / 2;
-    pointerState.lastCenterY = (pts[0].y + pts[1].y) / 2;
-
-    pointerState.isDragging = false;
+  if (e.touches.length === 2) {
+    lastDist = getDistance(e.touches);
   }
 });
 
-canvas.addEventListener("pointermove", (e) => {
-  if (!pointerState.pointers.has(e.pointerId)) return;
-
+// ================================
+// ▼ Touch move (pinch + drag)
+// ================================
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
 
-  pointerState.pointers.set(e.pointerId, { x, y });
-
-  if (pointerState.pointers.size === 2) {
-    const pts = [...pointerState.pointers.values()];
-
-    const dist = Math.hypot(
-      pts[0].x - pts[1].x,
-      pts[0].y - pts[1].y
-    );
+  if (e.touches.length === 2) {
+    const dist = getDistance(e.touches);
+    const center = getCenter(e.touches);
+    const cx = center.x - rect.left;
+    const cy = center.y - rect.top;
 
     const oldScale = scale;
-    const delta = (dist - pointerState.lastDist) * 0.004;
-
+    const delta = (dist - lastDist) * 0.004;
     scale = Math.max(minScale, Math.min(maxScale, scale + delta));
+
     const zoomRatio = scale / oldScale;
-
-    const cx = pointerState.lastCenterX;
-    const cy = pointerState.lastCenterY;
-
     offsetX = cx - (cx - offsetX) * zoomRatio;
     offsetY = cy - (cy - offsetY) * zoomRatio;
 
-    pointerState.lastDist = dist;
-    requestRedraw();
+    lastDist = dist;
+    redraw();
     return;
   }
 
-  if (pointerState.isDragging && pointerState.pointers.size === 1) {
-    const dx = x - pointerState.lastX;
-    const dy = y - pointerState.lastY;
-
-    offsetX += dx;
-    offsetY += dy;
-
-    pointerState.velocityX = dx;
-    pointerState.velocityY = dy;
-
-    pointerState.lastX = x;
-    pointerState.lastY = y;
-
-    requestRedraw();
+  if (e.touches.length === 1 && isDragging) {
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+    offsetX += x - lastX;
+    offsetY += y - lastY;
+    lastX = x;
+    lastY = y;
+    redraw();
   }
-});
+}, { passive: false });
 
-canvas.addEventListener("pointerup", (e) => {
-  pointerState.pointers.delete(e.pointerId);
-
-  if (pointerState.pointers.size === 1) {
-    const [remaining] = pointerState.pointers.values();
-    pointerState.isDragging = true;
-    pointerState.lastX = remaining.x;
-    pointerState.lastY = remaining.y;
-  } else {
-    pointerState.isDragging = false;
-    pointerState.lastDist = 0;
-  }
-});
-
-canvas.addEventListener("pointercancel", (e) => {
-  pointerState.pointers.delete(e.pointerId);
-  pointerState.isDragging = false;
-  pointerState.lastDist = 0;
+// ================================
+// ▼ Touch end
+// ================================
+canvas.addEventListener("touchend", () => {
+  isDragging = false;
+  lastX = null;
+  lastY = null;
+  lastDist = null;
 });
 
 // ================================
-// ▼ 慣性ドラッグ
+// ▼ PC: Drag move
 // ================================
-function applyMomentum() {
-  if (pointerState.isDragging || pointerState.pointers.size > 0) return;
+canvas.addEventListener("mousedown", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  isDragging = true;
+  lastX = e.clientX - rect.left;
+  lastY = e.clientY - rect.top;
+});
 
-  pointerState.velocityX *= 0.92;
-  pointerState.velocityY *= 0.92;
+canvas.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
 
-  offsetX += pointerState.velocityX;
-  offsetY += pointerState.velocityY;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-  if (Math.abs(pointerState.velocityX) < 0.1 &&
-      Math.abs(pointerState.velocityY) < 0.1) return;
+  offsetX += x - lastX;
+  offsetY += y - lastY;
 
-  requestRedraw();
-  requestAnimationFrame(applyMomentum);
-}
+  lastX = x;
+  lastY = y;
+
+  redraw();
+});
+
+canvas.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+
+canvas.addEventListener("mouseleave", () => {
+  isDragging = false;
+});
 
 // ================================
-// ▼ ホイールズーム（ピンチと同じ中心計算）
+// ▼ PC: Wheel zoom
 // ================================
 canvas.addEventListener("wheel", (e) => {
   e.preventDefault();
@@ -306,64 +270,13 @@ canvas.addEventListener("wheel", (e) => {
   offsetX = mx - (mx - offsetX) * zoomRatio;
   offsetY = my - (my - offsetY) * zoomRatio;
 
-  requestRedraw();
+  redraw();
 });
 
 // ================================
-// ▼ 境界制御（画像が飛ばない）
+// ▼ Drawing process
 // ================================
-function clampOffsets() {
-  if (!baseImage) return;
-
-  const cw = canvas.clientWidth;
-  const ch = canvas.clientHeight;
-
-  const iw = baseImage.width * scale;
-  const ih = baseImage.height * scale;
-
-  const minX = cw - iw;
-  const minY = ch - ih;
-
-  offsetX = Math.min(0, Math.max(minX, offsetX));
-  offsetY = Math.min(0, Math.max(minY, offsetY));
-}
-
-// ================================
-// ▼ ズームスナップ
-// ================================
-function applyZoomSnap() {
-  const cw = canvas.clientWidth;
-  const ch = canvas.clientHeight;
-
-  const iw = baseImage.width * scale;
-  const ih = baseImage.height * scale;
-
-  const fitScale = Math.min(cw / baseImage.width, ch / baseImage.height);
-
-  if (Math.abs(scale - fitScale) < 0.02) {
-    scale = fitScale;
-  }
-}
-
-// ================================
-// ▼ 描画（フレームもズーム）
-// ================================
-let redrawPending = false;
-
-function requestRedraw() {
-  if (!redrawPending) {
-    redrawPending = true;
-    requestAnimationFrame(() => {
-      redrawPending = false;
-      redraw();
-    });
-  }
-}
-
 function redraw() {
-  clampOffsets();
-  applyZoomSnap();
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (baseImage) {
@@ -373,12 +286,12 @@ function redraw() {
   }
 
   if (frameImage && frameImage.complete) {
-    ctx.drawImage(frameImage, 0, 0, canvas.clientWidth, canvas.clientHeight);
+    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
   }
 }
 
 // ================================
-// ▼ High-resolution save
+// ▼ High-resolution save（Safari＝表示のみ）
 // ================================
 function saveHighRes() {
   if (!baseImage) {
@@ -388,8 +301,8 @@ function saveHighRes() {
 
   const scaleFactor = 3;
   const saveCanvas = document.createElement("canvas");
-  saveCanvas.width = canvas.clientWidth * scaleFactor;
-  saveCanvas.height = canvas.clientHeight * scaleFactor;
+  saveCanvas.width = canvas.width * scaleFactor;
+  saveCanvas.height = canvas.height * scaleFactor;
   const sctx = saveCanvas.getContext("2d");
 
   sctx.fillStyle = "#ffffff";
@@ -413,6 +326,24 @@ function saveHighRes() {
     `${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}` +
     `${String(now.getSeconds()).padStart(2, "0")}.png`;
 
+  const ua = navigator.userAgent;
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+
+  // ▼ Safari専用：勝手に新規タブを開かず、表示を押したら同じタブで開く
+  if (isSafari) {
+    saveCanvas.toBlob((blob) => {
+      const blobURL = URL.createObjectURL(blob);
+
+      // Safariはここで「表示／ダウンロード」ダイアログを出す
+      window.location.href = blobURL;
+
+      alert("Safariでは画像が表示されます。表示された画像を長押しして保存してください。");
+    }, "image/png");
+
+    return;
+  }
+
+  // ▼ Chrome / Android / PC：通常のダウンロード
   saveCanvas.toBlob((blob) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
