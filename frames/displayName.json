@@ -1,4 +1,7 @@
 {
-  "pXPPrMFLW700.png": "花火🔶",
-  "IMG_6020.jpg": "飛ぶ愛"
+  "pXPPrMFLW700.png": {
+    "displayName": "花火🔶",
+    "publishAt": null,
+    "expireAt": null
+  }
 }
