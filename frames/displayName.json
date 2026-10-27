@@ -1,14 +1,4 @@
 {
-  "IMG_6020.jpg": {
-    "displayName": "飛ぶ愛",
-    "publishAt": null,
-    "expireAt": null
-  }
-}
-{
-  "pXPPrMFLW700.png": {
-    "displayName": "花火🔶",
-    "publishAt": null,
-    "expireAt": null
-  }
+  "pXPPrMFLW700.png": "花火🔶",
+  "IMG_6020.jpg": "飛ぶ愛"
 }
