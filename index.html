@@ -3,31 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e8ecf5">
   <title>FrameLab</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <div class="app-card">
-
-    <header>
+    <header class="app-header">
       <h1>FrameLab</h1>
       <p class="description">画像をフレーム付きアイコンにできます</p>
     </header>
 
     <div id="lineGuide" class="line-guide" style="display:none;">
       <div class="line-guide-content">
-        <div class="line-guide-title">
-        🌐 LINEから開いています
-        </div>
-
+        <div class="line-guide-title">🌐 LINEから開いています</div>
         <div class="line-guide-text">
           LINE内ブラウザでは、作成した画像の保存が正常に動作しない場合があります。<br>
-          画面の右下(または右上)にある「︙」メニューから標準のブラウザで開いてください。<br>
+          画面の右下(または右上)にある「︙」メニューから標準のブラウザで開いてください。
         </div>
       </div>
     </div>
-    
+
     <section class="notice">
       <h2>ご利用にあたって</h2>
       <p>
@@ -36,27 +32,35 @@
       </p>
     </section>
 
-    <main>
-      <!-- Image Selection -->
-      <label><span class="step-badge">1</span> 画像を選択</label>
-      <input type="file" id="imageInput" accept="image/*">
+    <main class="editor">
+      <div class="field-group">
+        <label class="field-label" for="imageInput"><span class="step-badge">1</span>画像を選択</label>
+        <input type="file" id="imageInput" accept="image/*">
+      </div>
 
-      <!-- Frame Selection -->
-      <label><span class="step-badge">2</span> フレームを選択</label>
-      <select id="frameSelect">
-        <option value="">選択してください</option>
-      </select>
+      <div class="field-group">
+        <label class="field-label" for="frameSelect"><span class="step-badge">2</span>フレームを選択</label>
+        <select id="frameSelect">
+          <option value="">選択してください</option>
+        </select>
+      </div>
 
-      <!-- Canvas -->
-      <canvas id="canvas"></canvas>
+      <section class="preview-section" aria-label="画像プレビュー">
+        <div class="preview-heading">
+          <h2>プレビュー</h2>
+          <span class="preview-hint">位置や大きさを調整できます</span>
+        </div>
+        <div class="canvas-shell">
+          <canvas id="canvas"></canvas>
+        </div>
+        <p class="canvas-help">ドラッグで移動・ピンチまたはホイールで拡大縮小</p>
+      </section>
 
-      <!-- Save & Reset -->
       <div class="button-row">
-        <button id="saveBtn" class="btn-save">保存</button>
-        <button id="resetBtn" class="btn-reset">リセット</button>
+        <button id="saveBtn" class="btn-save" type="button">保存</button>
+        <button id="resetBtn" class="btn-reset" type="button">リセット</button>
       </div>
     </main>
-
   </div>
 
   <script src="script.js"></script>
